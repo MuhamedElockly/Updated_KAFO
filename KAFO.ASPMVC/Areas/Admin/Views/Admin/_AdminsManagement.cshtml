@@ -1,0 +1,58 @@
+@model Kafo.ASPMVC.Models.HomeViewModel
+
+<div class="card mb-4" id="admins-management">
+    <div class="card-header bg-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">إدارة المسؤولين</h4>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAdminModal">
+                <i class="fas fa-plus"></i> إضافة مسؤول جديد
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>اسم المسؤول</th>
+                        <th>البريد الإلكتروني</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var admin in Model.Admins)
+                    {
+                        <tr>
+                            <td>@admin.Id</td>
+                            <td>@admin.Name</td>
+                            <td>@admin.Email</td>
+                            <td>
+                                <button class="btn btn-sm btn-info" onclick="editAdmin(@admin.Id)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteAdmin(@admin.Id)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <nav>
+            <ul class="pagination justify-content-end">
+                <li class="page-item @(Model.CurrentAdminPage == 1 ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { adminPage = Model.CurrentAdminPage - 1 })" tabindex="-1">السابق</a>
+                </li>
+                @for (int i = 1 ; i <= Model.TotalAdminPages ; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentAdminPage ? "active" : "")"><a class="page-link" href="@Url.Action("Index", new { adminPage = i })">@i</a></li>
+                }
+                <li class="page-item @(Model.CurrentAdminPage == Model.TotalAdminPages ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { adminPage = Model.CurrentAdminPage + 1 })">التالي</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div> 

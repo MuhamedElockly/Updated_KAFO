@@ -1,0 +1,30 @@
+<div class="modal fade" id="editCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">تعديل الفئة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCategoryForm">
+                    <div class="mb-3">
+                        <label class="form-label">رقم الفئة</label>
+                        <input type="text" class="form-control" name="id" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">اسم الفئة</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">الوصف</label>
+                        <textarea class="form-control" name="description" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-primary" onclick="updateCategory()">تحديث</button>
+            </div>
+        </div>
+    </div>
+</div> 

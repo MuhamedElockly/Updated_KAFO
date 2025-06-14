@@ -1,0 +1,30 @@
+<div class="modal fade" id="addProductModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">إضافة منتج جديد</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addProductForm">
+                    <div class="mb-3">
+                        <label class="form-label">اسم المنتج</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">السعر</label>
+                        <input type="number" class="form-control" name="price" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">الكمية</label>
+                        <input type="number" class="form-control" name="quantity" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-primary" onclick="saveProduct()">حفظ</button>
+            </div>
+        </div>
+    </div>
+</div> 

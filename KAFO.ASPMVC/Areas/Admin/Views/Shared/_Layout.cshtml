@@ -1,0 +1,165 @@
+﻿@model AdminHomeVM
+
+<!DOCTYPE html>
+
+<html lang="en" dir="rtl">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - Kafo.ASPMVC</title>
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/Kafo.ASPMVC.styles.css" asp-append-version="true" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+	<link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+	<style>
+		body {
+			display: flex;
+			min-height: 100vh;
+			background-color: #f4f7f6;
+		}
+
+		#sidebar {
+			width: 250px;
+			min-width: 250px;
+			background: #2a2e43; /* Dark blue from the image */
+			color: #fff;
+			transition: all 0.3s;
+			display: flex;
+			flex-direction: column;
+			padding-top: 20px;
+			box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+		}
+
+			#sidebar .sidebar-header {
+				padding: 20px;
+				text-align: center;
+				border-bottom: 1px solid rgba(255,255,255,0.1);
+				margin-bottom: 20px;
+			}
+
+				#sidebar .sidebar-header h3 {
+					color: #fff;
+					margin-bottom: 5px;
+					font-size: 20px;
+				}
+
+				#sidebar .sidebar-header span {
+					font-size: 14px;
+					color: #ccc;
+				}
+
+			#sidebar ul.components {
+				padding: 20px 0;
+				list-style: none;
+				flex-grow: 1;
+			}
+
+				#sidebar ul.components li a {
+					padding: 10px 20px;
+					font-size: 1.1em;
+					display: block;
+					color: #fff;
+					text-decoration: none;
+					transition: all 0.3s;
+					display: flex;
+					align-items: center;
+				}
+
+					#sidebar ul.components li a i {
+						margin-left: 10px; /* For RTL */
+					}
+
+					#sidebar ul.components li a:hover {
+						color: #f8f9fa;
+						background: #4a4f66;
+						border-radius: 5px;
+						margin: 0 10px;
+					}
+
+				#sidebar ul.components li.active > a, a[aria-expanded="true"] {
+					color: #fff;
+					background: #e91e63; /* Pink for active/logout from image */
+					border-radius: 5px;
+					margin: 0 10px;
+				}
+
+		#content {
+			flex-grow: 1;
+			padding: 20px;
+			transition: all 0.3s;
+		}
+
+		.navbar {
+			display: none; /* Hide default navbar */
+		}
+
+		.footer {
+			margin-top: auto; /* Push footer to the bottom */
+			background: #2a2e43;
+			color: #fff;
+			padding: 15px 0;
+			text-align: center;
+			width: 100%;
+		}
+
+			.footer a {
+				color: #fff;
+				text-decoration: none;
+			}
+
+				.footer a:hover {
+					text-decoration: underline;
+				}
+	</style>
+</head>
+<body>
+	<div id="sidebar">
+		<div class="sidebar-header">
+			<h3>اسم المسؤول</h3>
+			<span>@Model.AdminName</span>
+		</div>
+		<ul class="components">
+			<li>
+				<a href="#" class="sidebar-link" data-action="Sellers"><i class="fas fa-handshake"></i> البائعين</a>
+			</li>
+			<li>
+				<a href="#" class="sidebar-link" data-action="Categories"><i class="fas fa-th-large"></i> الفئات</a>
+			</li>
+			<li>
+				<a href="#" class="sidebar-link" data-action="Products"><i class="fas fa-box"></i> المنتجات</a>
+			</li>
+			<li>
+				<a href="#" class="sidebar-link" data-action="Reports"><i class="fas fa-chart-line"></i> التقارير</a>
+			</li>
+			<li>
+				<a href="#" class="sidebar-link" data-action="Profile"><i class="fas fa-user-circle"></i> الملف الشخصي</a>
+			</li>
+			<li>
+				<a href="#" class="sidebar-link" data-action="Admins"><i class="fas fa-user-shield"></i> المسؤولون</a>
+			</li>
+			<li style="margin-top: auto;">
+				<a asp-area="" asp-controller="Home" asp-action="Logout" class="logout-link"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
+			</li>
+		</ul>
+	</div>
+
+	<div id="content">
+		<main role="main" class="pb-3">
+			<div class="container-fluid">
+				@Html.Partial("_StatisticsCards", (AdminHomeVM)Model)
+			</div>
+			<div id="mainContent">
+				@RenderBody()
+			</div>
+		</main>
+	</div>
+
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	<script src="~/js/admin/shared.js" asp-append-version="true"></script>
+	@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,116 @@
+﻿@model AdminHomeVM
+@{
+    ViewData["Title"] = "لوحة التحكم";
+}
+
+<div class="container-fluid">
+    <!-- Statistics Cards -->
+    @* @Html.Partial("_StatisticsCards", Model) *@
+
+   @*  <!-- Management Sections -->
+    @Html.Partial("_SellersManagement", Model)
+
+    <div class="card mb-4" id="categories-management">
+        @Html.Partial("_CategoriesManagement", Model)
+    </div> *@
+
+    <!-- Products Management -->
+    @Html.Partial("_ProductsManagement", Model.Products)
+
+@*     <!-- Admins Management -->
+    @Html.Partial("_AdminsManagement", Model)
+
+    <!-- Placeholder for Profile Management -->
+    @Html.Partial("_ProfileManagement", Model)
+
+    <!-- Reports Management Section -->
+    @Html.Partial("_ReportsManagement", Model) *@
+
+</div>
+
+<!-- Add Product Modal -->
+@Html.Partial("_AddProductModal")
+
+<!-- Add Seller Modal -->
+@Html.Partial("_AddSellerModal")
+
+<!-- Add Admin Modal -->
+@Html.Partial("_AddAdminModal")
+
+<!-- Add Category Modal -->
+@Html.Partial("_AddCategoryModal")
+
+<!-- Edit Product Modal -->
+@Html.Partial("_EditProductModal")
+
+<!-- Edit Seller Modal -->
+@Html.Partial("_EditSellerModal")
+
+<!-- Edit Category Modal -->
+@Html.Partial("_EditCategoryModal")
+
+<!-- Edit Admin Modal -->
+@Html.Partial("_EditAdminModal")
+
+<!-- Delete Confirmation Modals -->
+@Html.Partial("_DeleteProductModal")
+
+@Html.Partial("_DeleteSellerModal")
+
+<!-- Delete Category Modal -->
+@Html.Partial("_DeleteCategoryModal")
+
+<!-- Delete Admin Modal -->
+@Html.Partial("_DeleteAdminModal")
+
+<!-- Report Actions Template -->
+@Html.Partial("_ReportActionsTemplate")
+
+@section Scripts {
+    <script>
+        function editSeller(id) { alert('تعديل البائع رقم ' + id); }
+        function deleteSeller(id) { if (confirm('هل أنت متأكد من حذف هذا البائع؟')) { alert('حذف البائع رقم ' + id); } }
+        function editCategory(id) { alert('تعديل الفئة رقم ' + id); }
+        function deleteCategory(id) { if (confirm('هل أنت متأكد من حذف هذه الفئة؟')) { alert('حذف الفئة رقم ' + id); } }
+        function editProduct(id) { alert('تعديل المنتج رقم ' + id); }
+        function deleteProduct(id) { if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) { alert('حذف المنتج رقم ' + id); } }
+        function editAdmin(id) { alert('تعديل المسؤول رقم ' + id); }
+        function deleteAdmin(id) { if (confirm('هل أنت متأكد من حذف هذا المسؤول؟')) { alert('حذف المسؤول رقم ' + id); } }
+
+        function saveProduct() {
+            const form = document.getElementById('addProductForm');
+            const formData = new FormData(form);
+            // In a real application, send this data to your API.
+            alert('تم حفظ المنتج بنجاح');
+            form.reset();
+            $('#addProductModal').modal('hide');
+        }
+
+        function saveSeller() {
+            const form = document.getElementById('addSellerForm');
+            const formData = new FormData(form);
+            // In a real application, send this data to your API.
+            alert('تم حفظ البائع بنجاح');
+            form.reset();
+            $('#addSellerModal').modal('hide');
+        }
+
+        function saveAdmin() {
+            const form = document.getElementById('addAdminForm');
+            const formData = new FormData(form);
+            // In a real application, send this data to your API.
+            alert('تم حفظ المسؤول بنجاح');
+            form.reset();
+            $('#addAdminModal').modal('hide');
+        }
+
+        function saveCategory() {
+            const form = document.getElementById('addCategoryForm');
+            const formData = new FormData(form);
+            // In a real application, send this data to your API.
+            alert('تم حفظ الفئة بنجاح');
+            form.reset();
+            $('#addCategoryModal').modal('hide');
+        }
+    </script>
+}

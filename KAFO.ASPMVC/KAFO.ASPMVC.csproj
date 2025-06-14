@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\KAFO.BLL\KAFO.BLL.csproj" />
+    <ProjectReference Include="..\KAFO.DAL\KAFO.DAL.csproj" />
+    <ProjectReference Include="..\KAFO.Domain\KAFO.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Admin\Controllers\" />
+    <Folder Include="Areas\Seller\Controllers\" />
+    <Folder Include="Areas\Seller\ViewModels\" />
+    <Folder Include="Areas\Seller\Views\" />
+  </ItemGroup>
+
+</Project>

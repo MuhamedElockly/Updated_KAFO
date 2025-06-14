@@ -1,0 +1,14 @@
+﻿.avatar {
+    vertical-align: middle;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+}
+
+.bg-default, .btn-default {
+    background-color: #f2f3f8;
+}
+
+.btn-error {
+    color: #ef5f5f;
+}

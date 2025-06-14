@@ -1,0 +1,17 @@
+﻿@model List<KAFO.Domain.Products.Product>;
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Products From Database</h1>
+
+@foreach (var item in Model)
+{
+    <div>
+        <p>Name: @item.Name</p>
+        <p>Price: @item.SellingPrice</p>
+        <p>Category: @item.Category?.Name</p>
+    </div>
+    <hr/>
+}
+
