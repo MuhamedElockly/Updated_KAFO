@@ -57,185 +57,201 @@ function generateReport() {
                     <p class="text-center text-muted">التقرير من <strong>${startDate}</strong> إلى <strong>${endDate}</strong></p>
                 </div>`;
 
-        if (currentReportType === 'profit') {
-            const profit = (Math.random() * 5000 + 1000).toFixed(2);
-            reportDataHtml += `
-                <div class="report-body">
-                    <div class="alert alert-success">
-                        <h5 class="mb-0">إجمالي الأرباح للفترة: <strong>${profit} ريال</strong></h5>
-                    </div>
-                </div>`;
-        } else if (currentReportType === 'sales') {
-            const sales = (Math.random() * 10000 + 2000).toFixed(2);
-            reportDataHtml += `
-                <div class="report-body">
-                    <div class="alert alert-info">
-                        <h5 class="mb-0">إجمالي المبيعات للفترة: <strong>${sales} ريال</strong></h5>
-                    </div>
-                </div>`;
-        } else if (currentReportType === 'most_sold') {
-            const products = [
-                { name: "منتج أ", quantity: Math.floor(Math.random() * 100) + 10 },
-                { name: "منتج ب", quantity: Math.floor(Math.random() * 100) + 10 },
-                { name: "منتج ج", quantity: Math.floor(Math.random() * 100) + 10 }
-            ];
-            products.sort((a, b) => b.quantity - a.quantity);
+        // Show loading indicator
+        reportResultsDiv.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';
 
-            reportDataHtml += `
-                <div class="report-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped mt-3">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>المنتج</th>
-                                    <th>الكمية المباعة</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
-            products.forEach(p => {
-                reportDataHtml += `
-                                <tr>
-                                    <td>${p.name}</td>
-                                    <td>${p.quantity}</td>
-                                </tr>`;
-            });
-            reportDataHtml += `
-                            </tbody>
-                        </table>
-                    </div>
-                </div>`;
-        } else if (currentReportType === 'most_profitable_seller') {
-            const sellers = [
-                { name: "البائع أ", profit: (Math.random() * 1000 + 500).toFixed(2) },
-                { name: "البائع ب", profit: (Math.random() * 1000 + 500).toFixed(2) },
-                { name: "البائع ج", profit: (Math.random() * 1000 + 500).toFixed(2) }
-            ];
-            sellers.sort((a, b) => b.profit - a.profit);
-
-            reportDataHtml += `
-                <div class="report-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped mt-3">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>البائع</th>
-                                    <th>إجمالي الربح</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
-            sellers.forEach(s => {
-                reportDataHtml += `
-                                <tr>
-                                    <td>${s.name}</td>
-                                    <td>${s.profit} ريال</td>
-                                </tr>`;
-            });
-            reportDataHtml += `
-                            </tbody>
-                        </table>
-                    </div>
-                </div>`;
-        } else if (currentReportType === 'most_profitable_product') {
-            const products = [
-                { name: "منتج X", profit: (Math.random() * 500 + 100).toFixed(2) },
-                { name: "منتج Y", profit: (Math.random() * 500 + 100).toFixed(2) },
-                { name: "منتج Z", profit: (Math.random() * 500 + 100).toFixed(2) }
-            ];
-            products.sort((a, b) => b.profit - a.profit);
-
-            reportDataHtml += `
-                <div class="report-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped mt-3">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>المنتج</th>
-                                    <th>إجمالي الربح</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
-            products.forEach(p => {
-                reportDataHtml += `
-                                <tr>
-                                    <td>${p.name}</td>
-                                    <td>${p.profit} ريال</td>
-                                </tr>`;
-            });
-            reportDataHtml += `
-                            </tbody>
-                        </table>
-                    </div>
-                </div>`;
-        } else if (currentReportType === 'total_payments') {
-            const paymentCount = Math.floor(Math.random() * 1000 + 100);
-            reportDataHtml += `
-                <div class="report-body">
-                    <div class="alert alert-primary">
-                        <h5 class="mb-0">عدد المدفوعات الكلي للفترة: <strong>${paymentCount} دفعة</strong></h5>
-                    </div>
-                </div>`;
-        } else if (currentReportType === 'sold_products') {
-            const soldProducts = [
-                { id: 101, name: "لابتوب ديل", price: 2500, quantity: 1, date: "2024-05-20" },
-                { id: 102, name: "هاتف سامسونج", price: 1800, quantity: 1, date: "2024-05-21" },
-                { id: 103, name: "سماعات بلوتوث", price: 250, quantity: 1, date: "2024-05-21" },
-                { id: 104, name: "شاحن سريع", price: 120, quantity: 1, date: "2024-05-22" }
-            ];
-            reportDataHtml += `
-                <div class="report-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped mt-3">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>رقم المنتج</th>
-                                    <th>اسم المنتج</th>
-                                    <th>السعر</th>
-                                    <th>الكمية المباعة</th>
-                                    <th>تاريخ البيع</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
-            soldProducts.forEach(p => {
-                reportDataHtml += `
-                                <tr>
-                                    <td>${p.id}</td>
-                                    <td>${p.name}</td>
-                                    <td>${p.price} ريال</td>
-                                    <td>${p.quantity}</td>
-                                    <td>${p.date}</td>
-                                </tr>`;
-            });
-            reportDataHtml += `
-                            </tbody>
-                        </table>
-                    </div>
-                </div>`;
+        // Make API call based on report type
+        let url = '';
+        switch (currentReportType) {
+            case 'profit':
+                url = `/Admin/Report/GetProfitReport?startDate=${startDate}&endDate=${endDate}`;
+                break;
+            case 'sales':
+                url = `/Admin/Report/GetSalesReport?startDate=${startDate}&endDate=${endDate}`;
+                break;
+            case 'most_sold':
+                url = `/Admin/Report/GetMostSoldProductsReport?startDate=${startDate}&endDate=${endDate}`;
+                break;
+            case 'most_profitable_seller':
+                url = `/Admin/Report/GetMostProfitableSellerReport?startDate=${startDate}&endDate=${endDate}`;
+                break;
+            case 'most_profitable_product':
+                url = `/Admin/Report/GetMostProfitableProductReport?startDate=${startDate}&endDate=${endDate}`;
+                break;
+            case 'total_payments':
+                url = `/Admin/Report/GetTotalPaymentsReport?startDate=${startDate}&endDate=${endDate}`;
+                break;
+            case 'sold_products':
+                url = `/Admin/Report/GetSoldProductsReport?startDate=${startDate}&endDate=${endDate}`;
+                break;
         }
 
-        reportDataHtml += `</div>`;
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function(data) {
+                switch (currentReportType) {
+                    case 'profit':
+                        reportDataHtml += `
+                            <div class="report-body">
+                                <div class="alert alert-success">
+                                    <h5 class="mb-0">إجمالي الأرباح للفترة: <strong> ${data.totalProfit} جنيه</strong></h5>
+                                </div>
+                            </div>`;
+                        break;
+                    case 'sales':
+                        reportDataHtml += `
+                            <div class="report-body">
+                                <div class="alert alert-info">
+                                    <h5 class="mb-0">إجمالي المبيعات للفترة: <strong>${data.totalSales} جنيه</strong></h5>
+                                </div>
+                            </div>`;
+                        break;
+                    case 'most_sold':
+                        reportDataHtml += `
+                            <div class="report-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped mt-3">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>المنتج</th>
+                                                <th>الكمية المباعة</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>`;
+                        data.forEach(p => {
+                            reportDataHtml += `
+                                <tr>
+                                    <td>${p.productName}</td>
+                                    <td>${p.totalQuantity}</td>
+                                </tr>`;
+                        });
+                        reportDataHtml += `
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>`;
+                        break;
+                    case 'most_profitable_seller':
+                        reportDataHtml += `
+                            <div class="report-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped mt-3">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>البائع</th>
+                                                <th>إجمالي الربح</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>`;
+                        data.forEach(s => {
+                            reportDataHtml += `
+                                <tr>
+                                    <td>${s.sellerName}</td>
+                                    <td>${s.totalProfit} جنيه</td>
+                                </tr>`;
+                        });
+                        reportDataHtml += `
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>`;
+                        break;
+                    case 'most_profitable_product':
+                        reportDataHtml += `
+                            <div class="report-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped mt-3">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>المنتج</th>
+                                                <th>إجمالي الربح</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>`;
+                        data.forEach(p => {
+                            reportDataHtml += `
+                                <tr>
+                                    <td>${p.productName}</td>
+                                    <td>${p.totalProfit} جنيه</td>
+                                </tr>`;
+                        });
+                        reportDataHtml += `
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>`;
+                        break;
+                    case 'total_payments':
+                        reportDataHtml += `
+                            <div class="report-body">
+                                <div class="alert alert-primary">
+                                    <h5 class="mb-0">عدد المدفوعات الكلي للفترة: <strong>${data.totalPayments} دفعة</strong></h5>
+                                </div>
+                            </div>`;
+                        break;
+                    case 'sold_products':
+                        reportDataHtml += `
+                            <div class="report-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped mt-3">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>رقم المنتج</th>
+                                                <th>اسم المنتج</th>
+                                                <th>السعر</th>
+                                                <th>الكمية المباعة</th>
+                                                <th>تاريخ البيع</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>`;
+                        data.forEach(p => {
+                            reportDataHtml += `
+                                <tr>
+                                    <td>${p.productId}</td>
+                                    <td>${p.productName}</td>
+                                    <td>${p.price} جنيه</td>
+                                    <td>${p.quantity}</td>
+                                    <td>${new Date(p.date).toLocaleDateString()}</td>
+                                </tr>`;
+                        });
+                        reportDataHtml += `
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>`;
+                        break;
+                }
 
-        // Add report actions
-        const reportActionsTemplate = document.getElementById('report-actions-template');
-        if (reportActionsTemplate) {
-            const reportActions = reportActionsTemplate.content.cloneNode(true);
-            reportResultsDiv.innerHTML = reportDataHtml;
-            reportResultsDiv.appendChild(reportActions);
-        } else {
-            // If template is not found, just add the report content
-            reportResultsDiv.innerHTML = reportDataHtml;
-            // Add buttons directly
-            reportResultsDiv.innerHTML += `
-                <div class="report-actions mt-3 d-flex gap-2 justify-content-end">
-                    <button class="btn btn-primary" onclick="downloadReportAsPDF()">
-                        <i class="fas fa-download"></i> تحميل PDF
-                    </button>
-                    <button class="btn btn-secondary" onclick="printReport()">
-                        <i class="fas fa-print"></i> طباعة
-                    </button>
-                </div>`;
-        }
+                reportDataHtml += `</div>`;
 
-        alert(`جارٍ إنشاء تقرير ${currentReportType} من ${startDate} إلى ${endDate}`);
+                // Add report actions
+                const reportActionsTemplate = document.getElementById('report-actions-template');
+                if (reportActionsTemplate) {
+                    const reportActions = reportActionsTemplate.content.cloneNode(true);
+                    reportResultsDiv.innerHTML = reportDataHtml;
+                    reportResultsDiv.appendChild(reportActions);
+                } else {
+                    reportResultsDiv.innerHTML = reportDataHtml;
+                    reportResultsDiv.innerHTML += `
+                        <div class="report-actions mt-3 d-flex gap-2 justify-content-end">
+                            <button class="btn btn-primary" onclick="downloadReportAsPDF()">
+                                <i class="fas fa-download"></i> تحميل PDF
+                            </button>
+                            <button class="btn btn-secondary" onclick="printReport()">
+                                <i class="fas fa-print"></i> طباعة
+                            </button>
+                        </div>`;
+                }
+            },
+            error: function(error) {
+                reportResultsDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        حدث خطأ أثناء تحميل التقرير. الرجاء المحاولة مرة أخرى.
+                    </div>`;
+            }
+        });
     } else {
         alert('الرجاء تحديد تاريخي البدء والانتهاء.');
     }

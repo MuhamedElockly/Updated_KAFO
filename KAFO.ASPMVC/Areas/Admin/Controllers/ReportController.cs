@@ -1,13 +1,34 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Kafo.DAL.Repository;
+using KAFO.Domain.Invoices;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using KAFO.BLL.Managers;
 
-namespace Kafo.ASPMVC.Areas.Admin.Controllers
+namespace KAFO.ASPMVC.Areas.Admin.Controllers
 {
 	[Area("Admin")]
 	public class ReportController : Controller
 	{
-		public IActionResult Index()
+		private readonly InvoiceManager _invcoiceManager;
+		private readonly IUnitOfWork _unitOfWork;
+
+		public ReportController(InvoiceManager invoiceManager)
 		{
-			return View();
+			_invcoiceManager = invoiceManager;
+
 		}
+
+
+		[HttpGet]
+		public IActionResult GetProfitReport(DateTime startDate, DateTime endDate)
+		{
+			double totalProfit = _invcoiceManager.GetTotalProfit(startDate, endDate);
+		//	double totalProfit = 345;
+			return Json(new { totalProfit });
+		}
+
+
 	}
 }

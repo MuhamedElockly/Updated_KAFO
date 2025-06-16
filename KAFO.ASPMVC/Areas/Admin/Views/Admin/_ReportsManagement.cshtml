@@ -42,7 +42,7 @@
 	</div>
 </div>
 
-<!-- Report Actions Template -->
+
 <template id="report-actions-template">
     <div class="report-actions mt-3 d-flex gap-2 justify-content-end">
         <button class="btn btn-primary" onclick="downloadReportAsPDF()">
@@ -57,7 +57,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="~/js/admin/reports.js" asp-append-version="true"></script>
 <script>
-    // Initialize report functionality after the view is loaded
     $(document).ready(function() {
         initializeReportFunctionality();
     });
