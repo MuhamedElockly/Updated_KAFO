@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\KAFO.BLL\KAFO.BLL.csproj" />
     <ProjectReference Include="..\KAFO.DAL\KAFO.DAL.csproj" />
     <ProjectReference Include="..\KAFO.Domain\KAFO.Domain.csproj" />
@@ -21,6 +17,13 @@
     <Folder Include="Areas\Seller\Controllers\" />
     <Folder Include="Areas\Seller\ViewModels\" />
     <Folder Include="Areas\Seller\Views\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

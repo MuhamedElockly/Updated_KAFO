@@ -1,17 +1,17 @@
-@model SellersTableVM
+@model UsersTableVM
 <div class="card mb-4" id="sellers-management">
 	<div class="card-header bg-white">
 		<div class="d-flex justify-content-between align-items-center">
-			<h4 class="mb-0">إدارة البائعين</h4>
+			<h4 class="mb-0">إدارة المستخدمين</h4>
 			<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSellerModal">
-				<i class="fas fa-plus"></i> إضافة بائع جديد
+				<i class="fas fa-plus"></i> إضافة مستخدم جديد
 			</button>
 		</div>
 	</div>
 	<div class="card-body">
 		<div class="input-group mb-3">
 			<span class="input-group-text"><i class="fas fa-search"></i></span>
-			<input type="text" class="form-control" placeholder="البحث عن البائعين بالاسم، البريد الإلكتروني، أو الدور...">
+			<input type="text" class="form-control" placeholder="البحث عن المستخدمين بالاسم، البريد الإلكتروني، أو الدور...">
 		</div>
 		<div class="table-responsive">
 			<table class="table table-hover">
@@ -26,7 +26,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					@foreach (var seller in Model.Sellers)
+					@foreach (var seller in Model.Users)
 					{
 						<tr>
 							<td>@seller.Id</td>
@@ -49,17 +49,17 @@
 		</div>
 		<nav>
 			<ul class="pagination justify-content-end">
-				<li class="page-item @(Model.CurrentSellerPage == 1 ? "disabled" : "")">
-					<a class="page-link" onclick="loadAdminContent('Sellers', @Model.CurrentSellerPage-1)" tabindex="-1">السابق</a>
+				<li class="page-item @(Model.CurrentUserPage == 1 ? "disabled" : "")">
+					<a class="page-link" onclick="loadAdminContent('Users', @Model.CurrentUserPage-1)" tabindex="-1">السابق</a>
 				</li>
-				@for (int i = 1; i <= Model.TotalSellersPages; i++)
+				@for (int i = 1; i <= Model.TotalUsersPages; i++)
 				{
-					<li class="page-item @(i == Model.CurrentSellerPage ? "active" : "")">
-						<a class="page-link" onclick="loadAdminContent('Sellers', @i)">@i</a>
+					<li class="page-item @(i == Model.CurrentUserPage ? "active" : "")">
+						<a class="page-link" onclick="loadAdminContent('Users', @i)">@i</a>
 					</li>
 				}
-				<li class="page-item @(Model.CurrentSellerPage == Model.TotalSellersPages ? "disabled" : "")">
-					<a class="page-link" onclick="loadAdminContent('Sellers', @Model.CurrentSellerPage+1)">التالي</a>
+				<li class="page-item @(Model.CurrentUserPage == Model.TotalUsersPages ? "disabled" : "")">
+					<a class="page-link" onclick="loadAdminContent('Users', @Model.CurrentUserPage+1)">التالي</a>
 				</li>
 			</ul>
 		</nav>

@@ -10,8 +10,10 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 	[Area("Admin")]
 	public class AdminController : Controller
 	{
+		const int pageSize = 5;
 		public IActionResult Index(int sellerPage = 1, int categoryPage = 1, int productPage = 1, int adminPage = 1)
 		{
+			
 			// Sample data creation using constructors
 
 			//		var allProducts = new List<Product>
@@ -108,7 +110,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 				new ProductVM() { IsActive = true,Category=allCategories[0],ImageUrl="New Image Url", Id=1,Name="منتج رقم 1",SellingPrice=22,StockQuantity=30},
 
 			};
-			int pageSize = 5;
+
 
 			ProductsTableVM productsTableVM = new ProductsTableVM()
 			{
@@ -128,33 +130,51 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 			var model = new HomeViewModel(); // Replace with your actual model
 			return PartialView("_ReportsManagement", model);
 		}
-		public IActionResult Sellers(int? page = 1)
+		public IActionResult Users(int? page )
 		{
-			int pageSize = 5;
-			List<SellerVM> allSellers = new List<SellerVM>()
+
+			List<UserVM> allSellers = new List<UserVM>()
 			{
-				new SellerVM() {Id = 1,Name="محمد محمود ",Phone="01029092093",Email="elocklymuhamed@gmail.com"},
-				new SellerVM() {Id = 1,Name="محمد محمود ",Phone="01029092093"},
-				new SellerVM() {Id = 1,Name="احمد خالد",Phone="01029092093",Email="elocklymuhamed@gmail.com"},
-				new SellerVM() {Id = 1,Name="محمد محمود ",Phone="01029092093",Email="elocklymuhamed@gmail.com"},
-				new SellerVM() {Id = 2,Name="علي",Phone="01029092093"},
-				new SellerVM() {Id = 4,Name="محمد محمود ",Phone="01029092093",Email="elocklymuhamed@gmail.com"},
-				new SellerVM() {Id = 5,Name="محمد محمود ",Phone="01029092093",Email="elocklymuhamed@gmail.com"},
-				new SellerVM() {Id = 1,Name="محمد محمود ",Phone="01029092093",Email="elocklymuhamed@gmail.com"},
+				new UserVM() {Id = 1,Name="محمد محمود ",Phone="01029092093",Email="elocklymuhamed@gmail.com",Role="Seller"},
+				new UserVM() {Id = 1,Name="محمد محمود ",Phone="01029092093",Role="Admin"},
+				new UserVM() {Id = 1,Name="احمد خالد",Phone="01029092093",Email="elocklymuhamed@gmail.com",Role="Admin"},
+				new UserVM() {Id = 1,Name="محمد محمود ",Phone="01029092093",Email="elocklymuhamed@gmail.com",Role="Seller"},
+				new UserVM() {Id = 2,Name="علي",Phone="01029092093",Role="Admin"},
+				new UserVM() {Id = 4,Name="محمد محمود ",Phone="01029092093",Email="elocklymuhamed@gmail.com",Role="Admin"},
+				new UserVM() {Id = 5,Name="محمد محمود ",Phone="01029092093",Email="elocklymuhamed@gmail.com",Role="Seller"},
+				new UserVM() {Id = 1,Name="محمد محمود ",Phone="01029092093",Email="elocklymuhamed@gmail.com",Role="Admin"},
 
 			};
 
-			SellersTableVM sellersTableVM = new SellersTableVM();
-			sellersTableVM.CurrentSellerPage = page ?? 1;
-			sellersTableVM.Sellers = allSellers;
-			sellersTableVM.TotalSellersPages = (int)Math.Ceiling(allSellers.Count / (double)pageSize);
+			UsersTableVM sellersTableVM = new UsersTableVM();
+			sellersTableVM.CurrentUserPage = page ?? 1;
+			sellersTableVM.Users = allSellers;
+			sellersTableVM.TotalUsersPages = (int)Math.Ceiling(allSellers.Count / (double)pageSize);
 
-			return PartialView("_SellersManagement", sellersTableVM);
+			return PartialView("_UsersManagement", sellersTableVM);
 		}
-		public IActionResult Categories()
+		public IActionResult Categories(int? page)
 		{
-			var model = new HomeViewModel(); // Replace with your actual model
-			return PartialView("_CategoriesManagement", model);
+
+			List<CategoryVM> allCategories = new List<CategoryVM>()
+			{
+				new CategoryVM(){Id=1,Name="شيبسي",Description="منتج شيبس"},
+				new CategoryVM(){Id=2,Name="شيبسي",Description="منتج شيبس"},
+				new CategoryVM(){Id=4,Name="مشروبات",Description="منتج شيبس"},
+				new CategoryVM(){Id=5,Name="شيبسي",Description="منتج شيبس"},
+				new CategoryVM(){Id=6,Name="شيبسي",Description="منتج شيبس"},
+				new CategoryVM(){Id=8,Name="شيبسي",Description="منتج شيبس"},
+				new CategoryVM(){Id=4,Name="شيبسي",Description="منتج شيبس"},
+			};
+
+			CategoriesTableVM categoriesTableVM = new CategoriesTableVM()
+			{
+				Categories = allCategories,
+				CurrentCategoryPage = page ?? 1,
+				TotalCategoriesPages = (int)Math.Ceiling(allCategories.Count / (double)pageSize)
+			};
+
+			return PartialView("_CategoriesManagement", categoriesTableVM);
 		}
 		public IActionResult Products(int productPage = 1)
 		{

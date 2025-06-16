@@ -1,10 +1,10 @@
 ﻿namespace KAFO.ASPMVC.Areas.Admin.ViewModels
 {
-	public class SellersTableVM
+	public class UsersTableVM
 	{
-		public List<SellerVM> Sellers { get; set; }
-		public int TotalSellersPages { get; set; }
-		public int CurrentSellerPage { get; set; }
+		public List<UserVM> Users { get; set; }
+		public int TotalUsersPages { get; set; }
+		public int CurrentUserPage { get; set; }
 	}
 
 }

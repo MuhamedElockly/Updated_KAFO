@@ -29,10 +29,10 @@
 </div>
 
 <!-- Add Product Modal -->
-@Html.Partial("_AddProductModal")
+@* @Html.Partial("_AddProductModal") *@
 
 <!-- Add Seller Modal -->
-@Html.Partial("_AddSellerModal")
+@* @Html.Partial("_AddSellerModal")
 
 <!-- Add Admin Modal -->
 @Html.Partial("_AddAdminModal")
@@ -64,7 +64,7 @@
 @Html.Partial("_DeleteAdminModal")
 
 <!-- Report Actions Template -->
-@Html.Partial("_ReportActionsTemplate")
+@Html.Partial("_ReportActionsTemplate") *@
 
 @section Scripts {
     <script>
@@ -77,14 +77,14 @@
         function editAdmin(id) { alert('تعديل المسؤول رقم ' + id); }
         function deleteAdmin(id) { if (confirm('هل أنت متأكد من حذف هذا المسؤول؟')) { alert('حذف المسؤول رقم ' + id); } }
 
-        function saveProduct() {
-            const form = document.getElementById('addProductForm');
-            const formData = new FormData(form);
-            // In a real application, send this data to your API.
-            alert('تم حفظ المنتج بنجاح');
-            form.reset();
-            $('#addProductModal').modal('hide');
-        }
+        // function saveProduct() {
+        //     const form = document.getElementById('addProductForm');
+        //     const formData = new FormData(form);
+        //     // In a real application, send this data to your API.
+        //     alert('تم حفظ المنتج بنجاح');
+        //     form.reset();
+        //     $('#addProductModal').modal('hide');
+        // }
 
         function saveSeller() {
             const form = document.getElementById('addSellerForm');
@@ -104,13 +104,6 @@
             $('#addAdminModal').modal('hide');
         }
 
-        function saveCategory() {
-            const form = document.getElementById('addCategoryForm');
-            const formData = new FormData(form);
-            // In a real application, send this data to your API.
-            alert('تم حفظ الفئة بنجاح');
-            form.reset();
-            $('#addCategoryModal').modal('hide');
-        }
+      
     </script>
 }

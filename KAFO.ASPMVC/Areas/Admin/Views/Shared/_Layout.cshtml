@@ -122,17 +122,17 @@
 		</div>
 		<ul class="components">
 			<li>
-				<a href="#" class="sidebar-link" data-action="Sellers"><i class="fas fa-handshake"></i> البائعين</a>
+				<a href="#" class="sidebar-link" data-action="Products"><i class="fas fa-box"></i> المنتجات</a>
 			</li>
 			<li>
 				<a href="#" class="sidebar-link" data-action="Categories"><i class="fas fa-th-large"></i> الفئات</a>
 			</li>
 			<li>
-				<a href="#" class="sidebar-link" data-action="Products"><i class="fas fa-box"></i> المنتجات</a>
-			</li>
-			<li>
 				<a href="#" class="sidebar-link" data-action="Reports"><i class="fas fa-chart-line"></i> التقارير</a>
 			</li>
+			<li>
+				<a href="#" class="sidebar-link" data-action="Users"><i class="fas fa-users"></i> المستخدمين</a>
+			</li>		
 			<li>
 				<a href="#" class="sidebar-link" data-action="Profile"><i class="fas fa-user-circle"></i> الملف الشخصي</a>
 			</li>
@@ -148,6 +148,7 @@
 	<div id="content">
 		<main role="main" class="pb-3">
 			<div class="container-fluid">
+				
 				@Html.Partial("_StatisticsCards", (AdminHomeVM)Model)
 			</div>
 			<div id="mainContent">
