@@ -84,7 +84,7 @@ namespace KAFO.WinForms
 
         private void FormRefresh()
         {
-            products = ProductManager.GetAll();
+        //    products = ProductManager.GetAll();
             Producsflow.Controls.Clear();
             foreach (var p in products)
             {

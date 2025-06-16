@@ -118,7 +118,7 @@
 	<div id="sidebar">
 		<div class="sidebar-header">
 			<h3>اسم المسؤول</h3>
-			<span>@Model.AdminName</span>
+			<span>@(Model?.AdminName ?? "")</span>
 		</div>
 		<ul class="components">
 			<li>

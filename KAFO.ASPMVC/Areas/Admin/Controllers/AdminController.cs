@@ -1,5 +1,6 @@
 ﻿using Kafo.ASPMVC.Models;
 using KAFO.ASPMVC.Areas.Admin.ViewModels;
+using KAFO.BLL.Managers;
 using KAFO.Domain.Products;
 using KAFO.Domain.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +11,20 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 	[Area("Admin")]
 	public class AdminController : Controller
 	{
+		private readonly CategoryManager _categoryManager;
+		private readonly InvoiceManager _incoiceManager;
+
+		public AdminController(CategoryManager categoryManager, InvoiceManager invoiceManager)
+		{
+			_categoryManager = categoryManager;
+			_incoiceManager = invoiceManager;
+
+
+		}
 		const int pageSize = 5;
 		public IActionResult Index(int sellerPage = 1, int categoryPage = 1, int productPage = 1, int adminPage = 1)
 		{
-			
+
 			// Sample data creation using constructors
 
 			//		var allProducts = new List<Product>
@@ -130,7 +141,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 			var model = new HomeViewModel(); // Replace with your actual model
 			return PartialView("_ReportsManagement", model);
 		}
-		public IActionResult Users(int? page )
+		public IActionResult Users(int? page)
 		{
 
 			List<UserVM> allSellers = new List<UserVM>()
@@ -156,16 +167,14 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 		public IActionResult Categories(int? page)
 		{
 
-			List<CategoryVM> allCategories = new List<CategoryVM>()
+			List<Category> categories = _categoryManager.GetAll();
+
+			List<CategoryVM> allCategories = new List<CategoryVM>();
+			foreach (Category category in categories)
 			{
-				new CategoryVM(){Id=1,Name="شيبسي",Description="منتج شيبس"},
-				new CategoryVM(){Id=2,Name="شيبسي",Description="منتج شيبس"},
-				new CategoryVM(){Id=4,Name="مشروبات",Description="منتج شيبس"},
-				new CategoryVM(){Id=5,Name="شيبسي",Description="منتج شيبس"},
-				new CategoryVM(){Id=6,Name="شيبسي",Description="منتج شيبس"},
-				new CategoryVM(){Id=8,Name="شيبسي",Description="منتج شيبس"},
-				new CategoryVM(){Id=4,Name="شيبسي",Description="منتج شيبس"},
-			};
+				allCategories.Add(new CategoryVM() { Id = category.Id, Name = category.Name, Description = category.Description });
+			}
+
 
 			CategoriesTableVM categoriesTableVM = new CategoriesTableVM()
 			{

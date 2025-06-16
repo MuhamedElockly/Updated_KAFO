@@ -1,0 +1,28 @@
+@model AdminHomeVM
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">إجمالي المبيعات اليوم</h5>
+                <p class="card-text">@Model.TotalSellsToday</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">إجمالي الربح اليوم</h5>
+                <p class="card-text">@Model.TotalProfitToday</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">إجمالي المنتجات المباعة اليوم</h5>
+                <p class="card-text">@Model.TotalProductSoldToday</p>
+            </div>
+        </div>
+    </div>
+</div> 

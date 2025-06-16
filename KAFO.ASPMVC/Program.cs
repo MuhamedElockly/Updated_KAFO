@@ -1,5 +1,6 @@
 using Kafo.DAL.Data;
 using Kafo.DAL.Repository;
+using KAFO.BLL.Managers;
 using Microsoft.EntityFrameworkCore;
 
 namespace KAFO.ASPMVC
@@ -10,19 +11,22 @@ namespace KAFO.ASPMVC
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            
             builder.Services.AddControllersWithViews();
+			builder.Services.AddDbContext<AppDBContext>(
+							options => options.UseSqlServer(
+								builder.Configuration
+								.GetConnectionString("DefaultConnection"))
+							);
 
-            builder.Services.AddDbContext<AppDBContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-            // Register Unit of Work
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+			builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+			builder.Services.AddScoped<CategoryManager>();
+			builder.Services.AddScoped<InvoiceManager>();
 
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+         
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");

@@ -1,15 +1,18 @@
 ﻿
 using Kafo.DAL.Data;
+using KAFO.Domain.Invoices;
 using KAFO.Domain.Products;
 
 namespace Kafo.DAL.Repository
 {
-    public class Invoice : Repository<Invoice>, IInvoiceRepository
+    public class InvoiceRepository : Repository<Invoice>, IInvoiceRepository
     {
         private readonly AppDBContext _dbcontext;
-        public Invoice(AppDBContext dbContext) : base(dbContext)
+        public InvoiceRepository(AppDBContext dbContext) : base(dbContext)
         {
             _dbcontext = dbContext;
         }
-    }
+
+		
+	}
 }
