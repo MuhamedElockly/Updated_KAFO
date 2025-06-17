@@ -55,7 +55,8 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 			{
 				_categoryManager.Update(category);
 			}
-			return RedirectToAction("Index", "Admin", new { area = "Admin" });
+            TempData["Success"] = "Product added successfuly";
+            return RedirectToAction("Index", "Admin", new { area = "Admin" });
 
 		}
 		[HttpPost]
