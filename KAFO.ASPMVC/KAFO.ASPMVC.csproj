@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\admin\category.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\js\admin\category.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\KAFO.BLL\KAFO.BLL.csproj" />
     <ProjectReference Include="..\KAFO.DAL\KAFO.DAL.csproj" />
     <ProjectReference Include="..\KAFO.Domain\KAFO.Domain.csproj" />
@@ -17,6 +25,10 @@
     <Folder Include="Areas\Seller\Controllers\" />
     <Folder Include="Areas\Seller\ViewModels\" />
     <Folder Include="Areas\Seller\Views\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\admin\category.js" />
   </ItemGroup>
 
   <ItemGroup>

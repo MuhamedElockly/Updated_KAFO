@@ -4,7 +4,7 @@
 	<div class="card-header bg-white">
 		<div class="d-flex justify-content-between align-items-center">
 			<h4 class="mb-0">إدارة الفئات</h4>
-			<a class="btn btn-primary" asp-action="Index" asp-controller="CategoryManagement"  >
+			<a class="btn btn-primary" asp-action="Index" asp-controller="CategoryManagement">
 				<i class="fas fa-plus"></i> إضافة فئة جديدة
 			</a>
 		</div>
@@ -31,9 +31,9 @@
 								<a class="btn btn-sm btn-info" asp-action="Edit" asp-controller="CategoryManagement" asp-route-id="@category.Id">
 									<i class="fas fa-edit"></i>
 								</a>
-								<button class="btn btn-sm btn-danger" onclick="deleteCategory(@category.Id)">
+								<a class="btn btn-sm btn-danger" onclick="deleteCategory(@category.Id)">
 									<i class="fas fa-trash"></i>
-								</button>
+								</a>
 							</td>
 						</tr>
 					}

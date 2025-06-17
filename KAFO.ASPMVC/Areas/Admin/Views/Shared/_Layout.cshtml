@@ -13,6 +13,7 @@
 	<link rel="stylesheet" href="~/Kafo.ASPMVC.styles.css" asp-append-version="true" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 	<link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet" />
 	<style>
 		body {
 			display: flex;
@@ -148,7 +149,7 @@
 	<div id="content">
 		<main role="main" class="pb-3">
 			<div class="container-fluid">
-				
+				@Html.Partial("_Notification")
 				@Html.Partial("_StatisticsCards", (AdminHomeVM)Model)
 			</div>
 			<div id="mainContent">
@@ -159,8 +160,21 @@
 
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
 	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+	@* <script>
+		window.onload = function() {
+			toastr.options = {
+				"closeButton": true,
+				"progressBar": true,
+				"positionClass": "toast-top-right",
+				"timeOut": "3000"
+			};
+			toastr.success("Test Message");
+		};
+	</script> *@
 	<script src="~/js/site.js" asp-append-version="true"></script>
 	<script src="~/js/admin/shared.js" asp-append-version="true"></script>
+	<script src="~/js/admin/category.js" asp-append-version="true"></script>
 	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

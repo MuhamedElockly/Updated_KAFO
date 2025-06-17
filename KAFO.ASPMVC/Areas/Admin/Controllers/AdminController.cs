@@ -166,21 +166,24 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 		}
 		public IActionResult Categories(int? page)
 		{
-
-			List<Category> categories = _categoryManager.GetAll();
+			if (page == null)
+			{
+				return BadRequest();
+			}
+			List<Category> categories = _categoryManager.GetAll().Skip(pageSize * (page.Value -1)).Take(pageSize).ToList();
 
 			List<CategoryVM> allCategories = new List<CategoryVM>();
 			foreach (Category category in categories)
 			{
 				allCategories.Add(new CategoryVM() { Id = category.Id, Name = category.Name, Description = category.Description });
 			}
-
+			int x = _categoryManager.GetAll().Count();
 
 			CategoriesTableVM categoriesTableVM = new CategoriesTableVM()
 			{
 				Categories = allCategories,
 				CurrentCategoryPage = page ?? 1,
-				TotalCategoriesPages = (int)Math.Ceiling(allCategories.Count / (double)pageSize)
+				TotalCategoriesPages = (int)Math.Ceiling(_categoryManager.GetAll().Count() / (double)pageSize)
 			};
 
 			return PartialView("_CategoriesManagement", categoriesTableVM);

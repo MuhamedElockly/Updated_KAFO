@@ -38,7 +38,7 @@ namespace KAFO.BLL.Managers
 		public void Delete(Category p)
 		{
 			//all product data from repository
-			UOW.Category.Add(p);
+			UOW.Category.Remove(p);
 			UOW.Save();
 		}
 	}
