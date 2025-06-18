@@ -52,5 +52,44 @@ namespace KAFO.ASPMVC.Models
             this.User = invoice.User;
             this.TotalInvoice = invoice.TotalInvoice;
         }
+
+
+    }
+    public static class InvoiceViewModelHelper
+    {
+        static public CashInvoice ToCashInvoice(this InvoiceViewModel invoice)
+        {
+            return new CashInvoice()
+            {
+                Id = invoice.Id,
+                CreatedAt = invoice.CreatedAt,
+                Items = invoice.Items,
+                User = invoice.User,
+                TotalInvoice = invoice.TotalInvoice
+            };
+        }
+        static public CreditInvoice ToCreditInvoice(this InvoiceViewModel invoice)
+        {
+            return new CreditInvoice()
+            {
+                Id = invoice.Id,
+                CreatedAt = invoice.CreatedAt,
+                Items = invoice.Items,
+                User = invoice.User,
+                TotalInvoice = invoice.TotalInvoice,
+                CustomerAccount = invoice.CustomerAccount
+            };
+        }
+        static public PurchasingInvoice ToPurchasingInvoice(this InvoiceViewModel invoice)
+        {
+            return new PurchasingInvoice()
+            {
+                Id = invoice.Id,
+                CreatedAt = invoice.CreatedAt,
+                Items = invoice.Items,
+                User = invoice.User,
+                TotalInvoice = invoice.TotalInvoice,
+            };
+        }
     }
 }

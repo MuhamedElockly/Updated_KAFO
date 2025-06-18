@@ -4,7 +4,7 @@ namespace KAFO.Domain.Invoices
 {
     public class CashInvoice : Invoice
     {
-        private CashInvoice()
+        public CashInvoice()
         {
 
         }

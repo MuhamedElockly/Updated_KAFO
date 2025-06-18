@@ -2,6 +2,8 @@
 @{
     ViewData["Title"] = "نقطة البيع";
     Layout = "_Layout";
+    var e = ViewData.ModelState.IsValid;
+    var f = 5 + 5;
 }
 <link rel="stylesheet" href="~/css/POS.css" asp-append-version="true" />
 <div class="container-fluid">
@@ -74,6 +76,9 @@
                                                 <div class="d-flex align-items-center justify-content-between">
                                                     <div>
                                                         <span class="product-price">@product.SellingPrice.ToString("N2") ج.م</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="product-price">متبقي  @product.StockQuantity قطع </span>
                                                     </div>
                                                 </div>
                                                 <button type="button" class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart(@product.Id, '@product.Name', @product.SellingPrice, '@product.ImageUrl')">
@@ -211,6 +216,43 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        // Update quantity function with zero check
+        function updateQuantity(id, change) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                item.quantity += change;
+
+                // Prevent quantity from going below zero
+                if (item.quantity <= 0) {
+                    removeFromCart(id);
+                } else {
+                    updateCartDisplay();
+                    updateInvoiceItemsInputs();
+
+                    // Find the product card and update its stock display
+                    const productCard = $(`.product-card[onclick*="${id}"]`);
+                    if (productCard.length) {
+                        const stockDisplay = productCard.find('.product-price:contains("متبقي")');
+                        if (stockDisplay.length) {
+                            const currentText = stockDisplay.text();
+                            const currentStock = parseInt(currentText.match(/\d+/)[0]);
+                            const newStock = currentStock - change;
+                            stockDisplay.text(currentText.replace(/\d+/, newStock));
+
+                            // Disable add button if stock reaches zero
+                            const addButton = productCard.find('.add-to-cart-btn');
+                            if (newStock <= 0) {
+                                addButton.prop('disabled', true)
+                                    .removeClass('add-to-cart-btn')
+                                    .addClass('btn-outline-secondary')
+                                    .html('<i class="fas fa-times me-1"></i> غير متوفر');
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
                 // Show beautiful alert
         function showAlert(title, message, type = 'warning') {
             const modal = $('#alertModal');
@@ -274,6 +316,12 @@
         let cartTotal = 0;
 
         $(document).ready(function() {
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <text>
+                        $('#alertModal').modal('show');
+            </text>
+        }
             // Handle form submission to prevent empty cart
             $('form').submit(function(e) {
                 if (cart.length === 0) {
@@ -380,9 +428,29 @@
 
         // Add item to cart
         function addToCart(id, name, price, image) {
+            // Find the product card to check stock
+            const productCard = $(`.product-card[onclick*="${id}"]`);
+            let availableStock = 0;
+
+            if (productCard.length) {
+                const stockDisplay = productCard.find('.product-price:contains("متبقي")');
+                if (stockDisplay.length) {
+                    availableStock = parseInt(stockDisplay.text().match(/\d+/)[0]);
+                }
+            }
+
+            if (availableStock <= 0) {
+                showAlert('تنبيه', 'هذا المنتج غير متوفر في المخزن', 'warning');
+                return;
+            }
+
             const existingItem = cart.find(item => item.id === id);
 
             if (existingItem) {
+                if (existingItem.quantity >= availableStock) {
+                    showAlert('تنبيه', 'لا يوجد كمية كافية في المخزن', 'warning');
+                    return;
+                }
                 existingItem.quantity += 1;
             } else {
                 cart.push({
@@ -397,6 +465,21 @@
             updateCartDisplay();
             updateInvoiceItemsInputs();
             showAddToCartAnimation();
+
+            // Update the stock display
+            if (productCard.length && stockDisplay.length) {
+                const newStock = availableStock - 1;
+                stockDisplay.text(stockDisplay.text().replace(/\d+/, newStock));
+
+                // Disable if stock reaches zero
+                if (newStock <= 0) {
+                    productCard.find('.add-to-cart-btn')
+                        .prop('disabled', true)
+                        .removeClass('add-to-cart-btn')
+                        .addClass('btn-outline-secondary')
+                        .html('<i class="fas fa-times me-1"></i> غير متوفر');
+                }
+            }
         }
 
         // Remove item from cart

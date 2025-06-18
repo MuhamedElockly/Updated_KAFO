@@ -4,10 +4,10 @@ using KAFO.Domain.Invoices;
 
 namespace Kafo.DAL.Repository
 {
-    public class InvoiceRepsitory : Repository<Invoice>, IInvoiceRepository
+    public class PurchasingInvoiceRepository : Repository<PurchasingInvoice>, IPurchasingInvoiceRepository
     {
         private readonly AppDBContext _dbcontext;
-        public InvoiceRepsitory(AppDBContext dbContext) : base(dbContext)
+        public PurchasingInvoiceRepository(AppDBContext dbContext) : base(dbContext)
         {
             _dbcontext = dbContext;
         }

@@ -66,7 +66,8 @@ namespace KAFO.Domain.Invoices
         {
             if (Items.Count < 1)
                 throw new Exception(Messages.EmptyInvoice);
-            CalculateTotalInvoice();
+            if (TotalInvoice <= 0)
+                CalculateTotalInvoice();
         }
 
         public decimal CalculateTotalInvoice()

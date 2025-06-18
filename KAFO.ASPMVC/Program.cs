@@ -40,7 +40,7 @@ namespace KAFO.ASPMVC
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{Area=Admin}/{controller=Admin}/{action=Index}/{id?}");
+                pattern: "{Area=Seller}/{controller=pos}/{action=Index}/{id?}");
 
             app.Run();
         }

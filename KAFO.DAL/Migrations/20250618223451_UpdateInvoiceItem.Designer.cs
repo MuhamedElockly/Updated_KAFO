@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KAFO.DAL.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20250618141902_initializedatabase")]
-    partial class initializedatabase
+    [Migration("20250618223451_UpdateInvoiceItem")]
+    partial class UpdateInvoiceItem
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,7 +53,7 @@ namespace KAFO.DAL.Migrations
 
                     b.ToTable("Invoices");
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Invoice");
+                    b.HasDiscriminator().HasValue("Invoice");
 
                     b.UseTphMappingStrategy();
                 });
