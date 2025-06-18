@@ -35,6 +35,12 @@ namespace KAFO.ASPMVC
 
 
 
+
+
+
+
+
+
             app.UseRouting();
 
             app.UseAuthorization();
