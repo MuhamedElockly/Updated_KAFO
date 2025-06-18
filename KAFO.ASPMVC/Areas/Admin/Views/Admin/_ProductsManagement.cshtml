@@ -12,14 +12,14 @@
 	<div class="card-body">
 		<div class="table-responsive">
 			<table class="table table-hover">
-				
+
 
 				<thead class="table-light">
 					<tr>
 						<th class="align-middle">الصورة</th>
 						<th class="align-middle">الاسم</th>
 						<th class="align-middle">الفئة</th>
-						<th class="align-middle">المخزون</th>				
+						<th class="align-middle">المخزون</th>
 						<th class="align-middle">متوسط سعر الشراء</th>
 						<th class="align-middle">سعر البيع</th>
 						<th class="align-middle">الحالة</th>
@@ -50,7 +50,7 @@
 								</span>
 
 							</td>
-						
+
 							<td class="align-middle currency-egp">@product.AveragePurchasePrice.ToString("N2")</td>
 							<td class="align-middle currency-egp">@product.SellingPrice.ToString("N2")</td>
 							<td class="align-middle">
@@ -64,7 +64,7 @@
 										<a href="@Url.Action("Details", new { id = product.Id })" class="btn btn-info" title="عرض">
 											<i class="fas fa-eye"></i>
 										</a>
-										<a href="@Url.Action("Edit", new { id = product.Id })" class="btn btn-warning" title="تعديل">
+										<a asp-controller="ProductManagement" asp-action="Edit" asp-route-Id="@product.Id" class="btn btn-warning" title="تعديل">
 											<i class="fas fa-edit"></i>
 										</a>
 										<a href="@Url.Action("Delete", new { id = product.Id })" class="btn btn-danger" title="حذف">

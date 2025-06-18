@@ -9,7 +9,6 @@
   <ItemGroup>
     <Content Remove="Areas\Admin\Views\ProductManagement\Delete.cshtml" />
     <Content Remove="Areas\Admin\Views\ProductManagement\Details.cshtml" />
-    <Content Remove="Areas\Admin\Views\ProductManagement\Edit.cshtml" />
     <Content Remove="wwwroot\js\admin\category.js" />
   </ItemGroup>
 
@@ -30,7 +29,6 @@
   <ItemGroup>
     <None Include="Areas\Admin\Views\ProductManagement\Delete.cshtml" />
     <None Include="Areas\Admin\Views\ProductManagement\Details.cshtml" />
-    <None Include="Areas\Admin\Views\ProductManagement\Edit.cshtml" />
     <None Include="Areas\Seller\Views\CustomerAccounts\Create.cshtml" />
     <None Include="Areas\Seller\Views\CustomerAccounts\Delete.cshtml" />
     <None Include="Areas\Seller\Views\CustomerAccounts\Details.cshtml" />
@@ -69,6 +67,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
