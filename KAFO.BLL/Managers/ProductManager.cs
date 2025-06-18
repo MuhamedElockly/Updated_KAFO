@@ -1,35 +1,82 @@
-﻿using Kafo.DAL.Data;
-using Kafo.DAL.Repository;
+﻿using Kafo.DAL.Repository;
 using KAFO.Domain.Products;
+using System.Linq.Expressions;
 
 namespace KAFO.BLL.Managers
 {
-    public static class ProductManager
+    public class ProductManager : IManager<Product>
     {
-     ////   static AppDBContext appDB = new AppDBContext();
-     //   static UnitOfWork UOW = new UnitOfWork(appDB);
-     //   public static List<Product> GetAll()
-     //   {
-     //       //all product data from repository
-     //       return UOW.Product.GetAll().ToList();
-     //   }
-     //   public static void Add(Product p)
-     //   {
-     //       //all product data from repository
-     //       UOW.Product.Add(p);
-     //       UOW.Save();
-     //   }
-     //   public static void Update(Product p)
-     //   {
-     //       //all product data from repository
-     //       UOW.Product.Update(p);
-     //       UOW.Save();
-     //   }
-     //   public static void Delete(Product p)
-     //   {
-     //       //all product data from repository
-     //       UOW.Product.Add(p);
-     //       UOW.Save();
-     //   }
+        private readonly IUnitOfWork _unitOfWork;
+        public ProductManager(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+        public List<Product> GetAll()
+        {
+            //all product data from repository
+            return _unitOfWork.Product.GetAll().ToList();
+        }
+        public void Add(Product p)
+        {
+            p.LastPurchasingPrice = p.AveragePurchasePrice;
+
+            _unitOfWork.Product.Add(p);
+            _unitOfWork.Save();
+        }
+        public void Update(Product p)
+        {
+            //all product data from repository
+            _unitOfWork.Product.Update(p);
+            _unitOfWork.Save();
+        }
+        public void Delete(Product p)
+        {
+            //all product data from repository
+            _unitOfWork.Product.Add(p);
+            _unitOfWork.Save();
+        }
+
+        public void AddORUpdate(int id, Product entity)
+        {
+            entity.Id = id;
+            entity.ImageUrl = entity.ImageUrl ?? Get(p => p.Id == id)?.ImageUrl;
+            _unitOfWork.Product.AddORUpdate(id, entity);
+            _unitOfWork.Save();
+        }
+
+        public void AddRange(IEnumerable<Product> entitie)
+        {
+            _unitOfWork.Product.AddRange(entitie);
+            _unitOfWork.Save();
+        }
+
+        public Product? FindById(object id)
+        {
+            return _unitOfWork.Product.FindById(id);
+        }
+
+        public Product? Get(Expression<Func<Product, bool>> filter, string? includeProperties = null, bool tracked = false)
+        {
+            return _unitOfWork.Product.Get(filter, includeProperties, tracked);
+        }
+
+        public IEnumerable<Product> GetAll(string? includeProperties = null, Expression<Func<Product, bool>>? filter = null)
+        {
+            return _unitOfWork.Product.GetAll(includeProperties, filter);
+
+        }
+
+        public void Remove(Product entity)
+        {
+            _unitOfWork.Product.Remove(entity);
+            _unitOfWork.Save();
+        }
+
+        public void RemoveRange(IEnumerable<Product> entities)
+        {
+            _unitOfWork.Product.RemoveRange(entities);
+            _unitOfWork.Save();
+        }
+
     }
 }

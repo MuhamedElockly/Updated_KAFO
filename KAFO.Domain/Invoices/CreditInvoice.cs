@@ -4,7 +4,7 @@ namespace KAFO.Domain.Invoices
 {
     public class CreditInvoice : Invoice
     {
-        public CustomerAccount CustomerAccount { get; private set; }
+        public CustomerAccount CustomerAccount { get; set; }
         private CreditInvoice()
         {
 

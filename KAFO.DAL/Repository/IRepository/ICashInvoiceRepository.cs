@@ -1,4 +1,4 @@
-﻿using KAFO.Domain.Products;
+﻿using KAFO.Domain.Invoices;
 
 namespace Kafo.DAL.Repository
 {

@@ -2,12 +2,15 @@
 using KAFO.Domain.Products;
 using KAFO.Domain.Users;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Kafo.DAL.Data
 {
     public class AppDBContext : DbContext
     {
+        public AppDBContext()
+        {
+
+        }
         public AppDBContext(DbContextOptions<AppDBContext> options)
         : base(options)
         {
@@ -21,19 +24,13 @@ namespace Kafo.DAL.Data
         public DbSet<User> Users { get; set; }
         public DbSet<CustomerAccount> CustomerAccounts { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDBContext).Assembly);
-
-            modelBuilder.Entity<Invoice>().Property(i => i.TotalInvoice).HasPrecision(18, 2);
-            modelBuilder.Entity<Invoice>().Property(i => i.ToTalInvoiceProfit).HasPrecision(18, 2);
-            modelBuilder.Entity<InvoiceItem>().Property(ii => ii.Quantity).HasPrecision(18, 2);
-            modelBuilder.Entity<Product>().Property(p => p.AveragePurchasePrice).HasPrecision(18, 2);
-            modelBuilder.Entity<Product>().Property(p => p.LastPurchasingPrice).HasPrecision(18, 2);
-            modelBuilder.Entity<Product>().Property(p => p.SellingPrice).HasPrecision(18, 2);
-            modelBuilder.Entity<Product>().Property(p => p.StockQuantity).HasPrecision(18, 2);
-            modelBuilder.Entity<CustomerAccount>().Property(ca => ca.TotalOwed).HasPrecision(18, 2);
-            modelBuilder.Entity<CustomerAccount>().Property(ca => ca.TotalPaid).HasPrecision(18, 2);
         }
     }
 }

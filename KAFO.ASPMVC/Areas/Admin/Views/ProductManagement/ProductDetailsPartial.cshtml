@@ -1,0 +1,68 @@
+﻿@model Product
+<div class="row">
+    <!-- Product Image -->
+    <div class="col-md-5 text-center mb-4 mb-md-0">
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <img src="@Model.ImageUrl" alt="@Model.Name" class="product-image img-fluid">
+        }
+        else
+        {
+            <div class="product-image d-flex align-items-center justify-content-center bg-light">
+                <i class="fas fa-box-open fa-4x text-muted"></i>
+            </div>
+        }
+    </div>
+
+    <!-- Product Details -->
+    <div class="col-md-7">
+        <div class="detail-item">
+            <h3 class="detail-label">الاسم</h3>
+            <p class="detail-value">@Model.Name</p>
+        </div>
+
+        <div class="detail-item">
+            <h3 class="detail-label">الفئة</h3>
+            <p class="detail-value">@Model.Category?.Name</p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="detail-item">
+                    <h3 class="detail-label">سعر الشراء</h3>
+                    <p class="detail-value price-value currency">@Model.AveragePurchasePrice.ToString("N2")</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="detail-item">
+                    <h3 class="detail-label">سعر البيع</h3>
+                    <p class="detail-value price-value currency">@Model.SellingPrice.ToString("N2")</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-item">
+            <h3 class="detail-label">الكمية المتاحة</h3>
+            <p class="detail-value">
+                <span class="@(Model.StockQuantity <= 0 ? "text-danger fw-bold" : (Model.StockQuantity < 10 ? "text-warning" : "text-success"))">
+                    @Model.StockQuantity.ToString("N0")
+                </span>
+            </p>
+        </div>
+
+        <div class="detail-item">
+            <h3 class="detail-label">آخر سعر شراء</h3>
+            <p class="detail-value currency">@Model.LastPurchasingPrice.ToString("N2")</p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <div class="detail-item">
+                <h3 class="detail-label">رابط الصورة</h3>
+                <p class="detail-value">
+                    <a href="@Model.ImageUrl" target="_blank" class="text-primary">عرض الصورة</a>
+                </p>
+            </div>
+        }
+    </div>
+</div>

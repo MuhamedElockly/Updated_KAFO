@@ -17,6 +17,19 @@ namespace Kafo.DAL.Repository
             _dbSet.Add(entity);
         }
 
+        public void AddORUpdate(int id, T entity)
+        {
+            var existing = _dbSet.Find(id);
+            if (existing == null)
+            {
+                Add(entity);
+                return;
+            }
+
+            _context.Entry(existing).CurrentValues.SetValues(entity);
+            _context.SaveChanges();
+        }
+
         public void AddRange(IEnumerable<T> entitie)
         {
             _dbSet.AddRange(entitie);

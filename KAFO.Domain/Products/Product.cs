@@ -1,20 +1,28 @@
 ﻿using KAFO.Domain.Statics;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace KAFO.Domain.Products
 {
     public class Product : Base
     {
-        public int Id { private set; get; }
-        public string Name { private set; get; }
+        public int Id { set; get; }
+        public string Name { set; get; }
         public string? ImageUrl { set; get; }
-        public decimal AveragePurchasePrice { private set; get; }
-        public decimal LastPurchasingPrice { private set; get; }
+
+        public decimal AveragePurchasePrice { set; get; }
+        public decimal LastPurchasingPrice { set; get; }
+        [Range(0.25, int.MaxValue)]
         public decimal SellingPrice { set; get; }
         public decimal StockQuantity { get; set; }
         public bool IsActive { get; set; }
+        [ForeignKey(nameof(Category))]
+        public int CategoryId { get; set; }
         public virtual Category? Category { set; get; }
 
-        private Product()
+
+        //for ASP.NET Binding 
+        public Product()
         {
 
         }
@@ -78,19 +86,3 @@ namespace KAFO.Domain.Products
         }
     }
 }
-
-/*
-50 ========== 15 ==============30  ----  (30-15)*50   
-
-100========== 20 ==============30  ----  (30-20)*100   total profit =  1750
-
-60 =========== 16.4 ==============30
-
-200 =========== 30 ===============40
-
-
-260 =========== 21 ===============40
-
-((50*15)+(100*20))/150    
-
-*/

@@ -1,4 +1,5 @@
 ﻿using Kafo.ASPMVC.Models;
+using Kafo.DAL.Repository;
 using KAFO.ASPMVC.Areas.Admin.ViewModels;
 using KAFO.BLL.Managers;
 using KAFO.Domain.Products;
@@ -13,8 +14,9 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 	{
 		private readonly CategoryManager _categoryManager;
 		private readonly InvoiceManager _incoiceManager;
-
-		public AdminController(CategoryManager categoryManager, InvoiceManager invoiceManager)
+		//   private readonly IUnitOfWork _unitOfWork;
+		private readonly ProductManager productManager;
+        public AdminController(CategoryManager categoryManager, InvoiceManager invoiceManager)
 		{
 			_categoryManager = categoryManager;
 			_incoiceManager = invoiceManager;
@@ -211,16 +213,17 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 
 			};
 			int pageSize = 5;
-
-			ProductsTableVM productsTableVM = new ProductsTableVM()
+			//List<Product> allProducts = productManager.GetAll(includeProperties: "Category").ToList();
+            ProductsTableVM productsTableVM = new ProductsTableVM()
 			{
 				CurrentProductPage = productPage,
 				Products = allProducts,
 				TotalProductPages = (int)Math.Ceiling(allProducts.Count / (double)pageSize)
 			};
+			
+			
 
-
-			return PartialView("_ProductsManagement", productsTableVM);
+            return PartialView("_ProductsManagement", Products);
 		}
 	}
 }

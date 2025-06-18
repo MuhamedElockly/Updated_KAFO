@@ -1,0 +1,299 @@
+﻿@model List<Product>
+@{
+    ViewData["Title"] = "إدارة المنتجات";
+
+}
+<body>
+    <div class="container-fluid px-0 mx-0">
+        <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+            <h1 class="m-0">
+                <i class="fas fa-boxes me-2"></i>@ViewData["Title"]
+            </h1>
+            <a href="@Url.Action("Create")" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> إضافة منتج جديد
+            </a>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" id="searchInput" class="form-control" placeholder="بحث عن المنتجات...">
+                            <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    @* <div class="col-md-6"> *@
+                        
+                    @* </div> *@
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped m-0 text-center" id="productsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="align-middle">الصورة</th>
+                                <th class="align-middle">الاسم</th>
+                                <th class="align-middle">الفئة</th>
+                                <th class="align-middle">المخزون</th>
+                                <th class="align-middle">سعر الشراء الاخير</th>
+                                <th class="align-middle">متوسط سعر الشراء</th>
+                                <th class="align-middle">سعر البيع</th>
+                                <th class="align-middle">الحالة</th>
+                                <th class="align-middle">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var product in Model)
+                            {
+                                <tr>
+                                    <td class="align-middle">
+                                        @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                        {
+                                            <img src="@product.ImageUrl" alt="@product.Name" class="img-thumbnail mx-auto" style="width: 60px; height: 60px; object-fit: cover;" />
+                                        }
+                                        else
+                                        {
+                                            <div class="no-image-placeholder mx-auto" style="width: 60px; height: 60px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-box-open text-muted"></i>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td class="align-middle">@product.Name</td>
+                                    <td class="align-middle">@product.Category?.Name</td>
+                                    <td class="align-middle">
+                                        <span class="@(product.StockQuantity <= 0 ? "text-danger fw-bold" : (product.StockQuantity < 10 ? "text-secondary" : "text-primary"))">
+                                            @product.StockQuantity.ToString("N0")
+                                            </span>
+                                        
+                                    </td>
+                                    <td class="align-middle currency-egp">@product.LastPurchasingPrice.ToString("N2")</td>
+                                    <td class="align-middle currency-egp">@product.AveragePurchasePrice.ToString("N2")</td>
+                                    <td class="align-middle currency-egp">@product.SellingPrice.ToString("N2")</td>
+                                    <td class="align-middle">
+                                        <span class="badge @(product.IsActive ? "bg-success" : "bg-secondary")">
+                                            @(product.IsActive ? "نشط" : "غير نشط")
+                                        </span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <div class="d-flex justify-content-center">
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="@Url.Action("Details", new { id = product.Id })" class="btn btn-info" title="عرض">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="@Url.Action("Edit", new { id = product.Id })" class="btn btn-warning" title="تعديل">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="@Url.Action("Delete", new { id = product.Id })" class="btn btn-danger" title="حذف">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white">
+                <div class="row">
+                    <div class="col-md-6">
+                        <span class="text-muted">عرض <strong>@Model.Count</strong> منتج</span>
+                    </div>
+                    <div class="col-md-6">
+                        <nav aria-label="Page navigation" class="float-end">
+                            <ul class="pagination pagination-sm">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#">السابق</a>
+                                </li>
+                                
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#" tabindex="-1">التالي</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   </body>
+@section Scripts
+{
+    <script>
+        $(document).ready(function() {
+            // Cache table elements
+            const $table = $('#productsTable');
+            const $tbody = $table.find('tbody');
+            const $rows = $tbody.find('tr');
+            const $pagination = $('.pagination');
+            const $searchInput = $('#searchInput');
+            const $searchButton = $('#searchButton');
+            const $productCount = $('.card-footer span strong');
+
+            // Initialize variables
+            const itemsPerPage = 10;
+            let currentPage = 1;
+            let filteredRows = $rows;
+
+            // Function to update pagination
+            function updatePagination() {
+                const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+                const pageItems = [];
+
+                // Previous button
+                pageItems.push(`<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="prev">السابق</a>
+                </li>`);
+
+                // Page numbers
+                for (let i = 1; i <= totalPages; i++) {
+                    pageItems.push(`<li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" data-page="${i}">${i}</a>
+                    </li>`);
+                }
+
+                // Next button
+                pageItems.push(`<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="next">التالي</a>
+                </li>`);
+
+                $pagination.html(pageItems.join(''));
+                $productCount.text(filteredRows.length);
+            }
+
+            // Function to show current page
+            function showPage(page) {
+                const startIndex = (page - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+
+                $rows.hide();
+                filteredRows.slice(startIndex, endIndex).show();
+            }
+
+            // Search function
+            function performSearch() {
+                const searchTerm = $searchInput.val().toLowerCase();
+
+                filteredRows = $rows.filter(function() {
+                    return $(this).text().toLowerCase().includes(searchTerm);
+                });
+
+                currentPage = 1;
+                showPage(currentPage);
+                updatePagination();
+            }
+
+            // Event handlers
+            $pagination.on('click', '.page-link', function(e) {
+                e.preventDefault();
+                const action = $(this).data('page');
+
+                if (action === 'prev' && currentPage > 1) {
+                    currentPage--;
+                } else if (action === 'next' && currentPage < Math.ceil(filteredRows.length / itemsPerPage)) {
+                    currentPage++;
+                } else if (!isNaN(action)) {
+                    currentPage = parseInt(action);
+                }
+
+                showPage(currentPage);
+                updatePagination();
+            });
+
+            $searchInput.on('input', performSearch);
+            $searchButton.on('click', performSearch);
+
+            // Initialize
+            showPage(currentPage);
+            updatePagination();
+        });
+    </script>
+}
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container-fluid {
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        border-radius: 0.35rem;
+    }
+
+    .card-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1rem 1.35rem;
+        background-color: #f8f9fc;
+    }
+
+    .table th {
+        border-top: none;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        color: #5a5c69;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .btn-group-sm > .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .no-image-placeholder {
+        border-radius: 0.25rem;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    .text-end {
+        text-align: left !important;
+    }
+
+    .float-end {
+        float: left !important;
+    }
+
+    .me-1 {
+        margin-left: 0.25rem !important;
+        margin-right: 0 !important;
+    }
+
+    .me-2 {
+        margin-left: 0.5rem !important;
+        margin-right: 0 !important;
+    }
+
+    .ms-auto {
+        margin-right: auto !important;
+        margin-left: 0 !important;
+    }
+
+    .pagination {
+        padding-right: 0;
+    }
+
+    .table > thead {
+        text-align-last: center;
+    }
+</style>

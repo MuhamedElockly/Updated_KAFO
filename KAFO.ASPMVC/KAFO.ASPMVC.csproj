@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Areas\Admin\Views\ProductManagement\Create.cshtml" />
+    <Content Remove="Areas\Admin\Views\ProductManagement\Delete.cshtml" />
+    <Content Remove="Areas\Admin\Views\ProductManagement\Details.cshtml" />
+    <Content Remove="Areas\Admin\Views\ProductManagement\Edit.cshtml" />
+    <Content Remove="Areas\Admin\Views\ProductManagement\Index.cshtml" />
+    <Content Remove="Areas\Admin\Views\ProductManagement\ProductDetailsPartial.cshtml" />
+    <Content Remove="Areas\Admin\Views\ProductManagement\ProductEditPartial.cshtml" />
     <Content Remove="wwwroot\js\admin\category.js" />
   </ItemGroup>
 
@@ -22,13 +29,51 @@
 
   <ItemGroup>
     <Folder Include="Areas\Admin\Controllers\" />
-    <Folder Include="Areas\Seller\Controllers\" />
-    <Folder Include="Areas\Seller\ViewModels\" />
-    <Folder Include="Areas\Seller\Views\" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Areas\Admin\Views\ProductManagement\Create.cshtml" />
+    <None Include="Areas\Admin\Views\ProductManagement\Delete.cshtml" />
+    <None Include="Areas\Admin\Views\ProductManagement\Details.cshtml" />
+    <None Include="Areas\Admin\Views\ProductManagement\Edit.cshtml" />
+    <None Include="Areas\Admin\Views\ProductManagement\Index.cshtml" />
+    <None Include="Areas\Admin\Views\ProductManagement\ProductDetailsPartial.cshtml" />
+    <None Include="Areas\Admin\Views\ProductManagement\ProductEditPartial.cshtml" />
+    <None Include="Areas\Seller\Views\CustomerAccounts\Create.cshtml" />
+    <None Include="Areas\Seller\Views\CustomerAccounts\Delete.cshtml" />
+    <None Include="Areas\Seller\Views\CustomerAccounts\Details.cshtml" />
+    <None Include="Areas\Seller\Views\CustomerAccounts\Edit.cshtml" />
+    <None Include="Areas\Seller\Views\CustomerAccounts\Index.cshtml" />
+    <None Include="Areas\Seller\Views\Home\Index.cshtml" />
+    <None Include="Areas\Seller\Views\Home\Privacy.cshtml" />
+    <None Include="Areas\Seller\Views\POS\Index.cshtml" />
+    <None Include="Areas\Seller\Views\Shared\Error.cshtml" />
+    <None Include="Areas\Seller\Views\Shared\_Layout.cshtml" />
+    <None Include="Areas\Seller\Views\Shared\_ValidationScriptsPartial.cshtml" />
     <None Include="wwwroot\js\admin\category.js" />
+    <None Include="wwwroot\lib\bootstrap-rtl\css\bootstrap-flipped.css.map" />
+    <None Include="wwwroot\lib\bootstrap-rtl\css\bootstrap-rtl.css.map" />
+    <None Include="wwwroot\lib\font-awesome\js\all.js" />
+    <None Include="wwwroot\lib\font-awesome\js\all.min.js" />
+    <None Include="wwwroot\lib\font-awesome\js\brands.js" />
+    <None Include="wwwroot\lib\font-awesome\js\brands.min.js" />
+    <None Include="wwwroot\lib\font-awesome\js\conflict-detection.js" />
+    <None Include="wwwroot\lib\font-awesome\js\conflict-detection.min.js" />
+    <None Include="wwwroot\lib\font-awesome\js\fontawesome.js" />
+    <None Include="wwwroot\lib\font-awesome\js\fontawesome.min.js" />
+    <None Include="wwwroot\lib\font-awesome\js\regular.js" />
+    <None Include="wwwroot\lib\font-awesome\js\regular.min.js" />
+    <None Include="wwwroot\lib\font-awesome\js\solid.js" />
+    <None Include="wwwroot\lib\font-awesome\js\solid.min.js" />
+    <None Include="wwwroot\lib\font-awesome\js\v4-shims.js" />
+    <None Include="wwwroot\lib\font-awesome\js\v4-shims.min.js" />
+    <None Include="wwwroot\lib\font-awesome\sprites\brands.svg" />
+    <None Include="wwwroot\lib\font-awesome\sprites\regular.svg" />
+    <None Include="wwwroot\lib\font-awesome\sprites\solid.svg" />
+    <None Include="wwwroot\lib\font-awesome\webfonts\fa-brands-400.woff2" />
+    <None Include="wwwroot\lib\font-awesome\webfonts\fa-regular-400.woff2" />
+    <None Include="wwwroot\lib\font-awesome\webfonts\fa-solid-900.woff2" />
+    <None Include="wwwroot\lib\font-awesome\webfonts\fa-v4compatibility.woff2" />
   </ItemGroup>
 
   <ItemGroup>

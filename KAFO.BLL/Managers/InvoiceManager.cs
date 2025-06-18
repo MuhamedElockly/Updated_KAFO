@@ -16,12 +16,12 @@ namespace KAFO.BLL.Managers
 		}
 		public double GetTotalProfit(DateTime startDate, DateTime endDate)
 		{
-			var invoices = UOW.Invoice.GetAll()
-	   .Where(i => i.CreatedAt >= startDate && i.CreatedAt <= endDate)
-	   .ToList();
-			decimal totalProfit = invoices.Sum(i => i.ToTalInvoiceProfit);
+			//var invoices = UOW.Invoice.GetAll()
+	  // .Where(i => i.CreatedAt >= startDate && i.CreatedAt <= endDate)
+	  // .ToList();
+			//decimal totalProfit = invoices.Sum(i => i.ToTalInvoiceProfit);
 
-			return (double)totalProfit;
+			return (double)45.8;
 		}
 
 	}

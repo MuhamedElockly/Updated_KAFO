@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - KAFO</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/KAFO.ASPMVC.styles.css" asp-append-version="true" />
+    <link href="~/lib/bootstrap-rtl/css/bootstrap-rtl.css" rel="stylesheet" />
+    <link href="~/lib/font-awesome/css/all.min.css" rel="stylesheet" />
+
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand mx-4" asp-area="" asp-controller="Home" asp-action="Index">كافو - الرئيسية</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-grow-1 justify-content-between">
+                    <ul class="navbar-nav flex-grow-1 justify-content-end">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index">المنتجات</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="POS" asp-action="Index">نقطة البيع</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Invoices" asp-action="Index">الفواتير</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="CustomerAccounts" asp-action="Index">عملاء الاجل</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">الخصوصية</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="mx-4">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+
+@* <footer class="footer bg-light py-4 mt-5 border-top">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Company Info -->
+            <div class="col-lg-4 mb-4 mb-lg-0 text-center text-lg-start">
+                <h5 class="fw-bold mb-3">
+                    <i class="fas fa-cash-register text-primary me-2"></i>كافو
+                </h5>
+                <p class="mb-2">نظام متكامل لإدارة نقاط البيع والمخازن</p>
+                <div class="social-icons">
+                    <a href="#" class="text-dark me-2"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-dark me-2"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-dark me-2"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-dark"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
+                <h6 class="fw-bold mb-3">روابط سريعة</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#" class="text-muted">الرئيسية</a></li>
+                    <li class="mb-2"><a href="#" class="text-muted">المنتجات</a></li>
+                    <li class="mb-2"><a href="#" class="text-muted">الفواتير</a></li>
+                    <li class="mb-2"><a href="#" class="text-muted">التقارير</a></li>
+                </ul>
+            </div>
+
+            <!-- Support -->
+            <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
+                <h6 class="fw-bold mb-3">الدعم</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="#" class="text-muted">الأسئلة الشائعة</a></li>
+                    <li class="mb-2"><a href="#" class="text-muted">الدعم الفني</a></li>
+                    <li class="mb-2"><a href="#" class="text-muted">الشروط والأحكام</a></li>
+                    <li class="mb-2"><a href="#" class="text-muted">سياسة الخصوصية</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact -->
+            <div class="col-lg-4">
+                <h6 class="fw-bold mb-3">تواصل معنا</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                        القاهرة، مصر
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-phone text-primary me-2"></i>
+                        +20 123 456 7890
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-envelope text-primary me-2"></i>
+                        info@kafu-pos.com
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Copyright -->
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start">
+                <p class="mb-0 text-muted">
+                    &copy; @DateTime.Now.Year كافو. جميع الحقوق محفوظة
+                </p>
+            </div>
+            <div class="col-md-6 text-center text-md-end">
+                <p class="mb-0 text-muted">
+                    برمجة وتطوير <a href="#" class="text-primary">فريق كافو</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+    .footer {
+        background-color: #f8f9fa;
+    }
+    .footer a {
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    .footer a:hover {
+        color: #0d6efd !important;
+    }
+    .social-icons a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        background-color: #e9ecef;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+    .social-icons a:hover {
+        background-color: #0d6efd;
+        color: white !important;
+    }
+</style> *@

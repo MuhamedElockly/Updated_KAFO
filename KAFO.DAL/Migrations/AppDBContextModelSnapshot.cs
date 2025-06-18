@@ -38,12 +38,7 @@ namespace KAFO.DAL.Migrations
                         .HasMaxLength(21)
                         .HasColumnType("nvarchar(21)");
 
-                    b.Property<decimal>("ToTalInvoiceProfit")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<decimal>("TotalInvoice")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("UserId")
@@ -75,7 +70,12 @@ namespace KAFO.DAL.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Quantity")
-                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitPurchasingPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitSellingPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
@@ -116,10 +116,9 @@ namespace KAFO.DAL.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("AveragePurchasePrice")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("CategoryId")
+                    b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<string>("ImageUrl")
@@ -129,7 +128,6 @@ namespace KAFO.DAL.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal>("LastPurchasingPrice")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")
@@ -137,11 +135,9 @@ namespace KAFO.DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("SellingPrice")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("StockQuantity")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
@@ -164,11 +160,9 @@ namespace KAFO.DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalOwed")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("TotalPaid")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
@@ -268,7 +262,9 @@ namespace KAFO.DAL.Migrations
                 {
                     b.HasOne("KAFO.Domain.Products.Category", "Category")
                         .WithMany("Products")
-                        .HasForeignKey("CategoryId");
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Category");
                 });

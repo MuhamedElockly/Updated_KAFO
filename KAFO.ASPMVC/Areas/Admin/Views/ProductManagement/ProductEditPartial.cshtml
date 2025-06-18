@@ -1,0 +1,210 @@
+﻿@model Product
+ 
+<form method="post" enctype="multipart/form-data">
+
+<div class="row">
+    <!-- Right Column -->
+    <div class="col-md-6">
+        <!-- Product Name -->
+        <div class="mb-4">
+            <label asp-for="Name" class="form-label required-field">اسم المنتج</label>
+            <input asp-for="Name" class="form-control" placeholder="أدخل اسم المنتج">
+            <span asp-validation-for="Name" class="text-danger small"></span>
+        </div>
+
+        <!-- Category -->
+        <div class="mb-4">
+            <label class="form-label required-field">الفئة</label>
+            <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.categoryList">
+                <option value="">-- اختر الفئة --</option>
+            </select>
+            <span asp-validation-for="CategoryId" class="text-danger small"></span>
+        </div>
+
+        <!-- Prices -->
+        <div class="mb-4">
+            <label class="form-label required-field">الأسعار</label>
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <label asp-for="AveragePurchasePrice" class="form-label">سعر الشراء</label>
+                    <div class="input-group">
+                        <span class="input-group-text">ج.م.</span>
+                        <input asp-for="AveragePurchasePrice" class="form-control" placeholder="0.00">
+                    </div>
+                    <span asp-validation-for="AveragePurchasePrice" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="SellingPrice" class="form-label">سعر البيع</label>
+                    <div class="input-group">
+                        <span class="input-group-text">ج.م.</span>
+                        <input asp-for="SellingPrice" class="form-control" placeholder="0.00">
+                    </div>
+                    <span asp-validation-for="SellingPrice" class="text-danger small"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Left Column -->
+    <div class="col-md-6">
+        <!-- Image Upload -->
+        <div class="mb-4">
+            <label for="imageUploadContainer" class="form-label">صورة المنتج</label>
+            <div class="image-upload-container" id="imageUploadContainer">
+                <div id="uploadIcon">
+                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                    <p class="mb-0">اضغط لرفع صورة المنتج</p>
+                    <small class="text-muted">(JPEG, PNG, Max 2MB)</small>
+                </div>
+                <img src="@(Model?.ImageUrl??"")" id="imagePreview" class="image-preview img-thumbnail" alt="Preview" style="display: @(Model?.ImageUrl==null?"none":"block")">
+                <input type="file" id="imageInput" name="imageFile" accept="image/*" style="display: none;" />
+            </div>
+            <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+        </div>
+
+        <!-- Stock Quantity -->
+        <div class="mb-4">
+            <label asp-for="StockQuantity" class="form-label">الكمية المتاحة</label>
+            <input asp-for="StockQuantity" class="form-control" placeholder="0" disabled="disabled">
+            <span asp-validation-for="StockQuantity" class="text-danger small"></span>
+        </div>
+
+        <!-- Status -->
+        <div class="form-check form-switch mb-4">
+                @if (Model == null || Model.IsActive)
+                {
+                <input asp-for="IsActive" class="form-check-input" type="checkbox" checked>
+            }else{
+                <input asp-for="IsActive" class="form-check-input" type="checkbox">
+
+            }
+            <label class="form-check-label" asp-for="IsActive">الحالة (نشط/غير نشط)</label>
+        </div>
+    </div>
+</div>
+
+<!-- Form Buttons -->
+<div class="d-flex justify-content-between mt-4">
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-right me-1"></i> رجوع
+    </a>
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save me-1"></i> حفظ المنتج
+    </button>
+</div>
+</form>
+    
+
+<script>
+        document.getElementById("imageUploadContainer").addEventListener("click", function () {
+            document.getElementById("imageInput").click();
+        });
+
+        document.getElementById("imageInput").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const imgPreview = document.getElementById("imagePreview");
+                    imgPreview.src = e.target.result;
+                    imgPreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+
+
+
+<style>
+    :root {
+        --primary-color: #4e73df;
+        --secondary-color: #f8f9fc;
+        --accent-color: #2e59d9;
+    }
+
+    body {
+        font-family: 'Tajawal', sans-serif;
+        background-color: #f8f9fa;
+    }
+
+    .form-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .form-header {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1.5rem;
+    }
+
+    .form-body {
+        padding: 2rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #5a5c69;
+    }
+
+    .form-control, .form-select {
+        border-radius: 0.375rem;
+        padding: 0.5rem 1rem;
+        border: 1px solid #d1d3e2;
+        transition: all 0.3s;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+        }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+    }
+
+        .btn-primary:hover {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+    .image-upload-container {
+        border: 2px dashed #d1d3e2;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+        .image-upload-container:hover {
+            border-color: var(--primary-color);
+            background-color: var(--secondary-color);
+        }
+
+    .image-preview {
+        max-width: 200px;
+        max-height: 200px;
+        margin: 0 auto;
+        display: none;
+    }
+
+    .required-field::after {
+        content: " *";
+        color: #e74a3b;
+    }
+
+    .input-group-text {
+        background-color: #eaecf4;
+        color: #5a5c69;
+    }
+</style>

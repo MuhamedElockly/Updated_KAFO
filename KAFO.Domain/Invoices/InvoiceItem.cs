@@ -1,18 +1,25 @@
 ﻿using KAFO.Domain.Products;
 using KAFO.Domain.Statics;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace KAFO.Domain.Invoices
 {
     public class InvoiceItem : Base
     {
-        public int Id { private set; get; }
-        public Invoice Invoice { get; private set; } = null!;
-        public Product Product { get; private set; }
-        public decimal UnitSellingPrice => Product.SellingPrice;
-        public decimal UnitPurchasingPrice => Product.LastPurchasingPrice;
-        public decimal Quantity { get; private set; }
+        public int Id { set; get; }
 
-        private InvoiceItem()
+        [ForeignKey(nameof(Invoice))]
+        public int InvoiceId { set; get; }
+
+        [ForeignKey(nameof(Product))]
+        public int ProductId { set; get; }
+        public Invoice Invoice { get; set; } = null!;
+        public Product Product { get; set; }
+        public decimal UnitSellingPrice { get; set; }
+        public decimal UnitPurchasingPrice { get; set; }
+        public decimal Quantity { get; set; }
+
+        public InvoiceItem()
         {
 
         }

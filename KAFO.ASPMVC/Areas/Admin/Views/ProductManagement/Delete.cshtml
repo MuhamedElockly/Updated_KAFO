@@ -1,0 +1,117 @@
+﻿@model Product
+@{
+    ViewData["Title"] = "حذف المنتج";
+}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        :root {
+            --danger-color: #e74a3b;
+            --warning-color: #f6c23e;
+            --secondary-color: #858796;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .delete-card {
+            max-width: 600px;
+            margin: 2rem auto;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: none;
+            border-top: 5px solid var(--danger-color);
+        }
+
+        .card-header {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 1.5rem;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .warning-alert {
+            background-color: #fff3cd;
+            border-right: 5px solid var(--warning-color);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.25rem;
+        }
+
+        .product-image {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 0.5rem;
+            border: 1px solid #ddd;
+            object-fit: contain;
+            background-color: #f8f9fa;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+
+        .detail-item {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #5a5c69;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-value {
+            font-size: 1.1rem;
+        }
+
+        .action-btn {
+            min-width: 120px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="delete-card card">
+            <div class="card-header">
+                <h2 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>@ViewData["Title"]
+                </h2>
+            </div>
+
+            <div class="card-body">
+                <div class="warning-alert">
+                    <h4 class="alert-heading">
+                        <i class="fas fa-exclamation-circle text-warning me-2"></i>تحذير!
+                    </h4>
+                    <p class="mb-0">هل أنت متأكد أنك تريد حذف هذا المنتج؟ هذه العملية لا يمكن التراجع عنها.</p>
+                </div>
+
+                <partial name="ProductDetailsPartial" model="@Model" />
+
+                </div>
+
+                <form asp-action="DeleteConfirmed" method="post">
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="d-flex flex-column flex-sm-row justify-content-between mt-4 pt-3 border-top gap-2">
+                        <button type="submit" class="btn btn-danger action-btn">
+                            <i class="fas fa-trash-alt me-1"></i> تأكيد الحذف
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+</body>
+</html>

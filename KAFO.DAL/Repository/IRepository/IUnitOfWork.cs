@@ -1,6 +1,6 @@
 ﻿namespace Kafo.DAL.Repository
 {
-    public interface IUnitOfWork : IDisposable
+    public interface IUnitOfWork
     {
         ICategoryRepository Category { get; }
         IProductRepository Product { get; }
