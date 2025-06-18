@@ -24,6 +24,7 @@ namespace KAFO.ASPMVC
             builder.Services.AddScoped<InvoiceManager>();
 
 
+
             var app = builder.Build();
 
             if (!app.Environment.IsDevelopment())
@@ -31,6 +32,8 @@ namespace KAFO.ASPMVC
                 app.UseExceptionHandler("/Home/Error");
             }
             app.UseStaticFiles();
+
+
 
             app.UseRouting();
 

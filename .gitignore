@@ -5,7 +5,7 @@
 *.dll
 *.exe
 *.pdb
-
+appsettings.json
 # Ignore Visual Studio files
 .vs/
 .vscode/
