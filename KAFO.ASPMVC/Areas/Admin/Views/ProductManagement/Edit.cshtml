@@ -1,5 +1,6 @@
-﻿@model Product
+﻿@model ProductVM
 @{
+    Layout = "_DefaultLayout";
     string title = $"تعديل منتج '{Model.Name}'";
     ViewData["Title"] = title;
     IEnumerable<Category> Categories = ViewBag.Categories;
