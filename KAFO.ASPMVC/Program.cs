@@ -33,14 +33,6 @@ namespace KAFO.ASPMVC
             }
             app.UseStaticFiles();
 
-
-
-
-
-
-
-
-
             app.UseRouting();
 
             app.UseAuthorization();
