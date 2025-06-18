@@ -1,7 +1,7 @@
 ﻿@model CategoryVM
 @{
 	// ViewData["Title"] = Model.Id == 0 ? "إضافة فئة جديدة" : "تعديل الفئة";
-	Layout = "_EditCategoryLayout";
+	Layout = "_DefaultLayout";
 	var isNewCategory = Model?.Id == 0;
 	var title = isNewCategory ? "إضافة فئة جديدة" : "تعديل الفئة";
 }

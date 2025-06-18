@@ -1,8 +1,9 @@
-﻿@model Product
+﻿@model ProductVM
 @{
+    Layout = "_DefaultLayout";
     string title =  "اضافة منتج جديد";
-   ViewData["Title"] = title;
-    IEnumerable<Category> Categories = ViewBag.Categories;
+    ViewData["Title"] = title;
+    IEnumerable<CategoryVM> Categories = ViewBag.Categories;
     ViewBag.categoryList = new SelectList(ViewBag.Categories, "Id", "Name",1);
 }
 

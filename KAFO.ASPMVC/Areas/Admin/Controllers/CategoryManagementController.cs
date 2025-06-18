@@ -44,7 +44,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 
             if (categoryVM == null)
             {
-                TempData["Success"] = "there is erorr";
+                TempData["Erorr"] = "there is erorr";
                 return BadRequest();
             }
             if (!ModelState.IsValid)

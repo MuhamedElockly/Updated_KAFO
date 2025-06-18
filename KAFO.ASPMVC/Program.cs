@@ -21,6 +21,7 @@ namespace KAFO.ASPMVC
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<CategoryManager>();
+            builder.Services.AddScoped<ProductManager>();
             builder.Services.AddScoped<InvoiceManager>();
 
 

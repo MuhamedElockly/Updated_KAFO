@@ -9,7 +9,9 @@ namespace KAFO.ASPMVC.Areas.Admin.ViewModels
 		public string? ImageUrl { set; get; }
 		public decimal SellingPrice { set; get; }
 		public decimal StockQuantity { get; set; }
+		public decimal AveragePurchasePrice { get; set; }
 		public bool IsActive { get; set; }
+		public int CategoryId { get; set; }
 		public virtual Category? Category { set; get; }
 	}
 }
