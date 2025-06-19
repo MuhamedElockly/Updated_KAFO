@@ -17,16 +17,18 @@ namespace KAFO.Domain.Invoices
             base.CompleteInvoice();
             foreach (var item in Items)
             {
-                // change price if changed
-                if (item.UnitPurchasingPrice != item.Product.LastPurchasingPrice)
-                {
-                    item.Product.ChangePurchasingPriceAndQuantity(item.UnitPurchasingPrice, item.UnitSellingPrice, item.Quantity);
-                }
-                else // because the ChangePurchasingPriceAndQuantity will increase the quantity
-                {
-                    // update products Quantity
-                    item.Product.IncreaseStockQuantity(item.Quantity);
-                }
+                //// change price if changed
+                //if (item.UnitPurchasingPrice != item.Product.LastPurchasingPrice)
+                //{
+                //    item.Product.ChangePurchasingPriceAndQuantity(item.UnitPurchasingPrice, item.UnitSellingPrice, item.Quantity);
+                //}
+                //else // because the ChangePurchasingPriceAndQuantity will increase the quantity
+                //{
+                //    // update products Quantity
+                //    item.Product.IncreaseStockQuantity(item.Quantity);
+                //}
+                item.Product.ChangePurchasingPriceAndQuantity(item.Product.LastPurchasingPrice, item.UnitSellingPrice, item.Quantity);
+                //item.Product.IncreaseStockQuantity(item.Quantity);
             }
         }
     }
