@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace KAFO.Domain.Invoices
 {
-    public class InvoiceItem : Base
+    public class InvoiceItem : Base, ISoftDelete
     {
         public int Id { set; get; }
 
@@ -18,6 +18,7 @@ namespace KAFO.Domain.Invoices
         public decimal UnitSellingPrice { get; set; }
         public decimal UnitPurchasingPrice { get; set; }
         public decimal Quantity { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
         public InvoiceItem()
         {

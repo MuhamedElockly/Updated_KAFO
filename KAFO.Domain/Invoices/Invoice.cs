@@ -4,7 +4,7 @@ using KAFO.Domain.Users;
 using System.ComponentModel.DataAnnotations;
 namespace KAFO.Domain.Invoices
 {
-    public abstract class Invoice : Base
+    public abstract class Invoice : Base, ISoftDelete
     {
 
         public int Id { set; get; }
@@ -13,6 +13,7 @@ namespace KAFO.Domain.Invoices
         public required ICollection<InvoiceItem> Items { set; get; } = [];
         public User User { set; get; }
         public decimal TotalInvoice { set; get; }
+        public bool IsDeleted { get; set; } = false;
 
         protected Invoice()
         {

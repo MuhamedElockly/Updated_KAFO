@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace KAFO.Domain.Products
 {
-    public class Product : Base
+    public class Product : Base, ISoftDelete
     {
         public int Id { set; get; }
         public string Name { set; get; }
@@ -19,6 +19,7 @@ namespace KAFO.Domain.Products
         [ForeignKey(nameof(Category))]
         public int CategoryId { get; set; }
         public virtual Category? Category { set; get; }
+        public bool IsDeleted { get; set; } = false;
 
 
         //for ASP.NET Binding 

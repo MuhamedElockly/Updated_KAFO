@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace KAFO.Domain.Users
 {
-    public class CustomerAccount : Base
+    public class CustomerAccount : Base, ISoftDelete
     {
         public int Id { get; set; }
         [Display(Name = "اسم العميل")]
@@ -14,6 +14,7 @@ namespace KAFO.Domain.Users
         public decimal TotalOwed { get; set; }
         public decimal Balance => TotalPaid - TotalOwed;
         public virtual ICollection<CreditInvoice> Invoices { get; set; } = [];
+        public bool IsDeleted { get; set; } = false;
 
         public CustomerAccount()
         {
