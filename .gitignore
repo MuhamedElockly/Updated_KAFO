@@ -5,7 +5,11 @@
 *.dll
 *.exe
 *.pdb
-KAFO.ASPMVC/appsettings.json
+
 # Ignore Visual Studio files
 .vs/
 .vscode/
+
+#Ignore Configurations
+appsettings.json
+appsettings.*.json
