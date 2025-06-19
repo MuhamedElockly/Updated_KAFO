@@ -3,7 +3,8 @@
     ViewData["Title"] = "نقطة البيع";
     Layout = "_Layout";
     var e = ViewData.ModelState.IsValid;
-    var f = 5 + 5;
+    // List<string> invoiceTypes = ["فاتورة نقدي", "فاتورة اجل", "فاتورة مرتجع نقدي", "فاتورة مرتجع اجل"];
+    // SelectList selectListItems = new SelectList(invoiceTypes);
 }
 <link rel="stylesheet" href="~/css/POS.css" asp-append-version="true" />
 <div class="container-fluid">
@@ -439,7 +440,10 @@
                 }
             }
 
-            if (availableStock <= 0) {
+            let InvoiceTypeSelectedval = $('#InvoiceTypeSelect').val()
+            let ifDecreaseItemsInvoice = (InvoiceTypeSelectedval === "0") || (InvoiceTypeSelectedval === "1") || (InvoiceTypeSelectedval === "5") ;
+
+            if (availableStock <= 0 && ifDecreaseItemsInvoice) {
                 showAlert('تنبيه', 'هذا المنتج غير متوفر في المخزن', 'warning');
                 return;
             }
@@ -447,7 +451,7 @@
             const existingItem = cart.find(item => item.id === id);
 
             if (existingItem) {
-                if (existingItem.quantity >= availableStock) {
+                if (existingItem.quantity >= availableStock && ifDecreaseItemsInvoice) {
                     showAlert('تنبيه', 'لا يوجد كمية كافية في المخزن', 'warning');
                     return;
                 }

@@ -1,0 +1,54 @@
+﻿@model IdentityViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-card-header">
+                <h3><i class="fas fa-lock me-2"></i>نظام تسجيل الدخول</h3>
+            </div>
+            <div class="login-card-body">
+                <form asp-action="Login">
+                    <div asp-validation-summary="All" class="alert alert-danger text-right"></div>
+                    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+
+                    <div class="mb-3">
+                        <label asp-for="userName" class="form-label"></label>
+                        <input asp-for="userName" class="form-control" />
+                        <span asp-validation-for="userName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="password" class="form-label"></label>
+                        <input asp-for="password" type="password" class="form-control"/>
+                        <span asp-validation-for="password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-login btn-primary">
+                            <i class="fas fa-sign-in-alt me-2"></i>تسجيل الدخول
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Validation Scripts -->
+    <partial name="_ValidationScriptsPartial" />
+
+    <!-- Tajawal Arabic Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+</body>
+
+<style>
+
+</style>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

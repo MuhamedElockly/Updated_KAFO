@@ -2,9 +2,7 @@
 using KAFO.ASPMVC.Areas.Admin.ViewModels;
 using KAFO.BLL.Managers;
 using KAFO.Domain.Products;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace KAFO.ASPMVC.Areas.Admin.Controllers
 {
@@ -167,7 +165,7 @@ namespace KAFO.ASPMVC.Areas.Admin.Controllers
                 {
 
                     product.ImageUrl = await UploadFile(imageFile, product.Name);
-                    _productManager.AddORUpdate((int)id, product);
+                    _productManager.AddORUpdate((int) id, product);
                     return RedirectToAction(nameof(Index));
                 }
                 else

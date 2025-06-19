@@ -13,17 +13,35 @@ namespace KAFO.ASPMVC
 
 
             builder.Services.AddControllersWithViews();
+
+            // DbContext
             builder.Services.AddDbContext<AppDBContext>(
                             options => options.UseSqlServer(
                                 builder.Configuration
                                 .GetConnectionString("DefaultConnection"))
                             );
 
+            // Repositories
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<CategoryManager>();
             builder.Services.AddScoped<ProductManager>();
             builder.Services.AddScoped<ReportManager>();
+            builder.Services.AddScoped<UserManager>();
 
+            // Identity
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = "CustomIdentity";
+                //options.DefaultChallengeScheme = "CustomIdentity";
+            })
+            .AddCookie("CustomIdentity", options =>
+            {
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                options.LoginPath = "/Identity/Identity/Login";
+                options.LogoutPath = "/Identity/Identity/Logout";
+                options.AccessDeniedPath = "/Identity/Identity/AccessDenied";
+                //options.RegistrationPath = "/Identity/Identity/Registration";
+            });
 
 
             var app = builder.Build();
@@ -41,7 +59,7 @@ namespace KAFO.ASPMVC
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{Area=seller}/{controller=pos}/{action=Index}/{id?}");
-
+            //pattern: "{Area=Identity}/{controller=Identity}/{action=Login}/{id?}");
             app.Run();
         }
     }

@@ -1,11 +1,13 @@
 ﻿using Kafo.DAL.Repository;
 using KAFO.ASPMVC.Models;
 using KAFO.Domain.Invoices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KAFO.ASPMVC.Controllers
 {
     [Area("Seller")]
+    [Authorize(Roles = "admin, seller")]
     public class POSController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -14,6 +16,7 @@ namespace KAFO.ASPMVC.Controllers
         {
             _unitOfWork = unitOfWork;
         }
+
         public IActionResult Index()
         {
             ViewBag.Products = _unitOfWork.Product.GetAll("Category", p => p.IsActive);
@@ -22,6 +25,7 @@ namespace KAFO.ASPMVC.Controllers
 
             return View();
         }
+
         [ValidateAntiForgeryToken]
         public IActionResult Create(InvoiceViewModel invoice)
         {
@@ -35,13 +39,14 @@ namespace KAFO.ASPMVC.Controllers
             //invoice.User = _unitOfWork.User.FindById(User.Identity.Name!);
             invoice.User = new Domain.Users.User("s", "s", "s", "s");
             ModelState.Clear();
+            bool isDecreaseItemsInvoice = ( invoice.Type == InvoiceType.Cash ) || ( invoice.Type == InvoiceType.Credit ) || ( invoice.Type == InvoiceType.PurchasingReturn );
             foreach (var item in invoice.Items)
             {
                 item.Invoice = invoice;
                 item.Product = Products.FirstOrDefault(p => p.Id == item.ProductId);
                 item.UnitSellingPrice = item.Product.SellingPrice;
                 item.UnitPurchasingPrice = item.Product.AveragePurchasePrice;
-                if (item.Quantity > item.Product.StockQuantity)
+                if (item.Quantity > item.Product.StockQuantity && isDecreaseItemsInvoice)
                 {
                     ModelState.AddModelError("", $"لا يمكن شراء عدد {item.Quantity} قطع من المنتج {item.Product.Name} لان اجمالي ما يزجد في المتجر هو {item.Product.StockQuantity}");
                 }

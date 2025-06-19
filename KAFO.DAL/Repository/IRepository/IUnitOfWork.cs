@@ -10,6 +10,7 @@
         ICustomerAccountRepository CustomerAccount { get; }
         IInvoiceItemRepository InvoiceItem { get; }
         IInvoiceRepository Invoice { get; }
+        IUserRepository User { get; }
 
         void Save();
     }

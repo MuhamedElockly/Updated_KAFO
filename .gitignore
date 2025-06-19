@@ -13,3 +13,4 @@
 #Ignore Configurations
 appsettings.json
 appsettings.*.json
+KAFO.DAL/Data/DesignTimeDbContextFactory.cs

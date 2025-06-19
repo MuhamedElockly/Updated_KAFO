@@ -20,6 +20,8 @@ namespace Kafo.DAL.Repository
 
         public IPurchasingInvoiceRepository PurchasingInvoice { get; private set; }
 
+        public IUserRepository User { get; private set; }
+
         public UnitOfWork(AppDBContext dbContext)
         {
             _dbcontext = dbContext;
@@ -32,6 +34,7 @@ namespace Kafo.DAL.Repository
             CustomerAccount = new CustomerAccountRepsitory(_dbcontext);
             InvoiceItem = new InvoiceItemRepsitory(_dbcontext);
             Invoice = new InvoiceRepository(_dbcontext);
+            User = new UserRepository(_dbcontext);
         }
 
         public void Save()

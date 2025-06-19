@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KAFO.DAL.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20250619083527_m2")]
-    partial class m2
+    [Migration("20250619182658_UpdateUser")]
+    partial class UpdateUser
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -56,7 +56,7 @@ namespace KAFO.DAL.Migrations
 
                     b.ToTable("Invoices");
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Invoice");
+                    b.HasDiscriminator().HasValue("Invoice");
 
                     b.UseTphMappingStrategy();
                 });
@@ -205,6 +205,10 @@ namespace KAFO.DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
