@@ -4,7 +4,7 @@ namespace KAFO.ASPMVC.Areas.Admin.ViewModels
 {
 	public class ProductVM
 	{
-		public int Id { set; get; }
+		public int? Id { set; get; } 
 		public string Name { set; get; }
 		public string? ImageUrl { set; get; }
 		public decimal SellingPrice { set; get; }

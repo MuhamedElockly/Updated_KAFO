@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KAFO.DAL.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20250618223451_UpdateInvoiceItem")]
-    partial class UpdateInvoiceItem
+    [Migration("20250619083527_m2")]
+    partial class m2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,6 +41,9 @@ namespace KAFO.DAL.Migrations
                         .HasMaxLength(21)
                         .HasColumnType("nvarchar(21)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<decimal>("TotalInvoice")
                         .HasColumnType("decimal(18,2)");
 
@@ -53,7 +56,7 @@ namespace KAFO.DAL.Migrations
 
                     b.ToTable("Invoices");
 
-                    b.HasDiscriminator().HasValue("Invoice");
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Invoice");
 
                     b.UseTphMappingStrategy();
                 });
@@ -68,6 +71,9 @@ namespace KAFO.DAL.Migrations
 
                     b.Property<int>("InvoiceId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -101,6 +107,9 @@ namespace KAFO.DAL.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -128,6 +137,9 @@ namespace KAFO.DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<decimal>("LastPurchasingPrice")
@@ -161,6 +173,9 @@ namespace KAFO.DAL.Migrations
                     b.Property<string>("CustomerName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<decimal>("TotalOwed")
                         .HasColumnType("decimal(18,2)");

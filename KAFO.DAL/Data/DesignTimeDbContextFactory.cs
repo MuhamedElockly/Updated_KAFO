@@ -11,7 +11,7 @@ namespace Kafo.DAL.Data
             var optionsBuilder = new DbContextOptionsBuilder<AppDBContext>();
 
             // Use the same connection string as in your Startup
-            optionsBuilder.UseSqlServer("Data Source=STEVEN\\SQLEXPRESS;Initial Catalog=KAFO;Persist Security Info=True;User ID=sa;Password=123;Encrypt=True;Trust Server Certificate=True");
+            optionsBuilder.UseSqlServer("Data Source=MOHAMED-ELOCKLY\\MYSQLSERVER;Initial Catalog=KAFODB;Integrated Security=True;Encrypt=True;Trust Server Certificate=True");
 
             return new AppDBContext(optionsBuilder.Options);
         }

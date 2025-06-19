@@ -53,7 +53,7 @@ namespace KAFO.DAL.Migrations
 
                     b.ToTable("Invoices");
 
-                    b.HasDiscriminator().HasValue("Invoice");
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Invoice");
 
                     b.UseTphMappingStrategy();
                 });
