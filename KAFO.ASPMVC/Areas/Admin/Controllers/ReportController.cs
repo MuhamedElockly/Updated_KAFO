@@ -11,8 +11,8 @@ namespace KAFO.ASPMVC.Areas.Admin.Controllers
 	[Area("Admin")]
 	public class ReportController : Controller
 	{
-		private readonly InvoiceManager _invcoiceManager;
-		public ReportController(InvoiceManager invoiceManager)
+		private readonly ReportManager _invcoiceManager;
+		public ReportController(ReportManager invoiceManager)
 		{
 			_invcoiceManager = invoiceManager;
 

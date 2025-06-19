@@ -13,14 +13,14 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 	public class AdminController : Controller
 	{
 		private readonly CategoryManager _categoryManager;
-		private readonly InvoiceManager _incoiceManager;
+		private readonly ReportManager _reportManager;
 		//   private readonly IUnitOfWork _unitOfWork;
 		private readonly ProductManager _productManager;
 		const int pageSize = 5;
-		public AdminController(CategoryManager categoryManager, InvoiceManager invoiceManager, ProductManager productManager)
+		public AdminController(CategoryManager categoryManager, ReportManager invoiceManager, ProductManager productManager)
 		{
 			_categoryManager = categoryManager;
-			_incoiceManager = invoiceManager;
+			_reportManager = invoiceManager;
 			_productManager = productManager;
 
 		}
@@ -51,11 +51,11 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 			ProductsTableVM productsTableVM = new ProductsTableVM()
 			{
 				Products = allProducts,
-				CurrentProductPage =  1,
+				CurrentProductPage = 1,
 				TotalProductPages = (int)Math.Ceiling(_productManager.GetAll().Count() / (double)pageSize)
 			};
 			ViewData["Title"] = "لوحة التحكم";
-			AdminHomeVM adminHomeVM = new AdminHomeVM { Products = productsTableVM, AdminName = "Muhamed Elockly", TotalProfitToday = 102.5, TotalProductSoldToday = 100, TotalSellsToday = 506.5 };
+			AdminHomeVM adminHomeVM = new AdminHomeVM { Products = productsTableVM, AdminName = "Muhamed Elockly", TotalProfitToday = _reportManager.GetTodayTotalProfit(), TotalProductSoldToday = _reportManager.GetTotalProductSoldToday(), TotalSellsToday = _reportManager.GetTotalSellsToday() };
 
 			return View(adminHomeVM);
 		}
