@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace KAFO.ASPMVC.Controllers
 {
     [Area("Seller")]
-    [Authorize(Roles = "admin, seller")]
+    //[Authorize(Roles = "admin, seller")]
     public class POSController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

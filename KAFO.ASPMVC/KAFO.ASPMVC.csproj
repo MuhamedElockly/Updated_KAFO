@@ -20,6 +20,7 @@
     <ProjectReference Include="..\KAFO.BLL\KAFO.BLL.csproj" />
     <ProjectReference Include="..\KAFO.DAL\KAFO.DAL.csproj" />
     <ProjectReference Include="..\KAFO.Domain\KAFO.Domain.csproj" />
+    <ProjectReference Include="..\KAFO.Utility\KAFO.Utility.csproj" />
   </ItemGroup>
 
   <ItemGroup>

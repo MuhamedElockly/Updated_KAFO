@@ -19,7 +19,7 @@ namespace KAFO.Domain.Invoices
         {
 
         }
-        public Invoice(DateTime createdAt, User user)
+        public Invoice(DateTime createdAt, User user) 
         {
             CreatedAt = createdAt;
             User = user;

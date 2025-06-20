@@ -3,9 +3,9 @@
 	<div class="card-header bg-white">
 		<div class="d-flex justify-content-between align-items-center">
 			<h4 class="mb-0">إدارة المستخدمين</h4>
-			<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSellerModal">
+			<a class="btn btn-primary" asp-action="Index" asp-controller="UserManagement">
 				<i class="fas fa-plus"></i> إضافة مستخدم جديد
-			</button>
+			</a>
 		</div>
 	</div>
 	<div class="card-body">
@@ -59,7 +59,7 @@
 					</li>
 				}
 				<li class="page-item @(Model.CurrentUserPage == Model.TotalUsersPages ? "disabled" : "")">
-					<a class="page-link" onclick="loadAdminContent('Users', @Model.CurrentUserPage+1)">التالي</a>
+					<a class="page-link" onclick="loadAdminContent('Users', @Model.CurrentUserPage +1)">التالي</a>
 				</li>
 			</ul>
 		</nav>

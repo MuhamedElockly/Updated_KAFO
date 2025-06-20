@@ -1,8 +1,10 @@
 ﻿using KAFO.ASPMVC.Areas.Identity.ViewModels;
+using KAFO.Utility.Helpers;
 using KAFO.BLL.Managers;
 using KAFO.Domain.Users;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace KAFO.ASPMVC.Areas.Identity.Controllers
@@ -26,10 +28,10 @@ namespace KAFO.ASPMVC.Areas.Identity.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Login(IdentityViewModel IdentityViewModel, string? ReturnUrl = null)
 		{
-			
+
 			if (ModelState.IsValid)
 			{
-				User user = _userManager.Get(IdentityViewModel.userName, IdentityViewModel.password);
+				User user = VerifyUser(IdentityViewModel.userName, IdentityViewModel.password);
 				if (user != null)
 				{
 					Claim info0 = new Claim(ClaimTypes.NameIdentifier, user.Id.ToString());
@@ -66,6 +68,28 @@ namespace KAFO.ASPMVC.Areas.Identity.Controllers
 			}
 
 			return Redirect("~/");
+		}
+		public User VerifyUser(string userInput, string password)
+		{
+			var user = _userManager.FindByEmailOrPhone(userInput);
+
+			if (user == null)
+			{
+				return null;
+			}
+			else
+			{
+				if (PasswordHelper.VerifyPassword(user.Password, password))
+				{
+					return user;
+				}
+				else
+				{
+					return null;
+				}
+			}
+
+
 		}
 		public async Task<IActionResult> Logout()
 		{

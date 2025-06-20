@@ -30,19 +30,19 @@ namespace KAFO.ASPMVC
 			builder.Services.AddScoped<UserManager>();
 
 			// Identity
-			builder.Services.AddAuthentication(options =>
-			{
-				options.DefaultAuthenticateScheme = "CustomIdentity";
-				//options.DefaultChallengeScheme = "CustomIdentity";
-			})
-			.AddCookie("CustomIdentity", options =>
-			{
-				options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-				options.LoginPath = "/Identity/Identity/Login";
-				options.LogoutPath = "/Identity/Identity/Logout";
-				options.AccessDeniedPath = "/Identity/Identity/AccessDenied";
-				//options.RegistrationPath = "/Identity/Identity/Registration";
-			});
+			//builder.Services.AddAuthentication(options =>
+			//{
+			//	options.DefaultAuthenticateScheme = "CustomIdentity";
+				
+			//})
+			//.AddCookie("CustomIdentity", options =>
+			//{
+			//	options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+			//	options.LoginPath = "/Identity/Identity/Login";
+			//	options.LogoutPath = "/Identity/Identity/Logout";
+			//	options.AccessDeniedPath = "/Identity/Identity/AccessDenied";
+				
+			//});
 
 
 			var app = builder.Build();
@@ -53,31 +53,31 @@ namespace KAFO.ASPMVC
 			}
 			app.UseStaticFiles();
 
-			app.Use(async (context, next) =>
-			{
-				if (context.Request.Path == "/" && context.User.Identity.IsAuthenticated)
-				{
-					var role = context.User.FindFirst(ClaimTypes.Role)?.Value;
-					if (role == "admin")
-					{
-						context.Response.Redirect("/Admin/Admin/Index");
-						return;
-					}
-					else if (role == "seller")
-					{
-						context.Response.Redirect("/Seller/POS/Index");
-						return;
-					}
-				}
-				await next();
-			});
-			app.UseRouting();
+			//app.Use(async (context, next) =>
+			//{
+			//	if (context.Request.Path == "/" && context.User.Identity.IsAuthenticated)
+			//	{
+			//		var role = context.User.FindFirst(ClaimTypes.Role)?.Value;
+			//		if (role == "admin")
+			//		{
+			//			context.Response.Redirect("/Admin/Admin/Index");
+			//			return;
+			//		}
+			//		else if (role == "seller")
+			//		{
+			//			context.Response.Redirect("/Seller/POS/Index");
+			//			return;
+			//		}
+			//	}
+			//	await next();
+			//});
+			//app.UseAuthorization();
 
-			app.UseAuthorization();
 
+			app.UseRouting();	
 			app.MapControllerRoute(
 				name: "default",
-				pattern: "{Area=seller}/{controller=pos}/{action=Index}/{id?}");
+				pattern: "{Area=admin}/{controller=admin}/{action=Index}/{id?}");
 
 			//pattern: "{Area=Identity}/{controller=Identity}/{action=Login}/{id?}");
 			app.Run();

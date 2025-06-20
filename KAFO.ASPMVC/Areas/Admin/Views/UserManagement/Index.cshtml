@@ -1,0 +1,200 @@
+﻿@model KAFO.ASPMVC.Areas.Admin.ViewModels.UserCreateVM
+@{
+	Layout = "_DefaultLayout";
+	ViewData["Title"] = "إضافة مستخدم جديد";
+}
+
+<div class="container-fluid d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+	<div class="row justify-content-center w-100">
+		<div class="col-lg-10 col-xl-8">
+			<div class="card shadow-lg border-0" style="max-height: 80vh; overflow-y: auto;">
+				<!-- Card Header -->
+				<div class="card-header border-0 py-3 sticky-top" style="background: linear-gradient(45deg, #4CAF50, #2E7D32);">
+					<div class="d-flex align-items-center">
+						<i class="fas fa-user-plus text-white fs-3 me-3"></i>
+						<h3 class="card-title text-white mb-0">إضافة مستخدم جديد</h3>
+					</div>
+				</div>
+
+				<!-- Card Body -->
+				<div class="card-body p-4">
+					<form asp-action="UpSert" asp-controller="UserManagement" method="post" class="needs-validation" novalidate>
+						<input type="hidden" asp-for="Id" value="@(Model?.Id ?? 0)" />
+
+						<!-- Compact Form Groups -->
+						<div class="row">
+							<!-- Name -->
+							<div class="col-md-6 mb-3">
+								<label asp-for="Name" class="form-label text-muted mb-2 fs-6">
+									<i class="fas fa-user me-2"></i>اسم المستخدم
+								</label>
+								<input asp-for="Name" class="form-control form-control-lg shadow-sm fs-6"
+									   style="height: 45px;" placeholder="مثال: أحمد محمد" />
+								<span asp-validation-for="Name" class="text-danger small"></span>
+							</div>
+
+							<!-- Gender -->
+							<div class="col-md-6 mb-3">
+								<label asp-for="Gender" class="form-label text-muted mb-2 fs-6">
+									<i class="fas fa-venus-mars me-2"></i>الجنس
+								</label>
+								<select asp-for="Gender" class="form-select form-select-lg shadow-sm fs-6"
+										style="height: 45px;">
+									<option value="">-- اختر الجنس --</option>
+									<option value="Male">ذكر</option>
+									<option value="Female">أنثى</option>
+								</select>
+								<span asp-validation-for="Gender" class="text-danger small"></span>
+							</div>
+						</div>
+
+						<div class="row">
+							<!-- Email -->
+							<div class="col-md-6 mb-3">
+								<label asp-for="Email" class="form-label text-muted mb-2 fs-6">
+									<i class="fas fa-envelope me-2"></i>البريد الإلكتروني
+								</label>
+								<input asp-for="Email" type="email" class="form-control form-control-lg shadow-sm fs-6"
+									   style="height: 45px;" placeholder="مثال: example@domain.com" />
+								<span asp-validation-for="Email" class="text-danger small"></span>
+							</div>
+
+							<!-- Phone -->
+							<div class="col-md-6 mb-3">
+								<label asp-for="Phone" class="form-label text-muted mb-2 fs-6">
+									<i class="fas fa-phone me-2"></i>رقم الهاتف
+								</label>
+								<input asp-for="Phone" class="form-control form-control-lg shadow-sm fs-6"
+									   style="height: 45px;" placeholder="مثال: 0512345678" />
+								<span asp-validation-for="Phone" class="text-danger small"></span>
+							</div>
+						</div>
+
+						<div class="row">
+							<!-- Role -->
+							<div class="col-md-6 mb-3">
+								<label asp-for="Role" class="form-label text-muted mb-2 fs-6">
+									<i class="fas fa-user-tag me-2"></i>الدور
+								</label>
+								<select asp-for="Role" class="form-select form-select-lg shadow-sm fs-6"
+										style="height: 45px;">
+									<option value="">-- اختر دور المستخدم --</option>
+									<option value="admin">مسئول</option>
+									<option value="seller">بائع</option>
+
+								</select>
+								<span asp-validation-for="Role" class="text-danger small"></span>
+							</div>
+						</div>
+
+						<!-- Password -->
+						<div class="row">
+							<div class="col-md-6 mb-3">
+								<label asp-for="Password" class="form-label text-muted mb-2 fs-6">
+									<i class="fas fa-lock me-2"></i>كلمة المرور
+								</label>
+								<div class="input-group">
+									<input asp-for="Password" type="password"
+										   class="form-control form-control-lg shadow-sm fs-6"
+										   style="height: 45px;" placeholder="أدخل كلمة المرور" />
+									<button class="btn btn-outline-secondary toggle-password" type="button" style="height: 45px;">
+										<i class="fas fa-eye"></i>
+									</button>
+								</div>
+								<span asp-validation-for="Password" class="text-danger small"></span>
+							</div>
+
+							<!-- Confirm Password -->
+							<div class="col-md-6 mb-3">
+								<label asp-for="ConfirmPassword" class="form-label text-muted mb-2 fs-6">
+									<i class="fas fa-lock me-2"></i>تأكيد كلمة المرور
+								</label>
+								<div class="input-group">
+									<input asp-for="ConfirmPassword" type="password"
+										   class="form-control form-control-lg shadow-sm fs-6"
+										   style="height: 45px;" placeholder="أعد إدخال كلمة المرور" />
+									<button class="btn btn-outline-secondary toggle-password" type="button" style="height: 45px;">
+										<i class="fas fa-eye"></i>
+									</button>
+								</div>
+								<span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+							</div>
+						</div>
+
+						<!-- Buttons -->
+						<div class="d-flex justify-content-end gap-3 mt-4">
+							<a asp-action="Index" class="btn btn-light px-4 py-1 fs-6">
+								<i class="fas fa-times me-2"></i>إلغاء
+							</a>
+							<button type="submit" class="btn btn-success px-4 py-1 fs-6">
+								<i class="fas fa-save me-2"></i>حفظ
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+		// Password visibility toggle
+		document.querySelectorAll('.toggle-password').forEach(button => {
+			button.addEventListener('click', function () {
+				const input = this.parentElement.querySelector('input');
+				const icon = this.querySelector('i');
+				if (input.type === 'password') {
+					input.type = 'text';
+					icon.classList.replace('fa-eye', 'fa-eye-slash');
+				} else {
+					input.type = 'password';
+					icon.classList.replace('fa-eye-slash', 'fa-eye');
+				}
+			});
+		});
+
+		// Form validation
+		(function () {
+			'use strict'
+			const forms = document.querySelectorAll('.needs-validation')
+			Array.from(forms).forEach(form => {
+				form.addEventListener('submit', event => {
+					if (!form.checkValidity()) {
+						event.preventDefault()
+						event.stopPropagation()
+					}
+					form.classList.add('was-validated')
+				}, false)
+			})
+		})()
+	</script>
+}
+
+<style>
+	/* Custom scrollbar for the card */
+	.card::-webkit-scrollbar {
+		width: 8px;
+	}
+
+	.card::-webkit-scrollbar-track {
+		background: #f1f1f1;
+		border-radius: 10px;
+	}
+
+	.card::-webkit-scrollbar-thumb {
+		background: #c1c1c1;
+		border-radius: 10px;
+	}
+
+		.card::-webkit-scrollbar-thumb:hover {
+			background: #a8a8a8;
+		}
+
+	/* Sticky header when scrolling */
+	.sticky-top {
+		position: sticky;
+		top: 0;
+		z-index: 1020;
+	}
+</style>
