@@ -1,200 +1,320 @@
 ﻿@model KAFO.ASPMVC.Areas.Admin.ViewModels.UserCreateVM
 @{
-	Layout = "_DefaultLayout";
-	ViewData["Title"] = "إضافة مستخدم جديد";
+    Layout = "_DefaultLayout";
+    var isUpdate = (Model != null && Model.Id != 0);
+    ViewData["Title"] = isUpdate ? "تعديل المستخدم" : "إضافة مستخدم جديد";
 }
 
 <div class="container-fluid d-flex align-items-center justify-content-center" style="min-height: 80vh;">
-	<div class="row justify-content-center w-100">
-		<div class="col-lg-10 col-xl-8">
-			<div class="card shadow-lg border-0" style="max-height: 80vh; overflow-y: auto;">
-				<!-- Card Header -->
-				<div class="card-header border-0 py-3 sticky-top" style="background: linear-gradient(45deg, #4CAF50, #2E7D32);">
-					<div class="d-flex align-items-center">
-						<i class="fas fa-user-plus text-white fs-3 me-3"></i>
-						<h3 class="card-title text-white mb-0">إضافة مستخدم جديد</h3>
-					</div>
-				</div>
+    <div class="row justify-content-center w-100">
+        <div class="col-lg-10 col-xl-8">
+            <div class="card shadow-lg border-0" style="max-height: 80vh; overflow-y: auto;">
+                <!-- Card Header -->
+                <div class="card-header border-0 py-3 sticky-top" style="background: linear-gradient(45deg, #4CAF50, #2E7D32);">
+                    <div class="d-flex align-items-center">
+                        <i class="fas @(isUpdate ? "fa-user-edit" : "fa-user-plus") text-white fs-3 me-3"></i>
+                        <h3 class="card-title text-white mb-0">@ViewData["Title"]</h3>
+                    </div>
+                </div>
 
-				<!-- Card Body -->
-				<div class="card-body p-4">
-					<form asp-action="UpSert" asp-controller="UserManagement" method="post" class="needs-validation" novalidate>
-						<input type="hidden" asp-for="Id" value="@(Model?.Id ?? 0)" />
+                <!-- Card Body -->
+                <div class="card-body p-4">
+                    <form id="userForm" asp-action="UpSert" asp-controller="UserManagement" method="post" class="needs-validation" novalidate>
+                        <input type="hidden" asp-for="Id" value="@(Model?.Id ?? 0)" />
 
-						<!-- Compact Form Groups -->
-						<div class="row">
-							<!-- Name -->
-							<div class="col-md-6 mb-3">
-								<label asp-for="Name" class="form-label text-muted mb-2 fs-6">
-									<i class="fas fa-user me-2"></i>اسم المستخدم
-								</label>
-								<input asp-for="Name" class="form-control form-control-lg shadow-sm fs-6"
-									   style="height: 45px;" placeholder="مثال: أحمد محمد" />
-								<span asp-validation-for="Name" class="text-danger small"></span>
-							</div>
+                        <!-- Compact Form Groups -->
+                        <div class="row">
+                            <!-- Name -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Name" class="form-label text-muted mb-2 fs-6">
+                                    <i class="fas fa-user me-3"></i>اسم المستخدم
+                                </label>
+                                <input asp-for="Name" class="form-control form-control-lg shadow-sm fs-6"
+                                       style="height: 45px;" placeholder="مثال: أحمد محمد" />
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                            </div>
 
-							<!-- Gender -->
-							<div class="col-md-6 mb-3">
-								<label asp-for="Gender" class="form-label text-muted mb-2 fs-6">
-									<i class="fas fa-venus-mars me-2"></i>الجنس
-								</label>
-								<select asp-for="Gender" class="form-select form-select-lg shadow-sm fs-6"
-										style="height: 45px;">
-									<option value="">-- اختر الجنس --</option>
-									<option value="Male">ذكر</option>
-									<option value="Female">أنثى</option>
-								</select>
-								<span asp-validation-for="Gender" class="text-danger small"></span>
-							</div>
-						</div>
+                            <!-- Gender -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Gender" class="form-label text-muted mb-2 fs-6 required-field">
+                                    <i class="fas fa-venus-mars me-3"></i>الجنس
+                                </label>
+                                <select asp-for="Gender" class="form-select form-select-lg shadow-sm fs-6"
+                                        style="height: 45px;">
+                                    <option value="">-- اختر الجنس --</option>
+                                    <option value="Male" selected="@(Model?.Gender == "Male")">ذكر</option>
+                                    <option value="Female" selected="@(Model?.Gender == "Female")">أنثى</option>
+                                </select>
+                                <span asp-validation-for="Gender" class="text-danger small"></span>
+                            </div>
+                        </div>
 
-						<div class="row">
-							<!-- Email -->
-							<div class="col-md-6 mb-3">
-								<label asp-for="Email" class="form-label text-muted mb-2 fs-6">
-									<i class="fas fa-envelope me-2"></i>البريد الإلكتروني
-								</label>
-								<input asp-for="Email" type="email" class="form-control form-control-lg shadow-sm fs-6"
-									   style="height: 45px;" placeholder="مثال: example@domain.com" />
-								<span asp-validation-for="Email" class="text-danger small"></span>
-							</div>
+                        <div class="row">
+                            <!-- Email -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Email" class="form-label text-muted mb-2 fs-6">
+                                    <i class="fas fa-envelope me-3"></i>البريد الإلكتروني
+                                </label>
+                                <input asp-for="Email" type="email" class="form-control form-control-lg shadow-sm fs-6"
+                                       style="height: 45px;" placeholder="مثال: example@domain.com" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
 
-							<!-- Phone -->
-							<div class="col-md-6 mb-3">
-								<label asp-for="Phone" class="form-label text-muted mb-2 fs-6">
-									<i class="fas fa-phone me-2"></i>رقم الهاتف
-								</label>
-								<input asp-for="Phone" class="form-control form-control-lg shadow-sm fs-6"
-									   style="height: 45px;" placeholder="مثال: 0512345678" />
-								<span asp-validation-for="Phone" class="text-danger small"></span>
-							</div>
-						</div>
+                            <!-- Phone -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Phone" class="form-label text-muted mb-2 fs-6 required-field">
+                                    <i class="fas fa-phone me-3"></i>رقم الهاتف
+                                </label>
+                                <input asp-for="Phone" class="form-control form-control-lg shadow-sm fs-6"
+                                       style="height: 45px;" placeholder="مثال: 0512345678" />
+                                <span asp-validation-for="Phone" class="text-danger small"></span>
+                            </div>
+                        </div>
 
-						<div class="row">
-							<!-- Role -->
-							<div class="col-md-6 mb-3">
-								<label asp-for="Role" class="form-label text-muted mb-2 fs-6">
-									<i class="fas fa-user-tag me-2"></i>الدور
-								</label>
-								<select asp-for="Role" class="form-select form-select-lg shadow-sm fs-6"
-										style="height: 45px;">
-									<option value="">-- اختر دور المستخدم --</option>
-									<option value="admin">مسئول</option>
-									<option value="seller">بائع</option>
+                        <div class="row">
+                            <!-- Role -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Role" class="form-label text-muted mb-2 fs-6 @(isUpdate ? "" : "required-field")">
+                                    <i class="fas fa-user-tag me-3"></i>الدور
+                                </label>
+                                <select asp-for="Role" class="form-select form-select-lg shadow-sm fs-6"
+                                        style="height: 45px;" disabled="@(isUpdate)" >
+                                    <option value="">-- اختر دور المستخدم --</option>
+                                    <option value="admin" selected="@(Model?.Role == "admin")">مسئول</option>
+                                    <option value="seller" selected="@(Model?.Role == "seller")">بائع</option>
+                                </select>
+                                @if(isUpdate)
+                                {
+                                    <input type="hidden" asp-for="Role" />
+                                }
+                                <span asp-validation-for="Role" class="text-danger small"></span>
+                            </div>
+                        </div>
 
-								</select>
-								<span asp-validation-for="Role" class="text-danger small"></span>
-							</div>
-						</div>
+                        <!-- Password Section -->
+                        @if (!isUpdate)
+                        {
+                            <div class="row password-section">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Password" class="form-label text-muted mb-2 fs-6 required-field">
+                                        <i class="fas fa-lock me-3"></i>كلمة المرور
+                                    </label>
+                                    <div class="input-group">
+                                        <input asp-for="Password" type="password"
+                                               class="form-control form-control-lg shadow-sm fs-6"
+                                               style="height: 45px;" placeholder="أدخل كلمة المرور" />
+                                        <button class="btn btn-outline-secondary toggle-password" type="button" style="height: 45px;">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <span asp-validation-for="Password" class="text-danger small"></span>
+                                </div>
 
-						<!-- Password -->
-						<div class="row">
-							<div class="col-md-6 mb-3">
-								<label asp-for="Password" class="form-label text-muted mb-2 fs-6">
-									<i class="fas fa-lock me-2"></i>كلمة المرور
-								</label>
-								<div class="input-group">
-									<input asp-for="Password" type="password"
-										   class="form-control form-control-lg shadow-sm fs-6"
-										   style="height: 45px;" placeholder="أدخل كلمة المرور" />
-									<button class="btn btn-outline-secondary toggle-password" type="button" style="height: 45px;">
-										<i class="fas fa-eye"></i>
-									</button>
-								</div>
-								<span asp-validation-for="Password" class="text-danger small"></span>
-							</div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="ConfirmPassword" class="form-label text-muted mb-2 fs-6 required-field">
+                                        <i class="fas fa-lock me-3"></i>تأكيد كلمة المرور
+                                    </label>
+                                    <div class="input-group">
+                                        <input asp-for="ConfirmPassword" type="password"
+                                               class="form-control form-control-lg shadow-sm fs-6"
+                                               style="height: 45px;" placeholder="أعد إدخال كلمة المرور" />
+                                        <button class="btn btn-outline-secondary toggle-password" type="button" style="height: 45px;">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
 
-							<!-- Confirm Password -->
-							<div class="col-md-6 mb-3">
-								<label asp-for="ConfirmPassword" class="form-label text-muted mb-2 fs-6">
-									<i class="fas fa-lock me-2"></i>تأكيد كلمة المرور
-								</label>
-								<div class="input-group">
-									<input asp-for="ConfirmPassword" type="password"
-										   class="form-control form-control-lg shadow-sm fs-6"
-										   style="height: 45px;" placeholder="أعد إدخال كلمة المرور" />
-									<button class="btn btn-outline-secondary toggle-password" type="button" style="height: 45px;">
-										<i class="fas fa-eye"></i>
-									</button>
-								</div>
-								<span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
-							</div>
-						</div>
 
-						<!-- Buttons -->
-						<div class="d-flex justify-content-end gap-3 mt-4">
-							<a asp-action="Index" class="btn btn-light px-4 py-1 fs-6">
-								<i class="fas fa-times me-2"></i>إلغاء
-							</a>
-							<button type="submit" class="btn btn-success px-4 py-1 fs-6">
-								<i class="fas fa-save me-2"></i>حفظ
-							</button>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
+
+
+<div class="row mb-3">
+    <div class="col-12 d-flex justify-content-start">
+        <div class="form-check form-switch d-flex align-items-center gap-2" dir="rtl">
+            <label class="form-check-label fs-6 text-muted ms-2" for="changePasswordCheckbox">
+                تغيير كلمة المرور
+            </label>
+            <input class="form-check-input" type="checkbox" id="changePasswordCheckbox" role="switch"
+                   style="width: 3rem; height: 1.5rem;">
+        </div>
+    </div>
+</div>
+                            <div class="row password-section" style="display: none;">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Password" class="form-label text-muted mb-2 fs-6">
+                                        <i class="fas fa-lock me-3"></i>كلمة المرور الجديدة
+                                    </label>
+                                    <div class="input-group">
+                                        <input asp-for="Password" type="password"
+                                               class="form-control form-control-lg shadow-sm fs-6"
+                                               style="height: 45px;" placeholder="أدخل كلمة المرور الجديدة" />
+                                        <button class="btn btn-outline-secondary toggle-password" type="button" style="height: 45px;">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <span asp-validation-for="Password" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="ConfirmPassword" class="form-label text-muted mb-2 fs-6">
+                                        <i class="fas fa-lock me-3"></i>تأكيد كلمة المرور
+                                    </label>
+                                    <div class="input-group">
+                                        <input asp-for="ConfirmPassword" type="password"
+                                               class="form-control form-control-lg shadow-sm fs-6"
+                                               style="height: 45px;" placeholder="أعد إدخال كلمة المرور" />
+                                        <button class="btn btn-outline-secondary toggle-password" type="button" style="height: 45px;">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-between mt-4 gap-3 mt-4">
+                            <a asp-action="Index" asp-controller="Admin" class="btn btn-outline-secondary">
+			<i class="fas fa-arrow-right me-1"></i> رجوع
+		</a>
+                           @*  <a asp-action="Index" asp-controller="Admin" class="btn btn-light px-4 py-1 fs-6">
+                                <i class="fas fa-times me-2"></i>إلغاء
+                            </a> *@
+                            <button type="submit" class="btn btn-success px-4 py-1 fs-6">
+                                <i class="fas fa-save me-2"></i>حفظ
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
-	<script>
-		// Password visibility toggle
-		document.querySelectorAll('.toggle-password').forEach(button => {
-			button.addEventListener('click', function () {
-				const input = this.parentElement.querySelector('input');
-				const icon = this.querySelector('i');
-				if (input.type === 'password') {
-					input.type = 'text';
-					icon.classList.replace('fa-eye', 'fa-eye-slash');
-				} else {
-					input.type = 'password';
-					icon.classList.replace('fa-eye-slash', 'fa-eye');
-				}
-			});
-		});
+    <!-- jQuery Validation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
 
-		// Form validation
-		(function () {
-			'use strict'
-			const forms = document.querySelectorAll('.needs-validation')
-			Array.from(forms).forEach(form => {
-				form.addEventListener('submit', event => {
-					if (!form.checkValidity()) {
-						event.preventDefault()
-						event.stopPropagation()
-					}
-					form.classList.add('was-validated')
-				}, false)
-			})
-		})()
-	</script>
+    <script>
+        $(document).ready(function () {
+            // Password visibility toggle
+            document.querySelectorAll('.toggle-password').forEach(button => {
+                button.addEventListener('click', function () {
+                    const input = this.parentElement.querySelector('input');
+                    const icon = this.querySelector('i');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.replace('fa-eye', 'fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.replace('fa-eye-slash', 'fa-eye');
+                    }
+                });
+            });
+
+            // Toggle password fields for update
+            $('#changePasswordCheckbox').change(function() {
+                if (this.checked) {
+                    $('.password-section').show();
+                    $('#Password').attr('data-val', 'true');
+                    $('#Password').attr('data-val-required', 'كلمة المرور مطلوبة');
+                    $('#ConfirmPassword').attr('data-val', 'true');
+                    $('#ConfirmPassword').attr('data-val-required', 'تأكيد كلمة المرور مطلوب');
+                    $('#ConfirmPassword').attr('data-val-equalto', 'كلمة المرور غير متطابقة');
+                } else {
+                    $('.password-section').hide();
+                    $('#Password').val('').removeAttr('data-val').removeAttr('data-val-required');
+                    $('#ConfirmPassword').val('').removeAttr('data-val').removeAttr('data-val-required').removeAttr('data-val-equalto');
+                }
+                $.validator.unobtrusive.parse("#userForm");
+            });
+
+            // Initialize validation
+            $("#userForm").validate({
+                errorClass: "is-invalid",
+                validClass: "is-valid",
+                errorElement: "span",
+                errorPlacement: function (error, element) {
+                    error.addClass("text-danger small");
+                    error.insertAfter(element);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass(errorClass).removeClass(validClass);
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass(errorClass).addClass(validClass);
+                },
+                ignore: ":hidden:not(.password-section :input)"
+            });
+
+            // Custom validation for phone number
+            $.validator.addMethod("exactLength", function(value, element, param) {
+                return this.optional(element) || value.length == param;
+            }, "Please enter exactly {0} characters.");
+
+            $("[data-val-length]").each(function() {
+                var $this = $(this);
+                var length = $this.attr("data-val-length-max");
+                $this.rules("add", {
+                    exactLength: length,
+                    messages: {
+                        exactLength: $this.attr("data-val-length")
+                    }
+                });
+            });
+        });
+    </script>
 }
 
 <style>
-	/* Custom scrollbar for the card */
-	.card::-webkit-scrollbar {
-		width: 8px;
-	}
+    /* Custom scrollbar for the card */
+    .card::-webkit-scrollbar {
+        width: 8px;
+    }
 
-	.card::-webkit-scrollbar-track {
-		background: #f1f1f1;
-		border-radius: 10px;
-	}
+    .card::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
 
-	.card::-webkit-scrollbar-thumb {
-		background: #c1c1c1;
-		border-radius: 10px;
-	}
+    .card::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 10px;
+    }
 
-		.card::-webkit-scrollbar-thumb:hover {
-			background: #a8a8a8;
-		}
+    .card::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
 
-	/* Sticky header when scrolling */
-	.sticky-top {
-		position: sticky;
-		top: 0;
-		z-index: 1020;
-	}
+    /* Sticky header when scrolling */
+    .sticky-top {
+        position: sticky;
+        top: 0;
+        z-index: 1020;
+    }
+
+    /* Required field indicator */
+    .required-field::after {
+        content: " *";
+        color: red;
+    }
+
+    /* Increased space between icons and labels */
+    .form-label i {
+        margin-right: 0.75rem !important;
+    }
+
+    /* Validation styles */
+    .is-invalid {
+        border-color: #dc3545 !important;
+    }
+
+    .is-valid {
+        border-color: #28a745 !important;
+    }
 </style>

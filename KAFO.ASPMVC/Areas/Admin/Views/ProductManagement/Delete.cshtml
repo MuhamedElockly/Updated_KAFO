@@ -1,5 +1,5 @@
 ﻿@model Product
-@{
+@{   Layout = "_DefaultLayout";
     ViewData["Title"] = "حذف المنتج";
 }
 
@@ -102,11 +102,11 @@
 
                 </div>
 
-                <form asp-action="DeleteConfirmed" method="post">
+                <form  asp-controller="ProductManagement" asp-action="DeleteConfirmed" asp-route-Id="@Model.Id"  method="post" >
                     <input type="hidden" asp-for="Id" />
 
                     <div class="d-flex flex-column flex-sm-row justify-content-between mt-4 pt-3 border-top gap-2">
-                        <button type="submit" class="btn btn-danger action-btn">
+                        <button  type="submit"  class="btn btn-danger action-btn">
                             <i class="fas fa-trash-alt me-1"></i> تأكيد الحذف
                         </button>
                     </div>

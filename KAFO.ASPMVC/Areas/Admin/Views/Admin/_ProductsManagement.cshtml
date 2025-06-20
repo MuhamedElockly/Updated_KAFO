@@ -61,13 +61,13 @@
 							<td class="align-middle">
 								<div class="d-flex justify-content-center">
 									<div class="btn-group btn-group-sm" role="group">
-										<a href="@Url.Action("Details", new { id = product.Id })" class="btn btn-info" title="عرض">
+										<a asp-controller="ProductManagement" asp-action="Details" asp-route-Id="@product.Id" class="btn btn-info" title="عرض">
 											<i class="fas fa-eye"></i>
 										</a>
 										<a asp-controller="ProductManagement" asp-action="Edit" asp-route-Id="@product.Id" class="btn btn-warning" title="تعديل">
 											<i class="fas fa-edit"></i>
 										</a>
-										<a href="@Url.Action("Delete", new { id = product.Id })" class="btn btn-danger" title="حذف">
+										<a asp-controller="ProductManagement" asp-action="Delete"  asp-route-Id="@product.Id" class="btn btn-danger" title="حذف">
 											<i class="fas fa-trash-alt"></i>
 										</a>
 									</div>

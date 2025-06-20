@@ -7,8 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="Areas\Admin\Views\ProductManagement\Delete.cshtml" />
-    <Content Remove="Areas\Admin\Views\ProductManagement\Details.cshtml" />
     <Content Remove="wwwroot\js\admin\category.js" />
   </ItemGroup>
 
@@ -28,8 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Areas\Admin\Views\ProductManagement\Delete.cshtml" />
-    <None Include="Areas\Admin\Views\ProductManagement\Details.cshtml" />
     <None Include="Areas\Seller\Views\CustomerAccounts\Create.cshtml" />
     <None Include="Areas\Seller\Views\CustomerAccounts\Delete.cshtml" />
     <None Include="Areas\Seller\Views\CustomerAccounts\Details.cshtml" />

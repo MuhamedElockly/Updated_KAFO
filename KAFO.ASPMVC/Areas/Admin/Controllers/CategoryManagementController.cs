@@ -48,7 +48,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
                 return BadRequest();
             }
             if (!ModelState.IsValid)
-            {            
+            {
                 return View("Index", categoryVM);
             }
             else
@@ -63,6 +63,8 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
                 }
                 else
                 {
+                    category.Name = categoryVM.Name;
+                    category.Description = categoryVM.Description;
                     _categoryManager.Update(category);
                     TempData["Success"] = "تم تعديل الفئة بنجاح";
                 }
@@ -78,8 +80,8 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
                 TempData["Success"] = "حدث خطأ";
             }
             Category category = _categoryManager.Get(id.Value);
-            //	_categoryManager.Delete(category);
-            //TempData["Success"] = "تم حذف الفئة بنجاح";
+            _categoryManager.Delete(category);
+            TempData["Success"] = "تم حذف الفئة بنجاح";
             //return RedirectToAction("Index", "Admin", new { area = "Admin", page = 1 });
             return Json(new { success = true });
         }
