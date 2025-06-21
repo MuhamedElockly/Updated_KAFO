@@ -60,7 +60,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
                     return View("Index", userCreateVM);
                 }
 
-                if (_userManager.FindByEmailOrPhone(userCreateVM.Email) != null)
+                if (userCreateVM.Email!=null && _userManager.FindByEmailOrPhone(userCreateVM.Email) != null)
                 {
                     ModelState.AddModelError("Email", "البريد الإلكتروني مستخدم بالفعل");
                     return View("Index", userCreateVM);
@@ -92,7 +92,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 
                     user.Password = PasswordHelper.HashPassword(userCreateVM.Password);
                 }
-                if (!_userManager.CanUpdateByEmailOrPhone(userCreateVM.Email, userCreateVM.Id))
+                if (userCreateVM.Email != null && !_userManager.CanUpdateByEmailOrPhone(userCreateVM.Email, userCreateVM.Id))
                 {
                     ModelState.AddModelError("Email", "البريد الإلكتروني مستخدم بالفعل");
                     return View("Index", userCreateVM);

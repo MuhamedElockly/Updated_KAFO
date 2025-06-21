@@ -10,7 +10,7 @@
         <div class="col-lg-10 col-xl-8">
             <div class="card shadow-lg border-0" style="max-height: 80vh; overflow-y: auto;">
                 <!-- Card Header -->
-                <div class="card-header border-0 py-3 sticky-top" style="background: linear-gradient(45deg, #4CAF50, #2E7D32);">
+                <div class="card-header border-0 py-3 sticky-top user-header-gradient">
                     <div class="d-flex align-items-center">
                         <i class="fas @(isUpdate ? "fa-user-edit" : "fa-user-plus") text-white fs-3 me-3"></i>
                         <h3 class="card-title text-white mb-0">@ViewData["Title"]</h3>
@@ -29,8 +29,8 @@
                                 <label asp-for="Name" class="form-label text-muted mb-2 fs-6">
                                     <i class="fas fa-user me-3"></i>اسم المستخدم
                                 </label>
-                                <input asp-for="Name" class="form-control form-control-lg shadow-sm fs-6"
-                                       style="height: 45px;" placeholder="مثال: أحمد محمد" />
+                                <input asp-for="Name" class="form-control custom-input form-control-lg shadow-sm fs-6"
+                                       placeholder="مثال: أحمد محمد" />
                                 <span asp-validation-for="Name" class="text-danger small"></span>
                             </div>
 
@@ -39,8 +39,7 @@
                                 <label asp-for="Gender" class="form-label text-muted mb-2 fs-6 required-field">
                                     <i class="fas fa-venus-mars me-3"></i>الجنس
                                 </label>
-                                <select asp-for="Gender" class="form-select form-select-lg shadow-sm fs-6"
-                                        style="height: 45px;">
+                                <select asp-for="Gender" class="form-select custom-input form-select-lg shadow-sm fs-6">
                                     <option value="">-- اختر الجنس --</option>
                                     <option value="Male" selected="@(Model?.Gender == "Male")">ذكر</option>
                                     <option value="Female" selected="@(Model?.Gender == "Female")">أنثى</option>
@@ -55,8 +54,8 @@
                                 <label asp-for="Email" class="form-label text-muted mb-2 fs-6">
                                     <i class="fas fa-envelope me-3"></i>البريد الإلكتروني
                                 </label>
-                                <input asp-for="Email" type="email" class="form-control form-control-lg shadow-sm fs-6"
-                                       style="height: 45px;" placeholder="مثال: example@domain.com" />
+                                <input asp-for="Email" type="email" class="form-control custom-input form-control-lg shadow-sm fs-6"
+                                       placeholder="مثال: example@domain.com" />
                                 <span asp-validation-for="Email" class="text-danger small"></span>
                             </div>
 
@@ -65,8 +64,8 @@
                                 <label asp-for="Phone" class="form-label text-muted mb-2 fs-6 required-field">
                                     <i class="fas fa-phone me-3"></i>رقم الهاتف
                                 </label>
-                                <input asp-for="Phone" class="form-control form-control-lg shadow-sm fs-6"
-                                       style="height: 45px;" placeholder="مثال: 0512345678" />
+                                <input asp-for="Phone" class="form-control custom-input form-control-lg shadow-sm fs-6"
+                                       placeholder="مثال: 0512345678" />
                                 <span asp-validation-for="Phone" class="text-danger small"></span>
                             </div>
                         </div>
@@ -77,13 +76,12 @@
                                 <label asp-for="Role" class="form-label text-muted mb-2 fs-6 @(isUpdate ? "" : "required-field")">
                                     <i class="fas fa-user-tag me-3"></i>الدور
                                 </label>
-                                <select asp-for="Role" class="form-select form-select-lg shadow-sm fs-6"
-                                        style="height: 45px;" disabled="@(isUpdate)" >
+                                <select asp-for="Role" class="form-select custom-input form-select-lg shadow-sm fs-6" disabled="@(isUpdate)">
                                     <option value="">-- اختر دور المستخدم --</option>
                                     <option value="admin" selected="@(Model?.Role == "admin")">مسئول</option>
                                     <option value="seller" selected="@(Model?.Role == "seller")">بائع</option>
                                 </select>
-                                @if(isUpdate)
+                                @if (isUpdate)
                                 {
                                     <input type="hidden" asp-for="Role" />
                                 }
@@ -101,9 +99,9 @@
                                     </label>
                                     <div class="input-group">
                                         <input asp-for="Password" type="password"
-                                               class="form-control form-control-lg shadow-sm fs-6"
-                                               style="height: 45px;" placeholder="أدخل كلمة المرور" />
-                                        <button class="btn btn-outline-secondary toggle-password" type="button" style="height: 45px;">
+                                               class="form-control custom-input form-control-lg shadow-sm fs-6"
+                                               placeholder="أدخل كلمة المرور" />
+                                        <button class="btn btn-outline-secondary toggle-password" type="button">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </div>
@@ -116,9 +114,9 @@
                                     </label>
                                     <div class="input-group">
                                         <input asp-for="ConfirmPassword" type="password"
-                                               class="form-control form-control-lg shadow-sm fs-6"
-                                               style="height: 45px;" placeholder="أعد إدخال كلمة المرور" />
-                                        <button class="btn btn-outline-secondary toggle-password" type="button" style="height: 45px;">
+                                               class="form-control custom-input form-control-lg shadow-sm fs-6"
+                                               placeholder="أعد إدخال كلمة المرور" />
+                                        <button class="btn btn-outline-secondary toggle-password" type="button">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </div>
@@ -128,21 +126,17 @@
                         }
                         else
                         {
-
-
-
-
-<div class="row mb-3">
-    <div class="col-12 d-flex justify-content-start">
-        <div class="form-check form-switch d-flex align-items-center gap-2" dir="rtl">
-            <label class="form-check-label fs-6 text-muted ms-2" for="changePasswordCheckbox">
-                تغيير كلمة المرور
-            </label>
-            <input class="form-check-input" type="checkbox" id="changePasswordCheckbox" role="switch"
-                   style="width: 3rem; height: 1.5rem;">
-        </div>
-    </div>
-</div>
+                            <div class="row mb-3">
+                                <div class="col-12 d-flex justify-content-start">
+                                    <div class="form-check form-switch d-flex align-items-center gap-2" dir="rtl">
+                                        <label class="form-check-label fs-6 text-muted ms-2" for="changePasswordCheckbox">
+                                            تغيير كلمة المرور
+                                        </label>
+                                        <input class="form-check-input" type="checkbox" id="changePasswordCheckbox" role="switch"
+                                               style="width: 3rem; height: 1.5rem;">
+                                    </div>
+                                </div>
+                            </div>
                             <div class="row password-section" style="display: none;">
                                 <div class="col-md-6 mb-3">
                                     <label asp-for="Password" class="form-label text-muted mb-2 fs-6">
@@ -150,9 +144,9 @@
                                     </label>
                                     <div class="input-group">
                                         <input asp-for="Password" type="password"
-                                               class="form-control form-control-lg shadow-sm fs-6"
-                                               style="height: 45px;" placeholder="أدخل كلمة المرور الجديدة" />
-                                        <button class="btn btn-outline-secondary toggle-password" type="button" style="height: 45px;">
+                                               class="form-control custom-input form-control-lg shadow-sm fs-6"
+                                               placeholder="أدخل كلمة المرور الجديدة" />
+                                        <button class="btn btn-outline-secondary toggle-password" type="button">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </div>
@@ -165,9 +159,9 @@
                                     </label>
                                     <div class="input-group">
                                         <input asp-for="ConfirmPassword" type="password"
-                                               class="form-control form-control-lg shadow-sm fs-6"
-                                               style="height: 45px;" placeholder="أعد إدخال كلمة المرور" />
-                                        <button class="btn btn-outline-secondary toggle-password" type="button" style="height: 45px;">
+                                               class="form-control custom-input form-control-lg shadow-sm fs-6"
+                                               placeholder="أعد إدخال كلمة المرور" />
+                                        <button class="btn btn-outline-secondary toggle-password" type="button">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </div>
@@ -179,12 +173,9 @@
                         <!-- Buttons -->
                         <div class="d-flex justify-content-between mt-4 gap-3 mt-4">
                             <a asp-action="Index" asp-controller="Admin" class="btn btn-outline-secondary">
-			<i class="fas fa-arrow-right me-1"></i> رجوع
-		</a>
-                           @*  <a asp-action="Index" asp-controller="Admin" class="btn btn-light px-4 py-1 fs-6">
-                                <i class="fas fa-times me-2"></i>إلغاء
-                            </a> *@
-                            <button type="submit" class="btn btn-success px-4 py-1 fs-6">
+                                <i class="fas fa-arrow-right me-1"></i> رجوع
+                            </a>
+                            <button type="submit" class="btn btn-save-user px-4 py-1 fs-6">
                                 <i class="fas fa-save me-2"></i>حفظ
                             </button>
                         </div>
@@ -218,46 +209,69 @@
             });
 
             // Toggle password fields for update
-            $('#changePasswordCheckbox').change(function() {
-                if (this.checked) {
-                    $('.password-section').show();
-                    $('#Password').attr('data-val', 'true');
-                    $('#Password').attr('data-val-required', 'كلمة المرور مطلوبة');
-                    $('#ConfirmPassword').attr('data-val', 'true');
-                    $('#ConfirmPassword').attr('data-val-required', 'تأكيد كلمة المرور مطلوب');
-                    $('#ConfirmPassword').attr('data-val-equalto', 'كلمة المرور غير متطابقة');
+            $('#changePasswordCheckbox').change(function () {
+                const isChecked = $(this).is(':checked');
+                const passwordSection = $('.password-section');
+                const passwordInput = $('#Password');
+                const confirmPasswordInput = $('#ConfirmPassword');
+
+                if (isChecked) {
+                    passwordSection.slideDown();
+                    // Add validation attributes
+                    passwordInput.attr('data-val', 'true').attr('data-val-required', 'كلمة المرور مطلوبة.');
+                    confirmPasswordInput.attr('data-val', 'true')
+                        .attr('data-val-required', 'تأكيد كلمة المرور مطلوب.')
+                        .attr('data-val-equalto', 'كلمة المرور غير متطابقة.')
+                        .attr('data-val-equalto-other', '*.Password'); // This was the missing piece
                 } else {
-                    $('.password-section').hide();
-                    $('#Password').val('').removeAttr('data-val').removeAttr('data-val-required');
-                    $('#ConfirmPassword').val('').removeAttr('data-val').removeAttr('data-val-required').removeAttr('data-val-equalto');
+                    passwordSection.slideUp();
+                    // Remove validation attributes and clear values
+                    passwordInput.val('').removeAttr('data-val').removeAttr('data-val-required');
+                    confirmPasswordInput.val('')
+                        .removeAttr('data-val')
+                        .removeAttr('data-val-required')
+                        .removeAttr('data-val-equalto')
+                        .removeAttr('data-val-equalto-other');
+                    // Remove validation error messages if they exist
+                    passwordInput.closest('.form-group').find('.text-danger').empty();
+                    confirmPasswordInput.closest('.form-group').find('.text-danger').empty();
+                    passwordInput.removeClass('is-invalid is-valid');
+                    confirmPasswordInput.removeClass('is-invalid is-valid');
                 }
+
+                // Re-parse the form for unobtrusive validation to recognize changes
                 $.validator.unobtrusive.parse("#userForm");
             });
 
-            // Initialize validation
+            // Initialize validation with default settings.
+            // No 'ignore' needed, the default ':hidden' works perfectly.
             $("#userForm").validate({
                 errorClass: "is-invalid",
                 validClass: "is-valid",
                 errorElement: "span",
                 errorPlacement: function (error, element) {
                     error.addClass("text-danger small");
-                    error.insertAfter(element);
+                    // Place error messages correctly, especially for input groups
+                    if (element.parent(".input-group").length) {
+                        error.insertAfter(element.parent(".input-group"));
+                    } else {
+                        error.insertAfter(element);
+                    }
                 },
                 highlight: function (element, errorClass, validClass) {
                     $(element).addClass(errorClass).removeClass(validClass);
                 },
                 unhighlight: function (element, errorClass, validClass) {
                     $(element).removeClass(errorClass).addClass(validClass);
-                },
-                ignore: ":hidden:not(.password-section :input)"
+                }
             });
 
-            // Custom validation for phone number
-            $.validator.addMethod("exactLength", function(value, element, param) {
+            // This part for phone validation can remain if needed
+            $.validator.addMethod("exactLength", function (value, element, param) {
                 return this.optional(element) || value.length == param;
             }, "Please enter exactly {0} characters.");
 
-            $("[data-val-length]").each(function() {
+            $("[data-val-length]").each(function () {
                 var $this = $(this);
                 var length = $this.attr("data-val-length-max");
                 $this.rules("add", {
@@ -270,8 +284,43 @@
         });
     </script>
 }
-
 <style>
+    .user-header-gradient {
+        background: linear-gradient(135deg, #00b894 0%, #00a085 100%) !important;
+    }
+
+    .btn-save-user {
+        background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+        color: #fff;
+        border: none;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+
+        .btn-save-user:hover, .btn-save-user:focus {
+            background: linear-gradient(135deg, #00a085 0%, #00b894 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0,184,148,0.15);
+            transform: translateY(-2px) scale(1.03);
+        }
+
+    /* Custom input fields */
+    .custom-input, .custom-input:focus {
+        background: #f8f9fa;
+        border: 1.5px solid #00b894;
+        border-radius: 0.5rem;
+        box-shadow: none;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+        .custom-input:focus {
+            border-color: #00a085;
+            background: #f1fff8;
+            box-shadow: 0 0 0 0.2rem rgba(0,184,148,0.15);
+        }
+
     /* Custom scrollbar for the card */
     .card::-webkit-scrollbar {
         width: 8px;
@@ -287,9 +336,9 @@
         border-radius: 10px;
     }
 
-    .card::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
-    }
+        .card::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
 
     /* Sticky header when scrolling */
     .sticky-top {

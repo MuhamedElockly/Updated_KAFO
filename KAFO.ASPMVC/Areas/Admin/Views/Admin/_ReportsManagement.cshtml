@@ -1,63 +1,316 @@
 @model Kafo.ASPMVC.Models.HomeViewModel
 
-<div class="card mb-4" id="reports-management">
-	<div class="card-header bg-white">
-		<h4 class="mb-0">التقارير</h4>
-	</div>
-	<div class="card-body">
-		<div class="row mb-4">
-			<div class="col-md-12">
-				<h5>اختر نوع التقرير:</h5>
-				<div class="d-flex flex-wrap gap-2 mb-3">
-					<button class="btn btn-info report-type-btn" data-report-type="profit">إجمالي الأرباح</button>
-					<button class="btn btn-warning report-type-btn" data-report-type="sales">إجمالي المبيعات</button>
-					<button class="btn btn-dark report-type-btn" data-report-type="most_sold">المنتج الأكثر مبيعًا</button>
-					<button class="btn btn-success report-type-btn" data-report-type="most_profitable_seller">البائع الأكثر ربحاً</button>
-					<button class="btn btn-primary report-type-btn" data-report-type="most_profitable_product">المنتج الأكثر ربحاً</button>
-					<button class="btn btn-info report-type-btn" data-report-type="total_payments">عدد المدفوعات الكلي</button>
-					<button class="btn btn-secondary report-type-btn" data-report-type="sold_products">المنتجات المباعة</button>
-				</div>
-			</div>
-		</div>
+<style>
+    .reports-table-card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border-radius: 0.75rem;
+        overflow: hidden;
+    }
 
-		<div id="report-details-section" style="display:none;">
-			<h5 class="mt-4" id="report-title"></h5>
-			<div class="row mb-3 align-items-end">
-				<div class="col-md-4">
-					<label for="reportStartDate" class="form-label">تاريخ البدء</label>
-					<input type="date" class="form-control" id="reportStartDate">
-				</div>
-				<div class="col-md-4">
-					<label for="reportEndDate" class="form-label">تاريخ الانتهاء</label>
-					<input type="date" class="form-control" id="reportEndDate">
-				</div>
-				<div class="col-md-2">
-					<button class="btn btn-primary w-100" onclick="generateReport()">عرض التقرير</button>
-				</div>
-			</div>
-			<div id="report-results" class="mt-3 p-3 border rounded bg-light">
-				<p class="text-muted">الرجاء تحديد نطاق تاريخ لعرض التقرير.</p>
-			</div>
-		</div>
-	</div>
+    .reports-table-header {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        color: white;
+        border: none;
+        padding: 1.5rem;
+    }
+
+        .reports-table-header h4 {
+            font-weight: 600;
+            margin: 0;
+        }
+
+    .report-section {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .report-type-btn {
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        color: white;
+        margin: 0.25rem;
+    }
+
+        .report-type-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            color: white;
+        }
+
+        .report-type-btn.active {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Profit Report Button - Green */
+        .report-type-btn[data-report-type="profit"] {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+        }
+
+            .report-type-btn[data-report-type="profit"]:hover {
+                background: linear-gradient(135deg, #00a085 0%, #00b894 100%);
+            }
+
+        /* Sales Report Button - Blue */
+        .report-type-btn[data-report-type="sales"] {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        }
+
+            .report-type-btn[data-report-type="sales"]:hover {
+                background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
+            }
+
+        /* Most Sold Report Button - Orange */
+        .report-type-btn[data-report-type="most_sold"] {
+            background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+        }
+
+            .report-type-btn[data-report-type="most_sold"]:hover {
+                background: linear-gradient(135deg, #e17055 0%, #fdcb6e 100%);
+            }
+
+        /* Most Profitable Seller Report Button - Purple */
+        .report-type-btn[data-report-type="most_profitable_seller"] {
+            background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
+        }
+
+            .report-type-btn[data-report-type="most_profitable_seller"]:hover {
+                background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            }
+
+        /* Most Profitable Product Report Button - Pink */
+        .report-type-btn[data-report-type="most_profitable_product"] {
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+        }
+
+            .report-type-btn[data-report-type="most_profitable_product"]:hover {
+                background: linear-gradient(135deg, #e84393 0%, #fd79a8 100%);
+            }
+
+        /* Total Payments Report Button - Teal */
+        .report-type-btn[data-report-type="total_payments"] {
+            background: linear-gradient(135deg, #00cec9 0%, #00b894 100%);
+        }
+
+            .report-type-btn[data-report-type="total_payments"]:hover {
+                background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            }
+
+        /* Sold Products Report Button - Indigo */
+        .report-type-btn[data-report-type="sold_products"] {
+            background: linear-gradient(135deg, #6c5ce7 0%, #5f3dc4 100%);
+        }
+
+            .report-type-btn[data-report-type="sold_products"]:hover {
+                background: linear-gradient(135deg, #5f3dc4 0%, #6c5ce7 100%);
+            }
+
+    .report-details-section {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e9ecef;
+    }
+
+    .report-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #17a2b8;
+    }
+
+    .date-input-group {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus {
+            border-color: #17a2b8;
+            box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+        }
+
+    .generate-report-btn {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+        .generate-report-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #138496 0%, #17a2b8 100%);
+            color: white;
+        }
+
+    .report-results {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        border: 1px solid #dee2e6;
+        min-height: 100px;
+    }
+
+    .report-actions {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-top: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .action-btn {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        color: #495057;
+        margin: 0.25rem;
+    }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+        }
+
+            .action-btn.primary:hover {
+                background: linear-gradient(135deg, #138496 0%, #17a2b8 100%);
+                color: white;
+            }
+
+        .action-btn.secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+        }
+
+            .action-btn.secondary:hover {
+                background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+                color: white;
+            }
+</style>
+
+<div class="card reports-table-card" id="reports-management">
+    <div class="card-header reports-table-header">
+        <div class="d-flex align-items-center">
+            <h4><i class="fas fa-chart-line me-2"></i>التقارير</h4>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="report-section">
+            <h5 class="mb-3"><i class="fas fa-list me-2"></i>اختر نوع التقرير:</h5>
+            <div class="d-flex flex-wrap gap-2">
+                <button class="btn report-type-btn" data-report-type="profit">
+                    <i class="fas fa-chart-pie me-2"></i>إجمالي الأرباح
+                </button>
+                <button class="btn report-type-btn" data-report-type="sales">
+                    <i class="fas fa-chart-bar me-2"></i>إجمالي المبيعات
+                </button>
+                <button class="btn report-type-btn" data-report-type="most_sold">
+                    <i class="fas fa-star me-2"></i>المنتج الأكثر مبيعًا
+                </button>
+                <button class="btn report-type-btn" data-report-type="most_profitable_seller">
+                    <i class="fas fa-user-tie me-2"></i>البائع الأكثر ربحاً
+                </button>
+                <button class="btn report-type-btn" data-report-type="most_profitable_product">
+                    <i class="fas fa-crown me-2"></i>المنتج الأكثر ربحاً
+                </button>
+                <button class="btn report-type-btn" data-report-type="total_payments">
+                    <i class="fas fa-credit-card me-2"></i>عدد المدفوعات الكلي
+                </button>
+                <button class="btn report-type-btn" data-report-type="sold_products">
+                    <i class="fas fa-box me-2"></i>المنتجات المباعة
+                </button>
+            </div>
+        </div>
+
+        <div id="report-details-section" class="report-details-section" style="display:none;">
+            <h5 class="report-title" id="report-title"></h5>
+            <div class="date-input-group">
+                <div class="row align-items-end">
+                    <div class="col-md-4">
+                        <label for="reportStartDate" class="form-label">
+                            <i class="fas fa-calendar-alt me-2"></i>تاريخ البدء
+                        </label>
+                        <input type="date" class="form-control" id="reportStartDate">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="reportEndDate" class="form-label">
+                            <i class="fas fa-calendar-check me-2"></i>تاريخ الانتهاء
+                        </label>
+                        <input type="date" class="form-control" id="reportEndDate">
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn generate-report-btn w-100" onclick="generateReport()">
+                            <i class="fas fa-search me-2"></i>عرض التقرير
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="report-results" class="report-results">
+                <p class="text-muted mb-0">
+                    <i class="fas fa-info-circle me-2"></i>الرجاء تحديد نطاق تاريخ لعرض التقرير.
+                </p>
+            </div>
+        </div>
+    </div>
 </div>
 
-
 <template id="report-actions-template">
-    <div class="report-actions mt-3 d-flex gap-2 justify-content-end">
-        <button class="btn btn-primary" onclick="downloadReportAsPDF()">
-            <i class="fas fa-download"></i> تحميل PDF
-        </button>
-        <button class="btn btn-secondary" onclick="printReport()">
-            <i class="fas fa-print"></i> طباعة
-        </button>
+    <div class="report-actions">
+        <div class="d-flex gap-2 justify-content-end">
+            <button class="btn action-btn primary" onclick="downloadReportAsPDF()">
+                <i class="fas fa-download me-2"></i>تحميل PDF
+            </button>
+            <button class="btn action-btn secondary" onclick="printReport()">
+                <i class="fas fa-print me-2"></i>طباعة
+            </button>
+        </div>
     </div>
 </template>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="~/js/admin/reports.js" asp-append-version="true"></script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         initializeReportFunctionality();
     });
-</script> 
+</script>
