@@ -5,7 +5,7 @@ namespace KAFO.ASPMVC.Areas.Identity.ViewModels
     public class IdentityViewModel
     {
         public int Id { get; set; }
-        [Display(Name = "اسم المستخدم")]
+        [Display(Name = " ايميل المستخدم او رقم الموبايل")]
         public string userName { get; set; } = null!;
 
         [Display(Name = "كلمة المرور")]

@@ -4,7 +4,8 @@
     string title = $"تعديل منتج '{Model.Name}'";
     ViewData["Title"] = title;
     IEnumerable<Category> Categories = ViewBag.Categories;
-    ViewBag.categoryList = new SelectList(Categories.ToList(), "Id", "Name");
+    ViewBag.categoryList = new SelectList(Categories.ToList(), "Id", "Name", Model?.CategoryId);
+    int x = 2;
 }
 <style>
     :root {

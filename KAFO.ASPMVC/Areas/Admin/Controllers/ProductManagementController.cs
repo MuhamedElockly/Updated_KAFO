@@ -37,58 +37,15 @@ namespace KAFO.ASPMVC.Areas.Admin.Controllers
 
             return View("Create");
         }
-        // GET: ProductController/Details/5
         public ActionResult Details(int? id)
         {
             if (id == null)
                 return BadRequest();
             var Product = _productManager.Get(p => p.Id == id, "Category");
 
-            return View("~/Areas/Admin/Views/ProductManagement/Index.cshtml");
-        }
-        [HttpGet]
-        // GET: ProductController/Create
-        public ActionResult Create()
-        {
-            try
-            {
-                var Categories = _unitOfWork.Category.GetAll();
-                ViewBag.Categories = Categories;
-                return View();
-
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "An error occurred while processing your request");
-            }
+            return View("Details", Product);
         }
 
-        // POST: ProductController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Product product, IFormFile imageFile)
-        {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-
-                    product.ImageUrl = await UploadFile(imageFile, product.Name);
-
-                    //BLL MAke LastPurchasing = AVGPurchasing
-                    _productManager.Add(product);
-                    return RedirectToAction(nameof(Index));
-                }
-                else
-                {
-                    return Create();
-                }
-            }
-            catch
-            {
-                return StatusCode(500, "An error occurred while processing your request");
-            }
-        }
         public async Task<IActionResult> Upsert(ProductVM productVM, IFormFile? imageFile)
         {
             if (ModelState.IsValid)
@@ -103,7 +60,7 @@ namespace KAFO.ASPMVC.Areas.Admin.Controllers
                 product.IsActive = productVM.IsActive;
 
 
-                if (productVM.Id == 0)
+                if (productVM.Id == null)
                 {
                     _productManager.Add(product);
 
@@ -111,8 +68,23 @@ namespace KAFO.ASPMVC.Areas.Admin.Controllers
                 }
                 else
                 {
-                    _productManager.Update(product);
+                    product = _productManager.Get(p => p.Id == productVM.Id);
+                    if (product == null)
+                    {
+                        return NotFound();
+                    }
 
+                    if (imageFile != null)
+                    {
+                        product.ImageUrl = await UploadFile(imageFile, productVM.Name);
+                    }
+                    product.Name = productVM.Name;
+                    product.Category = productVM.Category;
+                    product.CategoryId = productVM.CategoryId;
+                    product.AveragePurchasePrice = productVM.AveragePurchasePrice;
+                    product.SellingPrice = productVM.SellingPrice;
+                    product.IsActive = productVM.IsActive;
+                    _productManager.Update(product);
                     TempData["Success"] = "تم تعديل المنتج بنجاح";
                 }
 
@@ -127,8 +99,6 @@ namespace KAFO.ASPMVC.Areas.Admin.Controllers
             }
 
         }
-
-
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -138,8 +108,10 @@ namespace KAFO.ASPMVC.Areas.Admin.Controllers
             ViewBag.Categories = Categories;
             ProductVM productVM = new ProductVM()
             {
-                Id = product.Id,
-                Category = product.Category
+                Id = product.Id
+
+                ,
+                CategoryId = product.CategoryId
                 ,
                 ImageUrl = product.ImageUrl,
                 IsActive = product.IsActive
@@ -152,47 +124,21 @@ namespace KAFO.ASPMVC.Areas.Admin.Controllers
             return View(productVM);
         }
 
-        // POST: ProductController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? id, Product product, IFormFile? imageFile)
-        {
-            if (id == null)
-                return BadRequest();
-            try
-            {
-                if (ModelState.IsValid)
-                {
-
-                    product.ImageUrl = await UploadFile(imageFile, product.Name);
-                    _productManager.AddORUpdate((int) id, product);
-                    return RedirectToAction(nameof(Index));
-                }
-                else
-                {
-                    return Edit(id);
-                }
-            }
-            catch
-            {
-                return StatusCode(500, "An error occurred while processing your request");
-            }
-        }
-
-        // GET: ProductController/Delete/5
         public ActionResult Delete(int? id)
         {
             if (id == null)
                 return BadRequest();
 
             var Product = _productManager.Get(p => p.Id == id, "Category");
+            ProductVM productVM = new ProductVM();
+
 
             return View(Product);
         }
 
         // POST: ProductController/Delete/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int? id)
         {
             if (id == null)
@@ -204,7 +150,7 @@ namespace KAFO.ASPMVC.Areas.Admin.Controllers
                 {
                     _productManager.Remove(p);
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Admin", new { area = "Admin" });
             }
             catch
             {

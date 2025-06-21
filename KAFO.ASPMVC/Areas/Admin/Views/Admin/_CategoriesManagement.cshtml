@@ -1,60 +1,267 @@
 @model CategoriesTableVM
 
-<div class="card mb-4" id="categories-management">
-	<div class="card-header bg-white">
-		<div class="d-flex justify-content-between align-items-center">
-			<h4 class="mb-0">إدارة الفئات</h4>
-			<a class="btn btn-primary" asp-action="Index" asp-controller="CategoryManagement">
-				<i class="fas fa-plus"></i> إضافة فئة جديدة
-			</a>
-		</div>
-	</div>
-	<div class="card-body">
-		<div class="table-responsive">
-			<table class="table table-hover">
-				<thead>
-					<tr>
-						<th>#</th>
-						<th>اسم الفئة</th>
-						<th>الوصف</th>
-						<th>الإجراءات</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var category in Model.Categories)
-					{
-						<tr>
-							<td>@category.Id</td>
-							<td>@category.Name</td>
-							<td>@category.Description</td>
-							<td>
-								<a class="btn btn-sm btn-info" asp-action="Edit" asp-controller="CategoryManagement" asp-route-id="@category.Id">
-									<i class="fas fa-edit"></i>
-								</a>
-								<a class="btn btn-sm btn-danger" onclick="deleteCategory(@category.Id)">
-									<i class="fas fa-trash"></i>
-								</a>
-							</td>
-						</tr>
-					}
-				</tbody>
-			</table>
-		</div>
-		<nav>
-			<ul class="pagination justify-content-end">
-				<li class="page-item @(Model.CurrentCategoryPage == 1 ? "disabled" : "")">
-					<a class="page-link" onclick="loadAdminContent('Categories', @Model.CurrentCategoryPage-1)" tabindex="-1">السابق</a>
-				</li>
-				@for (int i = 1; i <= Model.TotalCategoriesPages; i++)
-				{
-					<li class="page-item @(i == Model.CurrentCategoryPage ? "active" : "")">
-						<a class="page-link" onclick="loadAdminContent('Categories', @i)">@i</a>
-					</li>
-				}
-				<li class="page-item @(Model.CurrentCategoryPage == Model.TotalCategoriesPages ? "disabled" : "")">
-					<a class="page-link" onclick="loadAdminContent('Categories', @Model.CurrentCategoryPage+1)">التالي</a>
-				</li>
-			</ul>
-		</nav>
-	</div>
+<style>
+    .categories-table-card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border-radius: 0.75rem;
+        overflow: hidden;
+    }
+
+    .categories-table-header {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        color: white;
+        border: none;
+        padding: 1.5rem;
+    }
+
+        .categories-table-header h4 {
+            font-weight: 600;
+            margin: 0;
+        }
+
+    .add-category-btn {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+        .add-category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+        }
+
+    .table-container {
+        background: white;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin: 1rem 0;
+    }
+
+    .categories-table {
+        margin: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+        .categories-table thead th {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: none;
+            padding: 1rem 0.75rem;
+            font-weight: 600;
+            color: #495057;
+            text-align: center;
+            position: relative;
+        }
+
+            .categories-table thead th:first-child {
+                border-top-right-radius: 0.5rem;
+            }
+
+            .categories-table thead th:last-child {
+                border-top-left-radius: 0.5rem;
+            }
+
+        .categories-table tbody tr {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+            .categories-table tbody tr:hover {
+                background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+                transform: scale(1.01);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+        .categories-table tbody td {
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
+            border: none;
+            text-align: center;
+        }
+
+    .category-id {
+        background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+        color: #d63031;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 1rem;
+        display: inline-block;
+        min-width: 40px;
+    }
+
+    .category-name {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 1.1rem;
+    }
+
+    .category-description {
+        color: #6c757d;
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .action-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 0.5rem;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .action-btn.edit {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: white;
+        }
+
+        .action-btn.delete {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+    .pagination-container {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-top: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .pagination {
+        margin: 0;
+        gap: 0.25rem;
+    }
+
+    .page-item .page-link {
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        color: #495057;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        margin: 0 0.125rem;
+    }
+
+        .page-item .page-link:hover {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+    .page-item.active .page-link {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-item.disabled .page-link {
+        background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+        color: #6c757d;
+        cursor: not-allowed;
+    }
+</style>
+
+<div class="card categories-table-card" id="categories-management">
+    <div class="card-header categories-table-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4><i class="fas fa-th-large me-2"></i>إدارة الفئات</h4>
+            <a class="btn add-category-btn" asp-action="Index" asp-controller="CategoryManagement">
+                <i class="fas fa-plus me-2"></i>إضافة فئة جديدة
+            </a>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="table categories-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>اسم الفئة</th>
+                            <th>الوصف</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var category in Model.Categories)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="category-id">@category.Id</span>
+                                </td>
+                                <td>
+                                    <span class="category-name">@category.Name</span>
+                                </td>
+                                <td>
+                                    <span class="category-description" title="@category.Description">
+                                        @category.Description
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a class="action-btn edit" asp-action="Edit" asp-controller="CategoryManagement" asp-route-id="@category.Id" title="تعديل">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a class="action-btn delete" onclick="deleteCategory(@category.Id)" title="حذف">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="pagination-container">
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.CurrentCategoryPage == 1 ? "disabled" : "")">
+                        <a class="page-link" onclick="loadAdminContent('Categories', @Model.CurrentCategoryPage-1)" tabindex="-1">
+                            <i class="fas fa-chevron-right me-1"></i>السابق
+                        </a>
+                    </li>
+                    @for (int i = 1; i <= Model.TotalCategoriesPages; i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentCategoryPage ? "active" : "")">
+                            <a class="page-link" onclick="loadAdminContent('Categories', @i)">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(Model.CurrentCategoryPage == Model.TotalCategoriesPages ? "disabled" : "")">
+                        <a class="page-link" onclick="loadAdminContent('Categories', @Model.CurrentCategoryPage+1)">
+                            التالي<i class="fas fa-chevron-left me-1"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
 </div>

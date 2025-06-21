@@ -14,15 +14,15 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 	{
 		private readonly CategoryManager _categoryManager;
 		private readonly ReportManager _reportManager;
-		//   private readonly IUnitOfWork _unitOfWork;
 		private readonly ProductManager _productManager;
+		private readonly UserManager _userManager;
 		const int pageSize = 5;
-		public AdminController(CategoryManager categoryManager, ReportManager invoiceManager, ProductManager productManager)
+		public AdminController(CategoryManager categoryManager, ReportManager invoiceManager, ProductManager productManager, UserManager userManager)
 		{
 			_categoryManager = categoryManager;
 			_reportManager = invoiceManager;
 			_productManager = productManager;
-
+			_userManager = userManager;
 		}
 
 		public IActionResult Index(int sellerPage = 1, int categoryPage = 1, int productPage = 1, int adminPage = 1)
@@ -67,26 +67,19 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 		}
 		public IActionResult Users(int? page)
 		{
-
-			List<UserVM> allSellers = new List<UserVM>()
+			List<User> users = _userManager.GetAll().Skip(pageSize * (page.Value - 1)).Take(pageSize).ToList();
+			List<UserVM> allUsersVM = new List<UserVM>();
+			foreach (var user in users)
 			{
-				new UserVM() {Id = 1,Name="محمد محمود ",Phone="01029092093",Email="elocklymuhamed@gmail.com",Role="Seller"},
-				new UserVM() {Id = 1,Name="محمد محمود ",Phone="01029092093",Role="Admin"},
-				new UserVM() {Id = 1,Name="احمد خالد",Phone="01029092093",Email="elocklymuhamed@gmail.com",Role="Admin"},
-				new UserVM() {Id = 1,Name="محمد محمود ",Phone="01029092093",Email="elocklymuhamed@gmail.com",Role="Seller"},
-				new UserVM() {Id = 2,Name="علي",Phone="01029092093",Role="Admin"},
-				new UserVM() {Id = 4,Name="محمد محمود ",Phone="01029092093",Email="elocklymuhamed@gmail.com",Role="Admin"},
-				new UserVM() {Id = 5,Name="محمد محمود ",Phone="01029092093",Email="elocklymuhamed@gmail.com",Role="Seller"},
-				new UserVM() {Id = 1,Name="محمد محمود ",Phone="01029092093",Email="elocklymuhamed@gmail.com",Role="Admin"},
+				UserVM userVM = new UserVM() { Name = user.Name, Id = user.Id, Email = user.Email, Phone = user.PhoneNumber, Role = user.Role };
+				allUsersVM.Add(userVM);
+			}
 
-			};
-
-			UsersTableVM sellersTableVM = new UsersTableVM();
-			sellersTableVM.CurrentUserPage = page ?? 1;
-			sellersTableVM.Users = allSellers;
-			sellersTableVM.TotalUsersPages = (int)Math.Ceiling(allSellers.Count / (double)pageSize);
-
-			return PartialView("_UsersManagement", sellersTableVM);
+			UsersTableVM usersTableVM = new UsersTableVM();
+			usersTableVM.CurrentUserPage = page ?? 1;
+			usersTableVM.Users = allUsersVM;
+			usersTableVM.TotalUsersPages = (int)Math.Ceiling(_userManager.GetAll().Count() / (double)pageSize);
+			return PartialView("_UsersManagement", usersTableVM);
 		}
 		public IActionResult Categories(int? page)
 		{

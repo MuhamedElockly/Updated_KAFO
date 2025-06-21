@@ -1,145 +1,156 @@
 ﻿@model CategoryVM
 @{
-	// ViewData["Title"] = Model.Id == 0 ? "إضافة فئة جديدة" : "تعديل الفئة";
-	Layout = "_DefaultLayout";
-	var isNewCategory = Model?.Id == 0;
-	var title = isNewCategory ? "إضافة فئة جديدة" : "تعديل الفئة";
+    Layout = "_DefaultLayout";
+    var isNewCategory = Model?.Id == 0;
+    var title = isNewCategory ? "إضافة فئة جديدة" : "تعديل الفئة";
 }
 
 <div class="container-fluid d-flex align-items-center justify-content-center" style="min-height: calc(100vh - 100px);">
-	<div class="row justify-content-center w-100">
-		<div class="col-lg-10 col-xl-8">
-			<div class="card shadow-lg border-0">
-				<!-- Card Header with Gradient Background -->
-				<div class="card-header border-0 py-4" style="background: linear-gradient(45deg, #2196F3, #1976D2);">
-					<div class="d-flex align-items-center">
-						<i class="fas fa-layer-group text-white fs-3 me-3"></i>
-						<h3 class="card-title text-white mb-0">@title</h3>
-					</div>
-				</div>
+    <div class="row justify-content-center w-100">
+        <div class="col-lg-10 col-xl-8">
+            <div class="card shadow-lg border-0">
+                <!-- Card Header with Gradient Background (matches categories table) -->
+                <div class="card-header border-0 py-4" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-th-large text-white fs-3 me-3"></i>
+                        <h3 class="card-title text-white mb-0">@title</h3>
+                    </div>
+                </div>
 
-				<!-- Card Body -->
-				<div class="card-body p-5">
-					<form asp-action="UpSert" method="post" class="needs-validation" novalidate>
-						<input type="hidden" asp-for="Id" value="@(Model?.Id ?? 0)" />
+                <!-- Card Body -->
+                <div class="card-body p-5">
+                    <form asp-action="UpSert" method="post" class="needs-validation" novalidate>
+                        <input type="hidden" asp-for="Id" value="@(Model?.Id ?? 0)" />
 
-						<!-- Name Input -->
-						<div class="form-group mb-5">
-							<label asp-for="Name" class="form-label text-muted mb-3 fs-5">
-								<i class="fas fa-tag me-2"></i>اسم الفئة
-							</label>
-							<input asp-for="Name"
-								   class="form-control form-control-lg shadow-sm fs-5"
-								   style="height: 55px;"
-								   placeholder="مثال: الإلكترونيات"
-								   value="@(Model?.Name ?? string.Empty)"
-								   required />
-							<span asp-validation-for="Name" class="text-danger fs-6"></span>
-						</div>
+                        <!-- Name Input -->
+                        <div class="form-group mb-5">
+                            <label asp-for="Name" class="form-label text-muted mb-3 fs-5">
+                                <i class="fas fa-tag me-2"></i>اسم الفئة
+                            </label>
+                            <input asp-for="Name"
+                                   class="form-control form-control-lg shadow-sm fs-5"
+                                   style="height: 55px;"
+                                   placeholder="مثال: الإلكترونيات"
+                                   value="@(Model?.Name ?? string.Empty)"
+                                   required />
+                            <span asp-validation-for="Name" class="text-danger fs-6"></span>
+                        </div>
 
-						<!-- Description Input -->
-						<div class="form-group mb-5">
-							<label asp-for="Description" class="form-label text-muted mb-3 fs-5">
-								<i class="fas fa-align-left me-2"></i>وصف الفئة
-							</label>
-							<textarea asp-for="Description"
-									  class="form-control shadow-sm fs-5"
-									  rows="5"
-									  style="resize: none;"
-									  placeholder="أدخل وصفاً مختصراً للفئة">@(Model?.Description ?? string.Empty)</textarea>
-							<span asp-validation-for="Description" class="text-danger fs-6"></span>
-						</div>
+                        <!-- Description Input -->
+                        <div class="form-group mb-5">
+                            <label asp-for="Description" class="form-label text-muted mb-3 fs-5">
+                                <i class="fas fa-align-left me-2"></i>وصف الفئة
+                            </label>
+                            <textarea asp-for="Description"
+                                      class="form-control shadow-sm fs-5"
+                                      rows="5"
+                                      style="resize: none;"
+                                      placeholder="أدخل وصفاً مختصراً للفئة">@(Model?.Description ?? string.Empty)</textarea>
+                            <span asp-validation-for="Description" class="text-danger fs-6"></span>
+                        </div>
 
-						<!-- Action Buttons -->
-						<div class="d-flex justify-content-end gap-3 mt-5">
-							<a asp-action="Index" asp-controller="Admin" class="btn btn-light px-5 py-2 fs-5">
-								<i class="fas fa-times me-2"></i>إلغاء
-							</a>
-							@* <button type="submit" class="btn btn-primary px-5 py-2 fs-5" onclick=toggleSpinner(true, " Loading data..." )>
-							<i class="fas fa-save me-2"></i>حفظ
-							</button> *@
-
-
-							<button type="submit" class="btn btn-primary px-5 py-2 fs-5" onclick="toggleSpinner(true, 'جاري الحفظ...'); setTimeout(() => this.form.submit(), 100);">
-								<i class="fas fa-save me-2"></i>حفظ
-							</button>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-end gap-3 mt-5">
+                            <a asp-action="Index" asp-controller="Admin" class="btn btn-light px-5 py-2 fs-5">
+                                <i class="fas fa-times me-2"></i>إلغاء
+                            </a>
+                            <button type="submit" class="btn btn-save-category px-5 py-2 fs-5">
+                                <i class="fas fa-save me-2"></i>حفظ
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-
 <style>
+    .btn-save-category {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        color: #fff;
+        border: none;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
 
-	.spinner-overlay {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background-color: rgba(255, 255, 255, 0.8);
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		z-index: 9999;
-		backdrop-filter: blur(2px);
-	}
+        .btn-save-category:hover, .btn-save-category:focus {
+            background: linear-gradient(135deg, #ee5a24 0%, #ff6b6b 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(255,107,107,0.15);
+            transform: translateY(-2px) scale(1.03);
+        }
 
-	.modern-spinner {
-		width: 50px;
-		height: 50px;
-		border: 3px solid rgba(0, 0, 0, 0.1);
-		border-radius: 50%;
-		border-top-color: #6200ee;
-		animation: spin 1s ease-in-out infinite;
-	}
+    .spinner-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        backdrop-filter: blur(2px);
+    }
 
+    .modern-spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+        border-top-color: #6200ee;
+        animation: spin 1s ease-in-out infinite;
+    }
 
-	.spinner-text {
-		margin-top: 15px;
-		color: #333;
-		font-family: 'Segoe UI', sans-serif;
-		font-size: 14px;
-	}
+    .spinner-text {
+        margin-top: 15px;
+        color: #333;
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 14px;
+    }
 
-	.spinner-container {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
+    .spinner-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 </style>
 
 @section Scripts {
-	<script>
+    <script>
+        document.querySelector('form').addEventListener('submit', function (e) {
+            toggleSpinner(true, 'جاري الحفظ...');
+            this.querySelector('button[type=\"submit\"]').disabled = true;
+        });
+        // Form validation
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
 
-		// Form validation
-		(function () {
-			'use strict'
-			var forms = document.querySelectorAll('.needs-validation')
-			Array.prototype.slice.call(forms).forEach(function (form) {
-				form.addEventListener('submit', function (event) {
-					if (!form.checkValidity()) {
-						event.preventDefault()
-						event.stopPropagation()
-					}
-					form.classList.add('was-validated')
-				}, false)
-			})
-		})()
-
-		// Real-time validation for name input
-		document.getElementById('Name').addEventListener('input', function (e) {
-			const input = e.target;
-			if (input.value.trim() === '') {
-				input.classList.remove('is-valid');
-				input.classList.add('is-invalid');
-			} else {
-				input.classList.remove('is-invalid');
-				input.classList.add('is-valid');
-			}
-		});
-	</script>
+        // Real-time validation for name input
+        document.getElementById('Name').addEventListener('input', function (e) {
+            const input = e.target;
+            if (input.value.trim() === '') {
+                input.classList.remove('is-valid');
+                input.classList.add('is-invalid');
+            } else {
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+            }
+        });
+    </script>
 }
