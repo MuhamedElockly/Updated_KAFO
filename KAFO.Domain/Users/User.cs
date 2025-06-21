@@ -6,7 +6,7 @@ namespace KAFO.Domain.Users
     {
         public int Id { private set; get; }
         public string Name { set; get; }
-        public string Password { set; get; }
+        public string Password { set; get; } = "jhhhh";
         public string Role { private set; get; }
         public string Gender { set; get; }
         public string Email { get; set; }

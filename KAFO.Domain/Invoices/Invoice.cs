@@ -6,7 +6,6 @@ namespace KAFO.Domain.Invoices
 {
     public abstract class Invoice : Base, ISoftDelete
     {
-
         public int Id { set; get; }
         public DateTime CreatedAt { set; get; }
         [Required]
