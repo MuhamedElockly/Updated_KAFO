@@ -4,12 +4,14 @@ using KAFO.ASPMVC.Areas.Admin.ViewModels;
 using KAFO.BLL.Managers;
 using KAFO.Domain.Products;
 using KAFO.Domain.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Drawing.Printing;
 
 namespace Kafo.ASPMVC.Areas.Admin.Controllers
 {
 	[Area("Admin")]
+	[Authorize(Roles ="admin")]
 	public class AdminController : Controller
 	{
 		private readonly CategoryManager _categoryManager;

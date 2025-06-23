@@ -43,11 +43,17 @@ $(document).ready(function () {
 });
 
 function toggleSpinner(show, message = '', options = {}) {
-    // Default options
+    // Modern default options
     const defaults = {
         color: '#6200ee',
-        size: 50,
-        thickness: 3
+        secondaryColor: 'rgba(98, 0, 238, 0.2)',
+        size: 60,
+        thickness: 4,
+        speed: 1,
+        overlayColor: 'rgba(255, 255, 255, 0.85)',
+        textColor: '#4a4a4a',
+        blurAmount: '3px',
+        animation: 'spin' // 'spin', 'pulse', or 'wave'
     };
 
     const config = { ...defaults, ...options };
@@ -60,22 +66,26 @@ function toggleSpinner(show, message = '', options = {}) {
             spinnerOverlay = document.createElement('div');
             spinnerOverlay.id = 'modern-spinner-overlay';
             spinnerOverlay.className = 'spinner-overlay';
+            spinnerOverlay.style.setProperty('--overlay-color', config.overlayColor);
+            spinnerOverlay.style.setProperty('--blur-amount', config.blurAmount);
 
             const spinnerContainer = document.createElement('div');
             spinnerContainer.className = 'spinner-container';
 
-            const spinner = document.createElement('div');
-            spinner.className = 'modern-spinner';
-
-            // Apply custom styles
-            spinner.style.width = `${config.size}px`;
-            spinner.style.height = `${config.size}px`;
-            spinner.style.borderWidth = `${config.thickness}px`;
-            spinner.style.borderTopColor = config.color;
+            // Create spinner based on animation type
+            let spinner;
+            if (config.animation === 'pulse') {
+                spinner = createPulseSpinner(config);
+            } else if (config.animation === 'wave') {
+                spinner = createWaveSpinner(config);
+            } else {
+                spinner = createSpinSpinner(config);
+            }
 
             const textElement = document.createElement('div');
             textElement.className = 'spinner-text';
             textElement.textContent = message;
+            textElement.style.color = config.textColor;
 
             spinnerContainer.appendChild(spinner);
             if (message) {
@@ -86,28 +96,81 @@ function toggleSpinner(show, message = '', options = {}) {
             document.body.appendChild(spinnerOverlay);
         } else {
             // Update existing spinner
-            const spinner = spinnerOverlay.querySelector('.modern-spinner');
+            const spinner = spinnerOverlay.querySelector('.spinner-element');
             const textElement = spinnerOverlay.querySelector('.spinner-text');
 
             if (spinner) {
-                spinner.style.width = `${config.size}px`;
-                spinner.style.height = `${config.size}px`;
-                spinner.style.borderWidth = `${config.thickness}px`;
-                spinner.style.borderTopColor = config.color;
+                // Update spinner styles based on type
+                if (spinner.classList.contains('spin-spinner')) {
+                    spinner.style.width = `${config.size}px`;
+                    spinner.style.height = `${config.size}px`;
+                    spinner.style.borderWidth = `${config.thickness}px`;
+                    spinner.style.borderTopColor = config.color;
+                    spinner.style.borderLeftColor = config.secondaryColor;
+                }
+                // Add similar updates for other spinner types
             }
 
             if (textElement) {
                 textElement.textContent = message;
+                textElement.style.color = config.textColor;
             } else if (message) {
                 const newTextElement = document.createElement('div');
                 newTextElement.className = 'spinner-text';
                 newTextElement.textContent = message;
+                newTextElement.style.color = config.textColor;
                 spinnerOverlay.querySelector('.spinner-container').appendChild(newTextElement);
             }
         }
 
         spinnerOverlay.style.display = 'flex';
     } else if (spinnerOverlay) {
-        spinnerOverlay.style.display = 'none';
+        // Add fade-out animation before hiding
+        spinnerOverlay.style.opacity = '0';
+        setTimeout(() => {
+            spinnerOverlay.style.display = 'none';
+            spinnerOverlay.style.opacity = '1';
+        }, 300); // Match this with the CSS transition time
     }
+}
+
+// Helper functions to create different spinner types
+function createSpinSpinner(config) {
+    const spinner = document.createElement('div');
+    spinner.className = 'spinner-element spin-spinner';
+    spinner.style.width = `${config.size}px`;
+    spinner.style.height = `${config.size}px`;
+    spinner.style.borderWidth = `${config.thickness}px`;
+    spinner.style.borderTopColor = config.color;
+    spinner.style.borderLeftColor = config.secondaryColor;
+    spinner.style.animationDuration = `${1 / config.speed}s`;
+    return spinner;
+}
+
+function createPulseSpinner(config) {
+    const spinner = document.createElement('div');
+    spinner.className = 'spinner-element pulse-spinner';
+    spinner.style.width = `${config.size}px`;
+    spinner.style.height = `${config.size}px`;
+    spinner.style.backgroundColor = config.color;
+    spinner.style.animationDuration = `${1 / config.speed}s`;
+    return spinner;
+}
+
+function createWaveSpinner(config) {
+    const container = document.createElement('div');
+    container.className = 'wave-container';
+    container.style.width = `${config.size * 1.5}px`;
+    container.style.height = `${config.size}px`;
+
+    for (let i = 0; i < 5; i++) {
+        const bar = document.createElement('div');
+        bar.className = 'wave-bar';
+        bar.style.backgroundColor = config.color;
+        bar.style.animationDelay = `${i * 0.1}s`;
+        bar.style.animationDuration = `${0.8 / config.speed}s`;
+        container.appendChild(bar);
+    }
+
+    return container;
 }

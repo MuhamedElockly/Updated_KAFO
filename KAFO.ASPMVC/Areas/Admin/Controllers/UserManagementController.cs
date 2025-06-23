@@ -38,6 +38,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
         }
         public IActionResult UpSert(UserCreateVM userCreateVM)
         {
+            TempData["Spinner"] = false;
 
             if (userCreateVM == null)
             {
