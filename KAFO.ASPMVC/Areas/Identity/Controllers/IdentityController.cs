@@ -42,7 +42,7 @@ namespace KAFO.ASPMVC.Areas.Identity.Controllers
                     await HttpContext.SignInAsync("CustomIdentity", claimsPrincipal, new AuthenticationProperties
                     {
                         IsPersistent = true, // makes the cookie persist after browser close
-                        ExpiresUtc = DateTime.UtcNow.AddMinutes(60),
+                     //   ExpiresUtc = DateTime.UtcNow.AddMinutes(60),
                         AllowRefresh = true
                        
                     });

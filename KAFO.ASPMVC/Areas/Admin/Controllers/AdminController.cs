@@ -11,7 +11,7 @@ using System.Drawing.Printing;
 namespace Kafo.ASPMVC.Areas.Admin.Controllers
 {
 	[Area("Admin")]
-	[Authorize(Roles ="admin")]
+	[Authorize(Roles = "admin")]
 	public class AdminController : Controller
 	{
 		private readonly CategoryManager _categoryManager;

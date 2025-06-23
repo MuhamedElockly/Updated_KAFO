@@ -359,3 +359,11 @@
     border: 1px solid rgba(255, 255, 255, 0.18);
     padding: 24px;
 }
+.swal2-actions {
+    gap: 1rem !important; /* Adjust the spacing as needed */
+}
+
+/* For Arabic RTL support */
+html[dir="rtl"] .swal2-actions {
+    flex-direction: row-reverse;
+}

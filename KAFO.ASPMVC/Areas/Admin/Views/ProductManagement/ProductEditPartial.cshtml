@@ -1,6 +1,8 @@
 ﻿@model ProductVM
-
-<form method="post" asp-action="UpSert" enctype="multipart/form-data">
+@{
+    Layout = "_DefaultLayout";
+}
+<form id="productForm" method="post" asp-action="UpSert" enctype="multipart/form-data">
 
 	<div class="row">
 		<!-- Right Column -->
@@ -88,10 +90,10 @@
 
 	<!-- Form Buttons -->
 	<div class="d-flex justify-content-between mt-4">
-		<a asp-action="Index" asp-controller="Admin" class="btn btn-outline-secondary">
+		<a asp-action="Index" asp-controller="Admin" class="btn btn-outline-secondary" onclick="toggleSpinner(true, 'جاري العرض ....')">
 			<i class="fas fa-arrow-right me-1"></i> رجوع
 		</a>
-		<button type="submit" class="btn btn-primary" onclick="toggleSpinner(true, 'جاري الحفظ...')>
+		<button type="submit" class="btn btn-primary" >
 			<i class="fas fa-save me-1"></i> حفظ المنتج
 		</button>
 	</div>
@@ -113,6 +115,11 @@
 				imgPreview.style.display = 'block';
 			};
 			reader.readAsDataURL(file);
+		}
+	});
+	$('#productForm').on('submit', function (e) {
+		if ($(this).valid()) {
+			toggleSpinner(true, 'جاري الحفظ ....');
 		}
 	});
 </script>

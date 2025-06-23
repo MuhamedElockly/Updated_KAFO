@@ -174,3 +174,128 @@ function createWaveSpinner(config) {
 
     return container;
 }
+/**
+ * Shows a confirmation dialog before executing a delete operation
+ * @param {number} itemId - The ID of the item to delete
+ * @param {string} controllerName - Name of the controller (without "Controller")
+ * @param {string} actionName - Name of the action method (default: "Delete")
+ * @param {string} confirmationMessage - Custom confirmation message
+ * @param {string} successMessage - Custom success message
+ * @param {function} [callback] - Optional callback after success
+ */
+function showDeleteConfirmation(options) {
+    // Default values with Arabic text
+    const settings = {
+        confirmText: 'هل أنت متأكد من الحذف؟',
+        confirmDescription: 'لن تتمكن من استعادة هذا العنصر مرة أخرى!',
+        confirmButtonText: 'نعم، احذفه!',
+        cancelButtonText: 'إلغاء',
+        processingText: 'جاري المعالجة...',
+        waitingText: 'الرجاء الانتظار بينما نعالج طلبك',
+        successText: 'تم الحذف بنجاح',
+        errorText: 'فشل الاتصال بالخادم',
+        callback: null,
+        ajaxData: {},
+        ...options
+    };
+
+    // Confirmation dialog
+    Swal.fire({
+        title: settings.confirmText,
+        text: settings.confirmDescription,
+        icon: 'warning',
+        iconColor: '#dc3545',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: settings.confirmButtonText,
+        cancelButtonText: settings.cancelButtonText,
+        background: 'white',
+        backdrop: `
+            rgba(220,53,69,0.1)
+            url("/images/trash-icon.gif")
+            center top
+            no-repeat
+        `,
+        showClass: {
+            popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+            popup: 'animate__animated animate__fadeOutUp'
+        },
+        customClass: {
+            confirmButton: 'btn btn-danger shadow-sm px-4 py-2 me-2', // Added me-2 for margin
+            cancelButton: 'btn btn-secondary shadow-sm px-4 py-2 ms-2', // Added ms-2 for margin
+            actions: 'swal2-actions-custom'
+        },
+        buttonsStyling: false
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Show processing dialog
+            Swal.fire({
+                title: settings.processingText,
+                html: settings.waitingText,
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading()
+                },
+                background: 'white',
+                backdrop: `
+                    rgba(0,0,0,0.5)
+                    center
+                    no-repeat
+                `,
+                allowOutsideClick: false
+            });
+
+            // Prepare AJAX data
+            const requestData = {
+                id: settings.itemId,
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                ...settings.ajaxData
+            };
+
+            // Execute AJAX request
+            $.ajax({
+                url: settings.actionUrl,
+                type: 'POST',
+                data: requestData,
+                success: function (response) {
+                    Swal.close();
+                    if (response.success) {
+                        Swal.fire({
+                            title: 'تم!',
+                            confirmButtonText: "موافق",
+                            text: settings.successText,
+                            icon: 'success',
+                            iconColor: '#28a745',
+                            confirmButtonColor: '#28a745',
+                            background: 'white',
+                            showClass: {
+                                popup: 'animate__animated animate__bounceIn'
+                            },
+                            customClass: {
+                                confirmButton: 'btn btn-success shadow-sm px-4 py-2'
+                            }
+                        }).then(() => {
+                            if (settings.callback) {
+                                settings.callback(response);
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'خطأ!',
+                            text: response.message || 'حدث خطأ أثناء المعالجة',
+                            icon: 'error',
+                            confirmButtonText: 'موافق'
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    Swal.close();
+                    Swal.fire({ title: 'خطأ!', text: xhr.responseJSON?.message || settings.errorText, confirmButtonText: "موافق" });
+                }
+            });
+        }
+    });
+}

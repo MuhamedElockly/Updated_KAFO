@@ -1,125 +1,145 @@
 ﻿@model Product
-@{  Layout = "_DefaultLayout";
-    ViewData["Title"] = "تفاصيل المنتج";
+@{
+	Layout = "_DefaultLayout";
+	ViewData["Title"] = "تفاصيل المنتج";
 }
 
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-        :root {
-            --primary-color: #4e73df;
-            --secondary-color: #f8f9fc;
-        }
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<style>
+		:root {
+			--primary-color: #4e73df;
+			--secondary-color: #f8f9fc;
+		}
 
-        body {
-            font-family: 'Tajawal', sans-serif;
-            background-color: #f8f9fa;
-        }
+		body {
+			font-family: 'Tajawal', sans-serif;
+			background-color: #f8f9fa;
+		}
 
-        .details-card {
-            max-width: 900px;
-            margin: 2rem auto;
-            border-radius: 0.5rem;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            border: none;
-        }
+		.details-card {
+			max-width: 900px;
+			margin: 2rem auto;
+			border-radius: 0.5rem;
+			box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+			overflow: hidden;
+			border: none;
+		}
 
-        .card-header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 1.5rem;
-        }
+		.card-header {
+			background-color: var(--primary-color);
+			color: white;
+			padding: 1.5rem;
+		}
 
-        .card-body {
-            padding: 2rem;
-        }
+		.card-body {
+			padding: 2rem;
+		}
 
-        .detail-item {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #eee;
-        }
+		.detail-item {
+			margin-bottom: 1.5rem;
+			padding-bottom: 1rem;
+			border-bottom: 1px solid #eee;
+		}
 
-        .detail-label {
-            font-weight: 600;
-            color: #5a5c69;
-            margin-bottom: 0.5rem;
-        }
+		.detail-label {
+			font-weight: 600;
+			color: #5a5c69;
+			margin-bottom: 0.5rem;
+		}
 
-        .detail-value {
-            font-size: 1.1rem;
-        }
+		.detail-value {
+			font-size: 1.1rem;
+		}
 
-        .product-image {
-            max-width: 300px;
-            max-height: 300px;
-            border-radius: 0.5rem;
-            border: 1px solid #ddd;
-            object-fit: contain;
-            background-color: #f8f9fa;
-        }
+		.product-image {
+			max-width: 300px;
+			max-height: 300px;
+			border-radius: 0.5rem;
+			border: 1px solid #ddd;
+			object-fit: contain;
+			background-color: #f8f9fa;
+		}
 
-        .status-badge {
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
-        }
+		.status-badge {
+			font-size: 0.9rem;
+			padding: 0.5rem 1rem;
+		}
 
-        .action-btn {
-            min-width: 120px;
-        }
+		.action-btn {
+			min-width: 120px;
+		}
 
-        .price-value {
-            font-weight: 700;
-            color: var(--primary-color);
-        }
+		.price-value {
+			font-weight: 700;
+			color: var(--primary-color);
+		}
 
-        .currency::before {
-            content: "ج.م. ";
-            color: #6c757d;
-        }
-    </style>
+		.currency::before {
+			content: "ج.م. ";
+			color: #6c757d;
+		}
+	</style>
 </head>
 <body>
-    <div class="container py-4">
-        <div class="details-card card">
-            <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0">
-                        <i class="fas fa-info-circle me-2"></i>@ViewData["Title"]
-                    </h2>
-                    <div>
-                        <span class="badge @(Model.IsActive ? "bg-success" : "bg-secondary") status-badge">
-                            @(Model.IsActive ? "نشط" : "غير نشط")
-                        </span>
-                    </div>
-                </div>
-            </div>
+	<div class="container py-4">
+		<div class="details-card card">
+			<div class="card-header">
+				<div class="d-flex justify-content-between align-items-center">
+					<h2 class="mb-0">
+						<i class="fas fa-info-circle me-2"></i>@ViewData["Title"]
+					</h2>
+					<div>
+						<span class="badge @(Model.IsActive ? "bg-success" : "bg-secondary") status-badge">
+							@(Model.IsActive ? "نشط" : "غير نشط")
+						</span>
+					</div>
+				</div>
+			</div>
 
-            <div class="card-body">
-                <partial name="ProductDetailsPartial" model="@Model"/>
+			<div class="card-body">
+				<partial name="ProductDetailsPartial" model="@Model" />
 
-                <!-- Action Buttons -->
-                <!-- Alternative Stacked Version -->
-                <div class="d-flex flex-column flex-sm-row justify-content-between mt-4 pt-3 border-top gap-2">
-                    <a  asp-controller="Admin" asp-action="Index"  class="btn btn-outline-secondary action-btn order-1 order-sm-0">
-                        <i class="fas fa-arrow-right me-1"></i> رجوع للقائمة
-                    </a>
-                    <div class="d-flex flex-column flex-sm-row gap-2 order-0 order-sm-1">
-                        <a  asp-controller="ProductManagement" asp-action="Edit" asp-route-Id="@Model.Id" class="btn btn-warning action-btn">
-                            <i class="fas fa-edit me-1"></i> تعديل
-                        </a>
-                        <a  asp-controller="ProductManagement" asp-action="Delete" asp-route-Id="@Model.Id" class="btn btn-danger action-btn">
-                            <i class="fas fa-trash-alt me-1"></i> حذف
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+				<!-- Action Buttons -->
+				<!-- Alternative Stacked Version -->
+				<div class="d-flex flex-column flex-sm-row justify-content-between mt-4 pt-3 border-top gap-2">
+					<a asp-controller="Admin" asp-action="Index" class="btn btn-outline-secondary action-btn order-1 order-sm-0" onclick="toggleSpinner(true, 'جاري العرض ....')">
+						<i class="fas fa-arrow-right me-1"></i> رجوع للقائمة
+					</a>
+					<div class="d-flex flex-column flex-sm-row gap-2 order-0 order-sm-1">
+						<a asp-controller="ProductManagement" asp-action="Edit" asp-route-Id="@Model.Id" class="btn btn-warning action-btn" onclick="toggleSpinner(true, 'جاري العرض ....')">
+							<i class="fas fa-edit me-1"></i> تعديل
+						</a>
+						<button onclick="showDeleteConfirmation({
+								itemId: @Model.Id,
+								confirmDescription:'لن تتمكن من استعادة هذا المنتج مرة أخرى!',
+								actionUrl: '@Url.Action("Delete", "ProductManagement")' ,
+								callback: function() {
+								Swal.fire({
+								title: 'جاري التوجيه' ,
+								html: 'سيتم تحويلك إلى لوحة التحكم' ,
+								timer: 1500,
+								timerProgressBar: true,
+								didOpen: ()=>
+							{
+							Swal.showLoading();
+							},
+							willClose: () => {
+							window.location.href = '@Url.Action("Index", "Admin")';
+							}
+							});
+							}
+							});" class="btn btn-danger action-btn">
+							<i class="fas fa-trash-alt me-1"></i> حذف
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
 </body>
 </html>
