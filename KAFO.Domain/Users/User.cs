@@ -6,7 +6,7 @@ namespace KAFO.Domain.Users
     {
         public int Id { private set; get; }
         public string Name { set; get; }
-        public string Password { set; get; } = "jhhhh";
+        public string Password { set; get; }
         public string Role { private set; get; }
         public string Gender { set; get; }
         public string? Email { get; set; }
@@ -20,7 +20,7 @@ namespace KAFO.Domain.Users
 
         public User(string name, string? email, string role, string gender, string? phoneNumber = null)
         {
-            if (name == null || role == null  || gender == null)
+            if (name == null || role == null || gender == null)
                 throw new ArgumentNullException(Messages.ArgumentNullException);
 
             Name = name;

@@ -1,8 +1,8 @@
 ﻿using Kafo.DAL.Repository;
 using KAFO.ASPMVC.Models;
 using KAFO.Domain.Invoices;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace KAFO.ASPMVC.Controllers
 {
@@ -37,7 +37,11 @@ namespace KAFO.ASPMVC.Controllers
             invoice.CreatedAt = DateTime.Now;
             invoice.CustomerAccount = Customers.FirstOrDefault(c => c.Id == invoice.CustomerAccount?.Id);
             //invoice.User = _unitOfWork.User.FindById(User.Identity.Name!);
-            invoice.User = new Domain.Users.User("s", "s", "s", "s");
+            var nameIdentifierClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+            if (nameIdentifierClaim != null)
+            {
+                invoice.User = _unitOfWork.User.Get(u => u.Id == int.Parse(nameIdentifierClaim.Value));
+            }
             ModelState.Clear();
             bool isDecreaseItemsInvoice = ( invoice.Type == InvoiceType.Cash ) || ( invoice.Type == InvoiceType.Credit ) || ( invoice.Type == InvoiceType.PurchasingReturn );
             foreach (var item in invoice.Items)
@@ -96,5 +100,6 @@ namespace KAFO.ASPMVC.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
     }
 }
