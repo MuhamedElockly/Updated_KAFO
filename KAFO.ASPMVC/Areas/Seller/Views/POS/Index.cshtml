@@ -1,26 +1,30 @@
-﻿@model InvoiceViewModel
+﻿@model Invoice
 @{
     ViewData["Title"] = "نقطة البيع";
     Layout = "_Layout";
     var e = ViewData.ModelState.IsValid;
-    // List<string> invoiceTypes = ["فاتورة نقدي", "فاتورة اجل", "فاتورة مرتجع نقدي", "فاتورة مرتجع اجل"];
+    List<string> invoiceTypes = ["فاتورة نقدي", "فاتورة اجل"]; //, "فاتورة مرتجع نقدي", "فاتورة مرتجع اجل"
     // SelectList selectListItems = new SelectList(invoiceTypes);
 }
 <link rel="stylesheet" href="~/css/POS.css" asp-append-version="true" />
 <div class="container-fluid">
     <div class="main-container">
 
-        <form asp-action="Create" method="post" id="invoiceForm">
+        <form asp-controller="Invoice" asp-action="Create" asp-route-dist="pos" method="post" id="invoiceForm">
             <div class="row">
                 <!-- Products Section -->
                 <div class="col-lg-8">
                     <!-- Invoice Type Selection -->
                     <div class="mb-2">
                         <label asp-for="Type" class="form-label fw-bold">نوع الفاتورة</label>
-                        <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<InvoiceType>()" id="InvoiceTypeSelect">
+                        <select asp-for="Type" class="form-select" id="InvoiceTypeSelect">
+                            @for (int i = 0 ; i < invoiceTypes.Count ; i++)
+                            {
+                                <option value="@i">@invoiceTypes[i]</option>
+                            }
                         </select>
                         <span asp-validation-for="Type" class="mt-2 text-danger"></span>
-                        <select asp-for="CustomerAccount.Id" class="mt-2 form-select" id="customerSelect" style="display: none;">
+                        <select asp-for="CustomerAccountId" class="mt-2 form-select" id="customerSelect" style="display: none;">
                             <option value="">اختر العميل</option>
                             @if (ViewBag.Customers != null)
                             {

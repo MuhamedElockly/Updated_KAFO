@@ -11,6 +11,8 @@ namespace KAFO.Domain.Products
         public string? ImageUrl { set; get; }
 
         public decimal AveragePurchasePrice { set; get; }
+        public decimal BoxPurchasePrice { set; get; }
+        public int BoxQuantity { set; get; }
         public decimal LastPurchasingPrice { set; get; }
         [Range(0.25, int.MaxValue)]
         public decimal SellingPrice { set; get; }

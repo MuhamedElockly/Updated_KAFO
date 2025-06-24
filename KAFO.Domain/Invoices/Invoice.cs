@@ -2,26 +2,37 @@
 using KAFO.Domain.Statics;
 using KAFO.Domain.Users;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace KAFO.Domain.Invoices
 {
-    public abstract class Invoice : Base, ISoftDelete
+    public class Invoice : Base, ISoftDelete
     {
         public int Id { set; get; }
         public DateTime CreatedAt { set; get; }
+        public InvoiceType Type { get; set; }
         [Required]
-        public required ICollection<InvoiceItem> Items { set; get; } = [];
+        public ICollection<InvoiceItem> Items { set; get; } = [];
         public User User { set; get; }
         public decimal TotalInvoice { set; get; }
         public bool IsDeleted { get; set; } = false;
 
-        protected Invoice()
+        // credit invoice 
+
+        [ForeignKey(nameof(CustomerAccount))]
+        public int? CustomerAccountId { get; set; }
+        public CustomerAccount? CustomerAccount { get; set; }
+
+        // End of credit invoice
+
+        public Invoice()
         {
 
         }
-        public Invoice(DateTime createdAt, User user) 
+        public Invoice(DateTime createdAt, User user, InvoiceType type)
         {
             CreatedAt = createdAt;
             User = user;
+            Type = type;
         }
         private InvoiceItem? GetInvoiceItemByProduct(Product product)
         {
@@ -66,8 +77,85 @@ namespace KAFO.Domain.Invoices
         {
             if (Items.Count < 1)
                 throw new Exception(Messages.EmptyInvoice);
+
+            switch (Type)
+            {
+                case InvoiceType.Cash:
+                    CashInvoiceCompleteInvoice();
+                    break;
+                case InvoiceType.Credit:
+                    CreditInvoiceCompleteInvoice();
+                    break;
+                case InvoiceType.Purchasing:
+                    PurchasingInvoiceCompleteInvoice();
+                    break;
+                case InvoiceType.CashReturn:
+                    CashReturnInvoiceCompleteInvoice();
+                    break;
+                case InvoiceType.CreditReturn:
+                    CreditReturnInvoiceCompleteInvoice();
+                    break;
+                case InvoiceType.PurchasingReturn:
+                    PurchasingReturnInvoiceCompleteInvoice();
+                    break;
+                default:
+                    break;
+            }
+
             if (TotalInvoice <= 0)
                 CalculateTotalInvoice();
+        }
+
+        private void PurchasingInvoiceCompleteInvoice()
+        {
+            foreach (var item in Items)
+            {
+                //// change price if changed
+                //if (item.UnitPurchasingPrice != item.Product.LastPurchasingPrice)
+                //{
+                //    item.Product.ChangePurchasingPriceAndQuantity(item.UnitPurchasingPrice, item.UnitSellingPrice, item.Quantity);
+                //}
+                //else // because the ChangePurchasingPriceAndQuantity will increase the quantity
+                //{
+                //    // update products Quantity
+                //    item.Product.IncreaseStockQuantity(item.Quantity);
+                //}
+                item.Product.ChangePurchasingPriceAndQuantity(item.Product.LastPurchasingPrice, item.UnitSellingPrice, item.Quantity);
+                //item.Product.IncreaseStockQuantity(item.Quantity);
+            }
+        }
+
+        private void CreditInvoiceCompleteInvoice()
+        {
+            foreach (var item in Items)
+            {
+                // Decrease The StockQuantity 
+                item.Product.DecreaseStockQuantity(item.Quantity);
+            }
+            CustomerAccount!.TotalOwed += TotalInvoice;
+        }
+
+        private void CashInvoiceCompleteInvoice()
+        {
+            foreach (var item in this.Items)
+            {
+                // Decrease The StockQuantity 
+                item.Product.DecreaseStockQuantity(item.Quantity);
+            }
+        }
+        private void PurchasingReturnInvoiceCompleteInvoice()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void CreditReturnInvoiceCompleteInvoice()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void CashReturnInvoiceCompleteInvoice()
+        {
+            throw new NotImplementedException();
         }
 
         public decimal CalculateTotalInvoice()

@@ -16,9 +16,6 @@ namespace Kafo.DAL.Data
         {
         }
         public DbSet<Invoice> Invoices { get; set; }
-        public DbSet<CreditInvoice> CreditInvoices { get; set; }
-        public DbSet<CashInvoice> CashInvoices { get; set; }
-        public DbSet<PurchasingInvoice> PurchasingInvoices { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<User> Users { get; set; }

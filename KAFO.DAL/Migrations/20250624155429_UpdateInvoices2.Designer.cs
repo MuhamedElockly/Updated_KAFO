@@ -4,6 +4,7 @@ using Kafo.DAL.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KAFO.DAL.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250624155429_UpdateInvoices2")]
+    partial class UpdateInvoices2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,7 +36,7 @@ namespace KAFO.DAL.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("CustomerAccountId")
+                    b.Property<int>("CustomerAccountId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
@@ -232,7 +235,9 @@ namespace KAFO.DAL.Migrations
                 {
                     b.HasOne("KAFO.Domain.Users.CustomerAccount", "CustomerAccount")
                         .WithMany("Invoices")
-                        .HasForeignKey("CustomerAccountId");
+                        .HasForeignKey("CustomerAccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("KAFO.Domain.Users.User", "User")
                         .WithMany()

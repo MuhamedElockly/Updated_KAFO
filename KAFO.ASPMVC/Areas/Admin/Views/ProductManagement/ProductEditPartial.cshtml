@@ -1,6 +1,6 @@
 ﻿@model ProductVM
 @{
-    Layout = "_DefaultLayout";
+	Layout = "_DefaultLayout";
 }
 <form id="productForm" method="post" asp-action="UpSert" enctype="multipart/form-data">
 
@@ -29,10 +29,25 @@
 				<label class="form-label required-field">الأسعار</label>
 				<div class="row g-2">
 					<div class="col-md-6">
-						<label asp-for="AveragePurchasePrice" class="form-label">سعر الشراء</label>
+						<label asp-for="BoxPurchasePrice" class="form-label">سعر العلبة</label>
 						<div class="input-group">
 							<span class="input-group-text">ج.م.</span>
-							<input asp-for="AveragePurchasePrice" class="form-control" placeholder="0.00">
+							<input asp-for="BoxPurchasePrice" class="form-control" placeholder="0.00" id="boxPriceInput">
+						</div>
+						<span asp-validation-for="BoxPurchasePrice" class="text-danger small"></span>
+					</div>
+					<div class="col-md-6">
+						<label asp-for="BoxQuantity" class="form-label">عدد القطع في العلبة</label>
+						<input asp-for="BoxQuantity" class="form-control" placeholder="0" id="boxQuantityInput">
+						<span asp-validation-for="BoxQuantity" class="text-danger small"></span>
+					</div>
+				</div>
+				<div class="row mt-2">
+					<div class="col-md-6">
+						<label asp-for="AveragePurchasePrice" class="form-label">سعر الشراء (للقطعة)</label>
+						<div class="input-group">
+							<span class="input-group-text">ج.م.</span>
+							<input asp-for="AveragePurchasePrice" class="form-control" placeholder="0.00" id="itemPriceInput" readonly>
 						</div>
 						<span asp-validation-for="AveragePurchasePrice" class="text-danger small"></span>
 					</div>
@@ -68,7 +83,7 @@
 			<!-- Stock Quantity -->
 			<div class="mb-4">
 				<label asp-for="StockQuantity" class="form-label">الكمية المتاحة</label>
-				<input asp-for="StockQuantity" class="form-control" placeholder="0" disabled="disabled">
+				<input asp-for="StockQuantity" class="form-control" placeholder="0" value="@(Model?.StockQuantity??0)" readonly>
 				<span asp-validation-for="StockQuantity" class="text-danger small"></span>
 			</div>
 
@@ -81,7 +96,6 @@
 				else
 				{
 					<input asp-for="IsActive" class="form-check-input" type="checkbox">
-
 				}
 				<label class="form-check-label" asp-for="IsActive">الحالة (نشط/غير نشط)</label>
 			</div>
@@ -93,12 +107,11 @@
 		<a asp-action="Index" asp-controller="Admin" class="btn btn-outline-secondary" onclick="toggleSpinner(true, 'جاري العرض ....')">
 			<i class="fas fa-arrow-right me-1"></i> رجوع
 		</a>
-		<button type="submit" class="btn btn-primary" >
+		<button type="submit" class="btn btn-primary">
 			<i class="fas fa-save me-1"></i> حفظ المنتج
 		</button>
 	</div>
 </form>
-
 
 <script>
 	document.getElementById("imageUploadContainer").addEventListener("click", function () {
@@ -117,13 +130,27 @@
 			reader.readAsDataURL(file);
 		}
 	});
+
+	// Calculate item price when box price or quantity changes
+	document.getElementById("boxPriceInput").addEventListener("input", calculateItemPrice);
+	document.getElementById("boxQuantityInput").addEventListener("input", calculateItemPrice);
+
+	function calculateItemPrice() {
+		const boxPrice = parseFloat(document.getElementById("boxPriceInput").value) || 0;
+		const boxQuantity = parseInt(document.getElementById("boxQuantityInput").value) || 1;
+		const itemPrice = boxPrice / boxQuantity;
+		document.getElementById("itemPriceInput").value = itemPrice.toFixed(2);
+	}
+
+	// Initial calculation when page loads
+	calculateItemPrice();
+
 	$('#productForm').on('submit', function (e) {
 		if ($(this).valid()) {
 			toggleSpinner(true, 'جاري الحفظ ....');
 		}
 	});
 </script>
-
 
 
 <style>

@@ -1,0 +1,136 @@
+﻿@model KAFO.Domain.Invoices.Invoice
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 bg-primary text-white">
+        <h6 class="m-0 font-weight-bold">ج.م الفاتورة</h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="CreatedAt" class="control-label">تاريخ الفاتورة</label>
+                    <input asp-for="CreatedAt" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                    <span asp-validation-for="CreatedAt" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Type" class="control-label">نوع الفاتورة</label>
+                    <select asp-for="Type" id="invoiceType" class="form-control" @* asp-items="Html.GetEnumSelectList<InvoiceType>()" *@>
+                        <option value="2">شراء</option>
+                    </select>
+                    <span asp-validation-for="Type" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        @if (Model?.Type == InvoiceType.Credit || Model?.Type == InvoiceType.CreditReturn)
+        {
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="CustomerAccountId" class="control-label">العميل</label>
+                        <select asp-for="CustomerAccountId" class="form-control" asp-items="ViewBag.CustomerAccounts">
+                            <option value="">-- اختر عميل --</option>
+                        </select>
+                        <span asp-validation-for="CustomerAccountId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 bg-primary text-white d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold">تفاصيل الفاتورة</h6>
+        <button type="button" id="addItemBtn" class="btn btn-success">
+            <i class="fas fa-plus"></i> إضافة منتج
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="invoiceItemsTable">
+                <thead class="bg-light">
+                    <tr>
+                        <th width="20%">المنتج</th>
+                        <th width="10%">الكمية بالقطعة</th>
+                        <th width="10%">الكمية بالكرتونة</th>
+                        <th width="10%">سعة الكرتونة</th>
+                        <th width="10%">سعر الشراء للقطعة</th>
+                        <th width="10%">سعر الشراء للكرتونة</th>
+                        <th width="10%">المجموع</th>
+                        <th width="10%">إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsContainer">
+                    @if (Model != null && Model!.Items != null && Model!.Items.Any())
+                    {
+                        for (var i = 0 ; i < Model?.Items.Count ; i++)
+                        {
+                            var item = Model?.Items.ElementAt(i);
+                            <tr data-row-index="@i">
+                                <td>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control product-search" placeholder="اختر منتج..."
+                                               value="@item.Product?.Name" readonly />
+                                        <input type="hidden" class="product-id" name="Items[@i].ProductId" value="@item.ProductId" />
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary product-search-btn" type="button">
+                                                <i class="fas fa-search"></i> بحث
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="product-info mt-2 @(item.Product == null ? "d-none" : "")">
+                                        <img src="@item.Product?.ImageUrl" class="product-image img-thumbnail mr-2" width="40" height="40" />
+                                        <span class="product-name text-primary font-weight-bold">@item.Product?.Name</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="number" min="0" step="1" class="form-control piece-quantity"
+                                           value="@(item.Quantity % item.Product?.BoxQuantity ?? 1)" />
+                                </td>
+                                <td hidden>
+                                    <input type="number" min="0" step="1" class="form-control total-piece-quantity"
+                                           name="Items[@i].Quantity" value="@item.Quantity" />
+                                </td>
+                                <td>
+                                    <input type="number" min="0" step="1" class="form-control box-quantity"
+                                           value="@(Math.Floor(item.Quantity / (item.Product?.BoxQuantity ?? 1)))" />
+                                </td>
+                                <td>
+                                    <input type="number" min="1" step="1" class="form-control box-capacity"
+                                           value="@item.Product?.BoxQuantity" readonly />
+                                </td>
+                                <td>
+                                    <input type="number" min="0" step="0.01" class="form-control unit-price"
+                                           name="Items[@i].UnitPurchasingPrice" value="@item.UnitPurchasingPrice" readonly />
+                                </td>
+                                <td>
+                                    <input type="number" min="0" step="0.01" class="form-control box-price"
+                                           value="@item.Product?.BoxPurchasePrice" readonly />
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control item-total"
+                                           value="@((item.Quantity * item.UnitPurchasingPrice).ToString("N2"))" readonly />
+                                </td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-danger btn-sm remove-item">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="font-weight-bold">
+                        <td colspan="6" class="text-left">الإجمالي</td>
+                        <td id="totalInvoiceAmount">@Model?.TotalInvoice.ToString("N2")</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <span id="itemsValidation" class="text-danger d-none">يجب إضافة منتج واحد على الأقل للفاتورة</span>
+    </div>
+</div>

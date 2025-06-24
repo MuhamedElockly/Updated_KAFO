@@ -127,3 +127,25 @@ namespace Kafo.DAL.Repository
 
     }
 }
+
+/*
+ private IQueryable<T> GetIncludedProps(IQueryable<T> query, string includeProperties)
+        {
+            foreach (var property in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if(property.Contains('.'))
+                {
+                    // Handle nested properties
+                    var properties = property.Split('.');
+                    query = query.Include(properties[0]);
+                    for (int i = 1 ; i < properties.Length ; i++)
+                    {
+                        query = query.ThenInclude(properties[i]);
+                    }
+                }
+                else
+                    query = query.Include(property);
+            }
+            return query;
+        }
+ */

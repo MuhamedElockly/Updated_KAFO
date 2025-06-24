@@ -1,0 +1,95 @@
+﻿@model Invoice
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">تفاصيل الفاتورة #@Model.Id</h4>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <h5 class="text-muted">معلومات الفاتورة</h5>
+                    <hr class="mt-1">
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="mb-1"><strong>رقم الفاتورة:</strong></p>
+                            <p class="mb-1"><strong>نوع الفاتورة:</strong></p>
+                            <p class="mb-1"><strong>التاريخ:</strong></p>
+                            <p class="mb-1"><strong>المستخدم:</strong></p>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-1">@Model.Id</p>
+                            <p class="mb-1">
+                                <span class="badge
+                                    @(Model.Type == InvoiceType.Cash ? "bg-success" :
+                                      Model.Type == InvoiceType.Credit ? "bg-info" :
+                                      Model.Type == InvoiceType.Purchasing ? "bg-warning" :
+                                      "bg-secondary")">
+                                    @Model.Type.GetDisplayName()
+                                </span>
+                            </p>
+                            <p class="mb-1">@Model.CreatedAt.ToString("dd/MM/yyyy hh:mm tt")</p>
+                            <p class="mb-1">@Model.User?.Name</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <h5 class="text-muted">معلومات العميل</h5>
+                    <hr class="mt-1">
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="mb-1"><strong>اسم العميل:</strong></p>
+                            @if (Model.Type == InvoiceType.Credit || Model.Type == InvoiceType.CreditReturn)
+                            {
+                                <p class="mb-1"><strong>رصيد العميل:</strong></p>
+                            }
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-1">@(Model.CustomerAccount?.CustomerName ?? "نقدي")</p>
+                            @if (Model.Type == InvoiceType.Credit || Model.Type == InvoiceType.CreditReturn)
+                            {
+                                <p class="mb-1">@(Model.CustomerAccount?.TotalOwed.ToString("N2") ?? "0.00") ج.م</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>الصنف</th>
+                        <th>الكمية</th>
+                        <th>سعر الشراء</th>
+                        <th>سعر البيع</th>
+                        <th>الإجمالي</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>@item.Product.Id</td>
+                            <td>@item.Product.Name</td>
+                            <td>@item.Quantity.ToString("N2")</td>
+                            <td>@item.UnitPurchasingPrice.ToString("N2") ج.م</td>
+                            <td>@item.UnitSellingPrice.ToString("N2") ج.م</td>
+                            <td>@(( item.Quantity * item.UnitSellingPrice ).ToString("N2")) ج.م</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <td colspan="5" class="text-end"><strong>المبلغ الإجمالي:</strong></td>
+                        <td>@Model.TotalInvoice.ToString("N2") ج.م</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>

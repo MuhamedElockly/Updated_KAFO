@@ -2,15 +2,12 @@
 {
     public interface IUnitOfWork
     {
-        ICategoryRepository Category { get; }
-        IProductRepository Product { get; }
-        ICashInvoiceRepository CashInvoice { get; }
-        ICreditInvoiceRepository CreditInvoice { get; }
-        IPurchasingInvoiceRepository PurchasingInvoice { get; }
-        ICustomerAccountRepository CustomerAccount { get; }
-        IInvoiceItemRepository InvoiceItem { get; }
-        IInvoiceRepository Invoice { get; }
-        IUserRepository User { get; }
+        ICategoryRepository Categories { get; }
+        IProductRepository Products { get; }
+        ICustomerAccountRepository CustomerAccounts { get; }
+        IInvoiceItemRepository InvoiceItems { get; }
+        IInvoiceRepository Invoices { get; }
+        IUserRepository Users { get; }
 
         void Save();
     }
