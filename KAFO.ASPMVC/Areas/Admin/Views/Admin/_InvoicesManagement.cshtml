@@ -1,0 +1,1083 @@
+@model InvoicesTableVM
+
+<style>
+    .invoices-table-card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border-radius: 0.75rem;
+        overflow: hidden;
+    }
+
+    .invoices-table-header {
+        background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+        color: white;
+        border: none;
+        padding: 1.5rem;
+    }
+
+        .invoices-table-header h4 {
+            font-weight: 600;
+            margin: 0;
+        }
+
+    .invoice-section {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .invoice-type-btn {
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        color: white;
+        margin: 0.25rem;
+    }
+
+        .invoice-type-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            color: white;
+        }
+
+        .invoice-type-btn.active {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Sell Invoices Button - Green */
+        .invoice-type-btn[data-invoice-type="sell"] {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+            .invoice-type-btn[data-invoice-type="sell"]:hover {
+                background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+            }
+
+        /* Purchase Invoices Button - Blue */
+        .invoice-type-btn[data-invoice-type="purchase"] {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        }
+
+            .invoice-type-btn[data-invoice-type="purchase"]:hover {
+                background: linear-gradient(135deg, #0056b3 0%, #007bff 100%);
+            }
+
+    .invoice-details-section {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e9ecef;
+    }
+
+    .invoice-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #6f42c1;
+    }
+
+    .date-input-group {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus {
+            border-color: #6f42c1;
+            box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+        }
+
+    .show-invoices-btn {
+        background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+        .show-invoices-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #5a32a3 0%, #6f42c1 100%);
+            color: white;
+        }
+
+    .table-container {
+        background: white;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin: 1rem 0;
+    }
+
+    .invoices-table {
+        margin: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+        .invoices-table thead th {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: none;
+            padding: 1rem 0.75rem;
+            font-weight: 600;
+            color: #495057;
+            text-align: center;
+            position: relative;
+        }
+
+            .invoices-table thead th:first-child {
+                border-top-right-radius: 0.5rem;
+            }
+
+            .invoices-table thead th:last-child {
+                border-top-left-radius: 0.5rem;
+            }
+
+        .invoices-table tbody tr {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+            .invoices-table tbody tr:hover {
+                background: linear-gradient(135deg, #f0fff4 0%, #e8f5e8 100%);
+                transform: scale(1.01);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+        .invoices-table tbody td {
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
+            border: none;
+            text-align: center;
+        }
+
+    .invoice-id {
+        background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+        color: #155724;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 1rem;
+        display: inline-block;
+        min-width: 40px;
+    }
+
+    .invoice-date {
+        color: #495057;
+        font-weight: 500;
+    }
+
+    .invoice-user {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 1.1rem;
+    }
+
+    .invoice-total {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        color: #1976d2;
+        padding: 0.5rem 1rem;
+        border-radius: 1rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+
+    .invoice-type {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        color: #856404;
+        padding: 0.5rem 1rem;
+        border-radius: 1rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+
+    .invoice-customer {
+        color: #6c757d;
+        font-style: italic;
+    }
+
+    .invoice-items {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        color: #721c24;
+        padding: 0.5rem 1rem;
+        border-radius: 1rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+
+    .pagination-container {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-top: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .pagination {
+        margin: 0;
+        gap: 0.25rem;
+    }
+
+    .page-item .page-link {
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        color: #495057;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        margin: 0 0.125rem;
+    }
+
+        .page-item .page-link:hover {
+            background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+    .page-item.active .page-link {
+        background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+        color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-item.disabled .page-link {
+        background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+        color: #6c757d;
+        cursor: not-allowed;
+    }
+
+    .no-invoices-message {
+        text-align: center;
+        padding: 2rem;
+        color: #6c757d;
+        font-style: italic;
+    }
+
+    .add-invoice-btn {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        color: white;
+        text-decoration: none;
+    }
+
+        .add-invoice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+            color: white;
+            text-decoration: none;
+        }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .action-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 0.5rem;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .action-btn.view {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+        }
+
+        .action-btn.edit {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: white;
+        }
+
+        .action-btn.delete {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+    /* Invoice Details Modal Styles */
+    .invoice-details-modal {
+        text-align: right;
+        direction: rtl;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        padding: 0.5rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+        .detail-item:hover {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            transform: translateX(-2px);
+        }
+
+    .detail-item i {
+        margin-left: 0.5rem;
+        font-size: 1.1rem;
+        min-width: 20px;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #495057;
+        margin-left: 0.5rem;
+        min-width: 80px;
+    }
+
+    .detail-value {
+        color: #2c3e50;
+        font-weight: 500;
+    }
+
+    .invoice-details-modal .table {
+        margin-bottom: 0;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .invoice-details-modal .table thead th {
+        background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem;
+        font-weight: 600;
+    }
+
+    .invoice-details-modal .table tbody td {
+        padding: 0.75rem;
+        border-color: #e9ecef;
+        vertical-align: middle;
+    }
+
+    .invoice-details-modal .table tbody tr:hover {
+        background: linear-gradient(135deg, #f0fff4 0%, #e8f5e8 100%);
+    }
+
+    .invoice-details-modal hr {
+        border-color: #e9ecef;
+        margin: 1.5rem 0;
+    }
+
+    .invoice-details-modal h6 {
+        color: #6f42c1;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .badge {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+        border-radius: 1rem;
+    }
+
+    /* Invoice Action Buttons */
+    .invoice-action-buttons {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-top: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e9ecef;
+    }
+
+    .invoice-action-btn {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        color: #495057;
+        margin: 0.25rem;
+    }
+
+        .invoice-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .invoice-action-btn.primary {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+        }
+
+            .invoice-action-btn.primary:hover {
+                background: linear-gradient(135deg, #138496 0%, #17a2b8 100%);
+                color: white;
+            }
+
+        .invoice-action-btn.secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+        }
+
+            .invoice-action-btn.secondary:hover {
+                background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+                color: white;
+            }
+</style>
+
+<div class="card invoices-table-card" id="invoices-management">
+    <div class="card-header invoices-table-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4><i class="fas fa-file-invoice me-2"></i>إدارة الفواتير</h4>
+            <a class="btn add-invoice-btn" href="#" onclick="showAddInvoiceModal()">
+                <i class="fas fa-plus me-2"></i>إضافة فاتورة شراء
+            </a>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="invoice-section">
+            <h5 class="mb-3"><i class="fas fa-list me-2"></i>اختر نوع الفواتير:</h5>
+            <div class="d-flex flex-wrap gap-2">
+                <button class="btn invoice-type-btn @(Model.InvoiceType == "sell" ? "active" : "")" data-invoice-type="sell">
+                    <i class="fas fa-shopping-cart me-2"></i>فواتير البيع
+                </button>
+                <button class="btn invoice-type-btn @(Model.InvoiceType == "purchase" ? "active" : "")" data-invoice-type="purchase">
+                    <i class="fas fa-truck me-2"></i>فواتير الشراء
+                </button>
+            </div>
+        </div>
+
+        <div id="invoice-details-section" class="invoice-details-section">
+            <h5 class="invoice-title" id="invoice-title">
+                @(Model.InvoiceType == "sell" ? "فواتير البيع" : "فواتير الشراء")
+            </h5>
+            <div class="date-input-group">
+                <div class="row align-items-end">
+                    <div class="col-md-4">
+                        <label for="invoiceStartDate" class="form-label">
+                            <i class="fas fa-calendar-alt me-2"></i>تاريخ البدء
+                        </label>
+                        <input type="date" class="form-control" id="invoiceStartDate">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="invoiceEndDate" class="form-label">
+                            <i class="fas fa-calendar-check me-2"></i>تاريخ الانتهاء
+                        </label>
+                        <input type="date" class="form-control" id="invoiceEndDate">
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn show-invoices-btn w-100" onclick="showInvoices()">
+                            <i class="fas fa-search me-2"></i>عرض الفواتير
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.Invoices.Any())
+            {
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="table invoices-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>التاريخ</th>
+                                    <th>المستخدم</th>
+                                    <th>المبلغ الإجمالي</th>
+                                    <th>نوع الفاتورة</th>
+                                    <th>العميل</th>
+                                    <th>عدد العناصر</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var invoice in Model.Invoices)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="invoice-id">@invoice.Id</span>
+                                        </td>
+                                        <td>
+                                            <span class="invoice-date">@invoice.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                                        </td>
+                                        <td>
+                                            <span class="invoice-user">@invoice.UserName</span>
+                                        </td>
+                                        <td>
+                                            <span class="invoice-total">@invoice.TotalInvoice.ToString("C")</span>
+                                        </td>
+                                        <td>
+                                            <span class="invoice-type">@invoice.InvoiceType</span>
+                                        </td>
+                                        <td>
+                                            <span class="invoice-customer">@invoice.CustomerName</span>
+                                        </td>
+                                        <td>
+                                            <span class="invoice-items">@invoice.ItemsCount</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn view" 
+                                                        onclick="showInvoiceDetails(@invoice.Id, '@invoice.InvoiceType')" 
+                                                        title="عرض التفاصيل">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="pagination-container">
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item @(Model.CurrentInvoicePage == 1 ? "disabled" : "")">
+                                <a class="page-link" onclick="loadInvoices('@Model.InvoiceType', @Model.CurrentInvoicePage-1)" tabindex="-1">
+                                    <i class="fas fa-chevron-right me-1"></i>السابق
+                                </a>
+                            </li>
+                            @for (int i = 1; i <= Model.TotalInvoicesPages; i++)
+                            {
+                                <li class="page-item @(i == Model.CurrentInvoicePage ? "active" : "")">
+                                    <a class="page-link" onclick="loadInvoices('@Model.InvoiceType', @i)">@i</a>
+                                </li>
+                            }
+                            <li class="page-item @(Model.CurrentInvoicePage == Model.TotalInvoicesPages ? "disabled" : "")">
+                                <a class="page-link" onclick="loadInvoices('@Model.InvoiceType', @Model.CurrentInvoicePage+1)">
+                                    التالي<i class="fas fa-chevron-left me-1"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+            else
+            {
+                <div class="no-invoices-message">
+                    <i class="fas fa-file-invoice fa-3x mb-3"></i>
+                    <p>الرجاء تحديد نطاق تاريخ لعرض الفواتير</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentInvoiceType = '@Model.InvoiceType';
+
+    function initializeInvoiceFunctionality() {
+        console.log("Initializing invoice functionality");
+        
+        // Remove any existing event handlers
+        $('.invoice-type-btn').off('click');
+        
+        // Add new event handlers
+        $('.invoice-type-btn').on('click', function () {
+            console.log("Invoice Type Btn Clicked");
+            currentInvoiceType = $(this).data('invoice-type');
+            const invoiceTitleElement = document.getElementById('invoice-title');
+
+            $('.invoice-type-btn').removeClass('active');
+            $(this).addClass('active');
+
+            switch (currentInvoiceType) {
+                case 'sell':
+                    invoiceTitleElement.innerText = 'فواتير البيع';
+                    break;
+                case 'purchase':
+                    invoiceTitleElement.innerText = 'فواتير الشراء';
+                    break;
+            }
+            // Clear previous content before appending
+            $('#invoice-details-section').find('.table-container, .pagination-container, .no-invoices-message').remove();
+            $('#invoice-details-section').append(`
+                <div class="no-invoices-message">
+                    <i class="fas fa-file-invoice fa-3x mb-3"></i>
+                    <p>الرجاء تحديد نطاق تاريخ لعرض الفواتير</p>
+                </div>
+            `);
+        });
+    }
+
+    function showInvoices() {
+        const startDate = document.getElementById('invoiceStartDate').value;
+        const endDate = document.getElementById('invoiceEndDate').value;
+
+        if (!startDate || !endDate) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'تنبيه',
+                text: 'الرجاء تحديد تاريخي البدء والانتهاء',
+                confirmButtonText: 'حسناً'
+            });
+            return;
+        }
+
+        // Validate that end date is greater than start date
+        if (new Date(endDate) <= new Date(startDate)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'خطأ في التواريخ',
+                text: 'تاريخ الانتهاء يجب أن يكون أكبر من تاريخ البدء',
+                confirmButtonText: 'حسناً'
+            });
+            return;
+        }
+
+        loadInvoices(currentInvoiceType, 1, startDate, endDate);
+    }
+
+    function loadInvoices(invoiceType, page, startDate = null, endDate = null) {
+        // Show loading indicator
+        $('#invoice-details-section').html('<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i></div>');
+
+        // Construct URL
+        let url = `/Admin/Admin/Invoices?invoiceType=${invoiceType}&page=${page}`;
+        if (startDate && endDate) {
+            url += `&startDate=${startDate}&endDate=${endDate}`;
+        }
+
+        // Load the partial view via AJAX
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function (result) {
+                $('#invoice-details-section').html($(result).find('#invoice-details-section').html());
+                initializeInvoiceFunctionality();
+            },
+            error: function (error) {
+                $('#invoice-details-section').html('<div class="alert alert-danger">خطأ في تحميل الفواتير</div>');
+            }
+        });
+    }
+
+    // Function to show add invoice modal
+    function showAddInvoiceModal() {
+        Swal.fire({
+            title: 'إضافة فاتورة شراء جديدة',
+            html: `
+                <div class="text-center">
+                    <i class="fas fa-file-invoice fa-3x text-primary mb-3"></i>
+                    <p class="text-muted">سيتم توجيهك إلى صفحة إضافة فاتورة الشراء</p>
+                </div>
+            `,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'متابعة',
+            cancelButtonText: 'إلغاء',
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#6c757d',
+            background: 'white',
+            backdrop: `
+                rgba(0,0,0,0.5)
+                center
+                no-repeat
+            `,
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Here you can redirect to the purchase invoice creation page
+                // For now, we'll show a success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'سيتم توجيهك قريباً',
+                    text: 'صفحة إضافة فاتورة الشراء قيد التطوير',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        });
+    }
+
+    // Function to show invoice details
+    function showInvoiceDetails(invoiceId, invoiceType) {
+        // Show loading modal first
+        Swal.fire({
+            title: 'جاري تحميل تفاصيل الفاتورة...',
+            html: '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i></div>',
+            allowOutsideClick: false,
+            showConfirmButton: false
+        });
+
+        // Simulate loading invoice details (replace with actual API call)
+        setTimeout(() => {
+            // Mock invoice details - replace with actual data from your backend
+            const mockInvoiceDetails = {
+                id: invoiceId,
+                type: invoiceType,
+                date: new Date().toLocaleDateString('ar-SA'),
+                time: new Date().toLocaleTimeString('ar-SA'),
+                user: 'أحمد محمد',
+                customer: invoiceType === 'sell' ? 'محمد علي' : 'شركة الموردين',
+                total: (Math.random() * 1000 + 100).toFixed(2),
+                items: [
+                    { name: 'منتج 1', quantity: 2, price: 50, total: 100 },
+                    { name: 'منتج 2', quantity: 1, price: 75, total: 75 },
+                    { name: 'منتج 3', quantity: 3, price: 25, total: 75 }
+                ],
+                notes: 'ملاحظات إضافية حول الفاتورة'
+            };
+
+            displayInvoiceDetailsModal(mockInvoiceDetails);
+        }, 1000);
+    }
+
+    // Function to display invoice details in modal
+    function displayInvoiceDetailsModal(invoice) {
+        const itemsHtml = invoice.items.map(item => `
+            <tr>
+                <td>${item.name}</td>
+                <td class="text-center">${item.quantity}</td>
+                <td class="text-center">${item.price.toFixed(2)} ر.س</td>
+                <td class="text-center fw-bold">${item.total.toFixed(2)} ر.س</td>
+            </tr>
+        `).join('');
+
+        Swal.fire({
+            title: `تفاصيل الفاتورة رقم #${invoice.id}`,
+            html: `
+                <div class="invoice-details-modal">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <i class="fas fa-calendar-alt text-primary"></i>
+                                <span class="detail-label">التاريخ:</span>
+                                <span class="detail-value">${invoice.date}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <i class="fas fa-clock text-primary"></i>
+                                <span class="detail-label">الوقت:</span>
+                                <span class="detail-value">${invoice.time}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <i class="fas fa-user text-primary"></i>
+                                <span class="detail-label">المستخدم:</span>
+                                <span class="detail-value">${invoice.user}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <i class="fas fa-${invoice.type === 'sell' ? 'user-tie' : 'building'} text-primary"></i>
+                                <span class="detail-label">${invoice.type === 'sell' ? 'العميل:' : 'المورد:'}</span>
+                                <span class="detail-value">${invoice.customer}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="detail-item">
+                                <i class="fas fa-tag text-primary"></i>
+                                <span class="detail-label">نوع الفاتورة:</span>
+                                <span class="detail-value badge bg-${invoice.type === 'sell' ? 'success' : 'info'}">${invoice.type === 'sell' ? 'بيع' : 'شراء'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <h6 class="mb-3"><i class="fas fa-list me-2"></i>تفاصيل المنتجات:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>المنتج</th>
+                                    <th class="text-center">الكمية</th>
+                                    <th class="text-center">السعر</th>
+                                    <th class="text-center">الإجمالي</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${itemsHtml}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <i class="fas fa-sticky-note text-primary"></i>
+                                <span class="detail-label">ملاحظات:</span>
+                                <span class="detail-value">${invoice.notes}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <i class="fas fa-calculator text-primary"></i>
+                                <span class="detail-label">المجموع الكلي:</span>
+                                <span class="detail-value fw-bold text-success">${invoice.total} ر.س</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="invoice-action-buttons">
+                        <div class="d-flex gap-2 justify-content-end">
+                            <button class="btn invoice-action-btn primary" onclick="downloadInvoiceAsPDF(${invoice.id}, '${invoice.type}')">
+                                <i class="fas fa-download me-2"></i>تحميل PDF
+                            </button>
+                            <button class="btn invoice-action-btn secondary" onclick="printInvoice(${invoice.id}, '${invoice.type}')">
+                                <i class="fas fa-print me-2"></i>طباعة
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `,
+            width: '800px',
+            showConfirmButton: true,
+            confirmButtonText: 'إغلاق',
+            confirmButtonColor: '#6c757d',
+            showCloseButton: true,
+            background: 'white',
+            backdrop: `
+                rgba(0,0,0,0.5)
+                center
+                no-repeat
+            `,
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            },
+            customClass: {
+                container: 'invoice-details-modal-container'
+            }
+        });
+    }
+
+    // Initialize the component
+    $(document).ready(function () {
+        initializeInvoiceFunctionality();
+    });
+</script>
+
+<!-- HTML2PDF Library for PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+    // Function to download invoice as PDF
+    function downloadInvoiceAsPDF(invoiceId, invoiceType) {
+        Swal.fire({
+            title: 'جاري تحضير ملف PDF...',
+            html: '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i></div>',
+            allowOutsideClick: false,
+            showConfirmButton: false
+        });
+
+        // Simulate PDF generation (replace with actual API call)
+        setTimeout(() => {
+            // Create a temporary div with invoice content for PDF generation
+            const invoiceContent = createInvoiceContentForPDF(invoiceId, invoiceType);
+            
+            const opt = {
+                margin: 1,
+                filename: `invoice_${invoiceId}_${invoiceType}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(invoiceContent).save().then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تم التحميل بنجاح!',
+                    text: `تم تحميل فاتورة رقم #${invoiceId} كملف PDF`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }).catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'خطأ في التحميل',
+                    text: 'حدث خطأ أثناء تحميل ملف PDF',
+                    confirmButtonText: 'حسناً'
+                });
+            });
+        }, 1500);
+    }
+
+    // Function to print invoice
+    function printInvoice(invoiceId, invoiceType) {
+        Swal.fire({
+            title: 'جاري تحضير الطباعة...',
+            html: '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i></div>',
+            allowOutsideClick: false,
+            showConfirmButton: false
+        });
+
+        // Simulate print preparation (replace with actual API call)
+        setTimeout(() => {
+            // Create a temporary div with invoice content for printing
+            const invoiceContent = createInvoiceContentForPrint(invoiceId, invoiceType);
+            
+            // Create a new window for printing
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html dir="rtl" lang="ar">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>فاتورة رقم #${invoiceId}</title>
+                    <style>
+                        body { font-family: 'Arial', sans-serif; margin: 20px; direction: rtl; }
+                        .invoice-header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
+                        .invoice-details { margin-bottom: 30px; }
+                        .invoice-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                        .invoice-table th, .invoice-table td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+                        .invoice-table th { background-color: #f8f9fa; font-weight: bold; }
+                        .total-section { text-align: left; font-weight: bold; font-size: 18px; }
+                        @@media print { body { margin: 0; } }
+                    </style>
+                </head>
+                <body>
+                    ${invoiceContent}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+            printWindow.close();
+
+            Swal.fire({
+                icon: 'success',
+                title: 'تم إرسال للطباعة!',
+                text: `تم إرسال فاتورة رقم #${invoiceId} للطباعة`,
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }, 1000);
+    }
+
+    // Function to create invoice content for PDF
+    function createInvoiceContentForPDF(invoiceId, invoiceType) {
+        // Mock data - replace with actual invoice data
+        const invoice = {
+            id: invoiceId,
+            type: invoiceType,
+            date: new Date().toLocaleDateString('ar-SA'),
+            time: new Date().toLocaleTimeString('ar-SA'),
+            user: 'أحمد محمد',
+            customer: invoiceType === 'sell' ? 'محمد علي' : 'شركة الموردين',
+            total: (Math.random() * 1000 + 100).toFixed(2),
+            items: [
+                { name: 'منتج 1', quantity: 2, price: 50, total: 100 },
+                { name: 'منتج 2', quantity: 1, price: 75, total: 75 },
+                { name: 'منتج 3', quantity: 3, price: 25, total: 75 }
+            ],
+            notes: 'ملاحظات إضافية حول الفاتورة'
+        };
+
+        const itemsHtml = invoice.items.map(item => `
+            <tr>
+                <td>${item.name}</td>
+                <td>${item.quantity}</td>
+                <td>${item.price.toFixed(2)} ر.س</td>
+                <td>${item.total.toFixed(2)} ر.س</td>
+            </tr>
+        `).join('');
+
+        return `
+            <div style="direction: rtl; text-align: right; padding: 20px; font-family: 'Arial', sans-serif;">
+                <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px;">
+                    <h1>كافو</h1>
+                    <h2>فاتورة ${invoice.type === 'sell' ? 'بيع' : 'شراء'} رقم #${invoice.id}</h2>
+                    <p>التاريخ: ${invoice.date} | الوقت: ${invoice.time}</p>
+                </div>
+                
+                <div style="margin-bottom: 30px;">
+                    <div style="margin-bottom: 10px;">
+                        <strong>المستخدم:</strong> ${invoice.user}
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong>${invoice.type === 'sell' ? 'العميل:' : 'المورد:'}</strong> ${invoice.customer}
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong>نوع الفاتورة:</strong> ${invoice.type === 'sell' ? 'بيع' : 'شراء'}
+                    </div>
+                </div>
+                
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+                    <thead>
+                        <tr style="background-color: #f8f9fa;">
+                            <th style="border: 1px solid #ddd; padding: 12px;">المنتج</th>
+                            <th style="border: 1px solid #ddd; padding: 12px;">الكمية</th>
+                            <th style="border: 1px solid #ddd; padding: 12px;">السعر</th>
+                            <th style="border: 1px solid #ddd; padding: 12px;">الإجمالي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml}
+                    </tbody>
+                </table>
+                
+                <div style="margin-bottom: 20px;">
+                    <strong>ملاحظات:</strong> ${invoice.notes}
+                </div>
+                
+                <div style="text-align: left; font-weight: bold; font-size: 18px; border-top: 2px solid #333; padding-top: 20px;">
+                    <strong>المجموع الكلي: ${invoice.total} ر.س</strong>
+                </div>
+            </div>
+        `;
+    }
+
+    // Function to create invoice content for printing
+    function createInvoiceContentForPrint(invoiceId, invoiceType) {
+        // Use the same content as PDF for consistency
+        return createInvoiceContentForPDF(invoiceId, invoiceType);
+    }
+</script> 
