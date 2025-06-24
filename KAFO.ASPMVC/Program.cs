@@ -35,14 +35,14 @@ namespace KAFO.ASPMVC
             {
                 options.DefaultAuthenticateScheme = "CustomIdentity";
 
-            })
-            .AddCookie("CustomIdentity", options =>
-            {
-                options.ExpireTimeSpan = TimeSpan.FromDays(1);
-                options.SlidingExpiration = true;
-                options.LoginPath = "/Identity/Identity/Login";
-                options.LogoutPath = "/Identity/Identity/Logout";
-                options.AccessDeniedPath = "/Identity/Identity/AccessDenied";
+			})
+			.AddCookie("CustomIdentity", options =>
+			{
+				options.ExpireTimeSpan = TimeSpan.FromDays(30);
+				options.SlidingExpiration = true;
+				options.LoginPath = "/Identity/Identity/Login";
+				options.LogoutPath = "/Identity/Identity/Logout";
+				options.AccessDeniedPath = "/Identity/Identity/AccessDenied";
 
             });
 

@@ -49,6 +49,27 @@ function generateReport() {
     const endDate = document.getElementById('reportEndDate').value;
     const reportResultsDiv = document.getElementById('report-results');
 
+    if (!startDate || !endDate) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'تنبيه',
+            text: 'الرجاء تحديد تاريخي البدء والانتهاء',
+            confirmButtonText: 'حسناً'
+        });
+        return;
+    }
+
+    // Validate that end date is greater than start date
+    if (new Date(endDate) <= new Date(startDate)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'خطأ في التواريخ',
+            text: 'تاريخ الانتهاء يجب أن يكون أكبر من تاريخ البدء',
+            confirmButtonText: 'حسناً'
+        });
+        return;
+    }
+
     if (startDate && endDate) {
         let reportDataHtml = `
             <div class="report-content">
@@ -252,8 +273,6 @@ function generateReport() {
                     </div>`;
             }
         });
-    } else {
-        alert('الرجاء تحديد تاريخي البدء والانتهاء.');
     }
 }
 

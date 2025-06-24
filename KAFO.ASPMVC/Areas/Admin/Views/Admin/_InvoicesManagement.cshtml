@@ -1,0 +1,148 @@
+@model InvoicesTableVM
+
+<div class="card invoices-table-card" id="invoices-management">
+    <div class="card-header invoices-table-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4><i class="fas fa-file-invoice me-2"></i>إدارة الفواتير</h4>
+            <a class="btn add-invoice-btn" href="#" onclick="showAddInvoiceModal()">
+                <i class="fas fa-plus me-2"></i>إضافة فاتورة شراء
+            </a>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="invoice-section">
+            <h5 class="mb-3"><i class="fas fa-list me-2"></i>اختر نوع الفواتير:</h5>
+            <div class="d-flex flex-wrap gap-2">
+                <button class="btn invoice-type-btn @(Model.InvoiceType == "sell" ? "active" : "")" data-invoice-type="sell">
+                    <i class="fas fa-shopping-cart me-2"></i>فواتير البيع
+                </button>
+                <button class="btn invoice-type-btn @(Model.InvoiceType == "purchase" ? "active" : "")" data-invoice-type="purchase">
+                    <i class="fas fa-truck me-2"></i>فواتير الشراء
+                </button>
+            </div>
+        </div>
+
+        <div id="invoice-details-section" class="invoice-details-section">
+            <h5 class="invoice-title" id="invoice-title">
+                @(Model.InvoiceType == "sell" ? "فواتير البيع" : "فواتير الشراء")
+            </h5>
+            <div class="date-input-group">
+                <div class="row align-items-end">
+                    <div class="col-md-4">
+                        <label for="invoiceStartDate" class="form-label">
+                            <i class="fas fa-calendar-alt me-2"></i>تاريخ البدء
+                        </label>
+                        <input type="date" class="form-control" id="invoiceStartDate">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="invoiceEndDate" class="form-label">
+                            <i class="fas fa-calendar-check me-2"></i>تاريخ الانتهاء
+                        </label>
+                        <input type="date" class="form-control" id="invoiceEndDate">
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn show-invoices-btn w-100" onclick="showInvoices()">
+                            <i class="fas fa-search me-2"></i>عرض الفواتير
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.Invoices.Any())
+            {
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="table invoices-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>التاريخ</th>
+                                    <th>المستخدم</th>
+                                    <th>المبلغ الإجمالي</th>
+                                    <th>نوع الفاتورة</th>
+                                    <th>العميل</th>
+                                    <th>عدد العناصر</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var invoice in Model.Invoices)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="invoice-id">@invoice.Id</span>
+                                        </td>
+                                        <td>
+                                            <span class="invoice-date">@invoice.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                                        </td>
+                                        <td>
+                                            <span class="invoice-user">@invoice.UserName</span>
+                                        </td>
+                                        <td>
+                                            <span class="invoice-total">@invoice.TotalInvoice.ToString("C")</span>
+                                        </td>
+                                        <td>
+                                            <span class="invoice-type">@invoice.InvoiceType</span>
+                                        </td>
+                                        <td>
+                                            <span class="invoice-customer">@invoice.CustomerName</span>
+                                        </td>
+                                        <td>
+                                            <span class="invoice-items">@invoice.ItemsCount</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn view" 
+                                                        onclick="showInvoiceDetails(@invoice.Id, '@invoice.InvoiceType')" 
+                                                        title="عرض التفاصيل">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="pagination-container">
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item @(Model.CurrentInvoicePage == 1 ? "disabled" : "")">
+                                <a class="page-link" onclick="loadInvoices('@Model.InvoiceType', @Model.CurrentInvoicePage-1)" tabindex="-1">
+                                    <i class="fas fa-chevron-right me-1"></i>السابق
+                                </a>
+                            </li>
+                            @for (int i = 1; i <= Model.TotalInvoicesPages; i++)
+                            {
+                                <li class="page-item @(i == Model.CurrentInvoicePage ? "active" : "")">
+                                    <a class="page-link" onclick="loadInvoices('@Model.InvoiceType', @i)">@i</a>
+                                </li>
+                            }
+                            <li class="page-item @(Model.CurrentInvoicePage == Model.TotalInvoicesPages ? "disabled" : "")">
+                                <a class="page-link" onclick="loadInvoices('@Model.InvoiceType', @Model.CurrentInvoicePage+1)">
+                                    التالي<i class="fas fa-chevron-left me-1"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+            else
+            {
+                <div class="no-invoices-message">
+                    <i class="fas fa-file-invoice fa-3x mb-3"></i>
+                    <p>الرجاء تحديد نطاق تاريخ لعرض الفواتير</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- HTML2PDF Library for PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<!-- Invoices CSS and JS -->
+<link rel="stylesheet" href="~/css/invoices.css" asp-append-version="true" />
+<script src="~/js/admin/invoices.js" asp-append-version="true"></script> 

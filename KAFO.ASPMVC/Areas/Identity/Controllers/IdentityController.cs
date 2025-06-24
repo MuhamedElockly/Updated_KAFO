@@ -8,103 +8,111 @@ using System.Security.Claims;
 
 namespace KAFO.ASPMVC.Areas.Identity.Controllers
 {
-    [Area("Identity")]
-    public class IdentityController : Controller
-    {
-        private readonly UserManager _userManager;
+	[Area("Identity")]
+	public class IdentityController : Controller
+	{
+		private readonly UserManager _userManager;
 
-        public IdentityController(UserManager userManager)
-        {
-            _userManager = userManager;
-        }
-        public IActionResult Login(string? returnUrl = null)
-        {
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
-        }
+		public IdentityController(UserManager userManager)
+		{
+			_userManager = userManager;
+		}
+		public IActionResult Login(string? returnUrl = null)
+		{
+			ViewData["ReturnUrl"] = returnUrl;
+			return View();
+		}
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(IdentityViewModel IdentityViewModel, string? ReturnUrl = null)
-        {
+		[HttpPost]
+		public async Task<IActionResult> Login(IdentityViewModel IdentityViewModel, string? ReturnUrl = null)
+		{
 
-            if (ModelState.IsValid)
-            {
-                User user = VerifyUser(IdentityViewModel.userName, IdentityViewModel.password);
-                if (user != null)
-                {
-                    Claim info0 = new Claim(ClaimTypes.NameIdentifier, user.Id.ToString());
-                    Claim info1 = new Claim(ClaimTypes.Name, user.Name.Trim());
-                    Claim info2 = new Claim(ClaimTypes.Role, user.Role.ToLower().Trim());
-                    ClaimsIdentity card = new ClaimsIdentity([info0, info1, info2], "CustomIdentity");
-                    ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(card);
-                    await HttpContext.SignInAsync("CustomIdentity", claimsPrincipal, new AuthenticationProperties
-                    {
-                        IsPersistent = true, // makes the cookie persist after browser close
-                     //   ExpiresUtc = DateTime.UtcNow.AddMinutes(60),
-                        AllowRefresh = true
-                       
-                    });
+			if (ModelState.IsValid)
+			{
+				User userByEmailOrPhone = _userManager.FindByEmailOrPhone(IdentityViewModel.userName);
+				if (userByEmailOrPhone == null)
+				{
+					return Json(new { success = false, message = "رقم الهاتف أو الايميل غير صحيح" });
+				}
+				User user = VerifyUser(IdentityViewModel.userName, IdentityViewModel.password);
+				if (user != null)
+				{
+					Claim info0 = new Claim(ClaimTypes.NameIdentifier, user.Id.ToString());
+					Claim info1 = new Claim(ClaimTypes.Name, user.Name.Trim());
+					Claim info2 = new Claim(ClaimTypes.Role, user.Role.ToLower().Trim());
+					ClaimsIdentity card = new ClaimsIdentity(new[] { info0, info1, info2 }, "CustomIdentity");
+					ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(card);
+					await HttpContext.SignInAsync("CustomIdentity", claimsPrincipal, new AuthenticationProperties
+					{
 
-                    HttpContext.User = claimsPrincipal;
-                    if (user.Role.ToLower() == UserRole.admin.ToString())
-                    {
-                        return RedirectToAction("Index", "Admin", new { area = "Admin" });
-                    }
-                    else if (user.Role.ToLower() == UserRole.seller.ToString())
-                    {
-                        return RedirectToAction("Index", "POS", new { area = "Seller" });
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError("", "user Not Founded");
-                    return View(IdentityViewModel);
-                }
-            }
-            else
-            {
-                return View(IdentityViewModel);
-            }
+						IsPersistent = IdentityViewModel.RememberMe, 
+						ExpiresUtc = DateTimeOffset.UtcNow.AddDays(30),                                           
+						AllowRefresh = true,
 
-            if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
-            {
-                return LocalRedirect(ReturnUrl);
-            }
+					});
 
-            return Redirect("~/");
-        }
-        public User VerifyUser(string userInput, string password)
-        {
-            var user = _userManager.FindByEmailOrPhone(userInput);
+					HttpContext.User = claimsPrincipal;
 
-            if (user == null)
-            {
-                return null;
-            }
-            else
-            {
-                if (PasswordHelper.VerifyPassword(user.Password, password))
-                {
-                    return user;
-                }
-                else
-                {
-                    return null;
-                }
-            }
+					string redirectUrl;
+					if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+					{
+						redirectUrl = ReturnUrl;
+					}
+					else
+					{
+						if (user.Role.ToLower() == UserRole.admin.ToString())
+						{
+							redirectUrl = Url.Action("Index", "Admin", new { area = "Admin" });
+						}
+						else
+						{
+							redirectUrl = Url.Action("Index", "POS", new { area = "Seller" });
+						}
+					}
+					return Json(new { success = true, redirectUrl });
+				}
+				else
+				{
+					return Json(new { success = false, message = "كلمة المرور غير صحيحة" });
+				}
+			}
+			else
+			{
+				var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+				return Json(new { success = false, message = string.Join("\n", errors) });
+			}
+		}
+		public User VerifyUser(string userInput, string password)
+		{
+			var user = _userManager.FindByEmailOrPhone(userInput);
+
+			if (user == null)
+			{
+				return null;
+			}
+			else
+			{
+				if (PasswordHelper.VerifyPassword(user.Password, password))
+				{
+					return user;
+				}
+				else
+				{
+					return null;
+				}
+			}
 
 
-        }
-        public async Task<IActionResult> Logout()
-        {
-            await HttpContext.SignOutAsync("CustomIdentity");
-            return Redirect("~/");
-        }
+		}
+		public async Task<IActionResult> Logout()
+		{
+			await HttpContext.SignOutAsync("CustomIdentity");
+			return Redirect("~/");
+		}
 
-        public async Task<IActionResult> AccessDenied()
-        {
-            return View();
-        }
-    }
+		public async Task<IActionResult> AccessDenied()
+		{
+			return View();
+		}
+	}
 }

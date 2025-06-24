@@ -1,4 +1,3 @@
-
 function loadAdminContent(action, pageNumber) {
     // Show loading indicator
     $('#mainContent').html('<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i></div>');
@@ -19,6 +18,11 @@ function loadAdminContent(action, pageNumber) {
             // Initialize report functionality if we're on the reports page
             if (action === 'Reports' && typeof initializeReportFunctionality === 'function') {
                 initializeReportFunctionality();
+            }
+            
+            // Initialize invoice functionality if we're on the invoices page
+            if (action === 'Invoices' && typeof initializeInvoiceFunctionality === 'function') {
+                initializeInvoiceFunctionality();
             }
         },
         error: function (error) {
