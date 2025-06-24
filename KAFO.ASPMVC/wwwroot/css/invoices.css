@@ -1,0 +1,466 @@
+.invoices-table-card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.invoices-table-header {
+    background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+    color: white;
+    border: none;
+    padding: 1.5rem;
+}
+
+    .invoices-table-header h4 {
+        font-weight: 600;
+        margin: 0;
+    }
+
+.invoice-section {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.invoice-type-btn {
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: white;
+    margin: 0.25rem;
+}
+
+    .invoice-type-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        color: white;
+    }
+
+    .invoice-type-btn.active {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+
+    /* Sell Invoices Button - Green */
+    .invoice-type-btn[data-invoice-type="sell"] {
+        background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+    }
+
+        .invoice-type-btn[data-invoice-type="sell"]:hover {
+            background: linear-gradient(135deg, #00a085 0%, #00b894 100%);
+        }
+
+    /* Purchase Invoices Button - Blue */
+    .invoice-type-btn[data-invoice-type="purchase"] {
+        background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+    }
+
+        .invoice-type-btn[data-invoice-type="purchase"]:hover {
+            background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
+        }
+
+.invoice-details-section {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.invoice-title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #6f42c1;
+}
+
+.date-input-group {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+    .form-control:focus {
+        border-color: #6f42c1;
+        box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+    }
+
+.show-invoices-btn {
+    background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+    .show-invoices-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(135deg, #5a32a3 0%, #6f42c1 100%);
+        color: white;
+    }
+
+.table-container {
+    background: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    margin: 1rem 0;
+}
+
+.invoices-table {
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+    .invoices-table thead th {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: none;
+        padding: 1rem 0.75rem;
+        font-weight: 600;
+        color: #495057;
+        text-align: center;
+        position: relative;
+    }
+
+        .invoices-table thead th:first-child {
+            border-top-right-radius: 0.5rem;
+        }
+
+        .invoices-table thead th:last-child {
+            border-top-left-radius: 0.5rem;
+        }
+
+    .invoices-table tbody tr {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f1f3f4;
+    }
+
+        .invoices-table tbody tr:hover {
+            background: linear-gradient(135deg, #f0fff4 0%, #e8f5e8 100%);
+            transform: scale(1.01);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .invoices-table tbody td {
+        padding: 1rem 0.75rem;
+        vertical-align: middle;
+        border: none;
+        text-align: center;
+    }
+
+.invoice-id {
+    background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+    color: #155724;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    display: inline-block;
+    min-width: 40px;
+}
+
+.invoice-date {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1.1rem;
+}
+
+.invoice-user {
+    color: #495057;
+    font-weight: 500;
+}
+
+.invoice-total {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    color: #1976d2;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.invoice-type {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #856404;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.invoice-customer {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.invoice-items {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.pagination-container {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-top: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.pagination {
+    margin: 0;
+    gap: 0.25rem;
+}
+
+.page-item .page-link {
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    color: #495057;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    margin: 0 0.125rem;
+}
+
+    .page-item .page-link:hover {
+        background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+.page-item.active .page-link {
+    background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.page-item.disabled .page-link {
+    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+.no-invoices-message {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.add-invoice-btn {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: white;
+    text-decoration: none;
+}
+
+    .add-invoice-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+        color: white;
+        text-decoration: none;
+    }
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.action-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 0.5rem;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .action-btn.view {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        color: white;
+    }
+
+    .action-btn.edit {
+        background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+        color: white;
+    }
+
+    .action-btn.delete {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+    }
+
+/* Invoice Details Modal Styles */
+.invoice-details-modal {
+    text-align: right;
+    direction: rtl;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+    .detail-item:hover {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        transform: translateX(-2px);
+    }
+
+.detail-item i {
+    margin-left: 0.5rem;
+    font-size: 1.1rem;
+    min-width: 20px;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #495057;
+    margin-left: 0.5rem;
+    min-width: 80px;
+}
+
+.detail-value {
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.invoice-details-modal .table {
+    margin-bottom: 0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.invoice-details-modal .table thead th {
+    background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    font-weight: 600;
+}
+
+.invoice-details-modal .table tbody td {
+    padding: 0.75rem;
+    border-color: #e9ecef;
+    vertical-align: middle;
+}
+
+.invoice-details-modal .table tbody tr:hover {
+    background: linear-gradient(135deg, #f0fff4 0%, #e8f5e8 100%);
+}
+
+.invoice-details-modal hr {
+    border-color: #e9ecef;
+    margin: 1.5rem 0;
+}
+
+.invoice-details-modal h6 {
+    color: #6f42c1;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.badge {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+}
+
+/* Invoice Action Buttons */
+.invoice-action-buttons {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-top: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.invoice-action-btn {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: #495057;
+    margin: 0.25rem;
+}
+
+    .invoice-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .invoice-action-btn.primary {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        color: white;
+    }
+
+        .invoice-action-btn.primary:hover {
+            background: linear-gradient(135deg, #138496 0%, #17a2b8 100%);
+            color: white;
+        }
+
+    .invoice-action-btn.secondary {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        color: white;
+    }
+
+        .invoice-action-btn.secondary:hover {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            color: white;
+        } 

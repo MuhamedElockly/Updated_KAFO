@@ -60,7 +60,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 				TotalProductPages = (int)Math.Ceiling(_productManager.GetAll().Count() / (double)pageSize)
 			};
 			ViewData["Title"] = "لوحة التحكم";
-			AdminHomeVM adminHomeVM = new AdminHomeVM { Products = productsTableVM, AdminName = "Muhamed Elockly", TotalProfitToday = _reportManager.GetTodayTotalProfit(), TotalProductSoldToday = _reportManager.GetTotalProductSoldToday(), TotalSellsToday = _reportManager.GetTotalSellsToday() };
+			AdminHomeVM adminHomeVM = new AdminHomeVM { Products = productsTableVM, AdminName = User.Identity.Name, TotalProfitToday = _reportManager.GetTodayTotalProfit(), TotalProductSoldToday = _reportManager.GetTotalProductSoldToday(), TotalSellsToday = _reportManager.GetTotalSellsToday() };
 
 			return View(adminHomeVM);
 		}
