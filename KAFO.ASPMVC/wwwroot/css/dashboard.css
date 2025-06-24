@@ -251,6 +251,10 @@
     }
 }
 
+:root {
+    --overlay-color: rgba(255, 255, 255, 0.85);
+    --blur-amount: 3px;
+}
 
 .spinner-overlay {
     position: fixed;
@@ -258,33 +262,108 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: var(--overlay-color);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
-    backdrop-filter: blur(2px);
-}
-
-.modern-spinner {
-    width: 50px;
-    height: 50px;
-    border: 3px solid rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-    border-top-color: #6200ee;
-    animation: spin 1s ease-in-out infinite;
-}
-
-
-.spinner-text {
-    margin-top: 15px;
-    color: #333;
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 14px;
+    backdrop-filter: blur(var(--blur-amount));
+    transition: opacity 0.3s ease;
 }
 
 .spinner-container {
     display: flex;
     flex-direction: column;
     align-items: center;
+    transform: translateY(-20%);
+}
+
+.spinner-text {
+    margin-top: 20px;
+    color: #4a4a4a;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    max-width: 200px;
+    line-height: 1.4;
+}
+
+/* Spin Animation */
+.spin-spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: #6200ee;
+    border-left-color: rgba(98, 0, 238, 0.2);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Pulse Animation */
+.pulse-spinner {
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+    transform: scale(0.8);
+    opacity: 0.8;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(0.8);
+        opacity: 0.8;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+}
+
+/* Wave Animation */
+.wave-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 50px;
+}
+
+.wave-bar {
+    width: 12%;
+    height: 100%;
+    border-radius: 4px;
+    animation: wave 0.8s ease-in-out infinite;
+    animation-direction: alternate;
+}
+
+@keyframes wave {
+    from {
+        height: 20%;
+    }
+
+    to {
+        height: 100%;
+    }
+}
+
+/* Modern Glass Morphism Effect (optional) */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 24px;
+}
+.swal2-actions {
+    gap: 1rem !important; /* Adjust the spacing as needed */
+}
+
+/* For Arabic RTL support */
+html[dir="rtl"] .swal2-actions {
+    flex-direction: row-reverse;
 }

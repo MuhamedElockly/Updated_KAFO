@@ -3,25 +3,27 @@ using KAFO.ASPMVC.Areas.Admin.ViewModels;
 using KAFO.BLL.Managers;
 using KAFO.Domain.Products;
 using KAFO.Domain.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kafo.ASPMVC.Areas.Admin.Controllers
 {
-    [Area("Admin")]
-    public class AdminController : Controller
-    {
-        private readonly CategoryManager _categoryManager;
-        private readonly ReportManager _reportManager;
-        private readonly ProductManager _productManager;
-        private readonly UserManager _userManager;
-        const int pageSize = 5;
-        public AdminController(CategoryManager categoryManager, ReportManager invoiceManager, ProductManager productManager, UserManager userManager)
-        {
-            _categoryManager = categoryManager;
-            _reportManager = invoiceManager;
-            _productManager = productManager;
-            _userManager = userManager;
-        }
+	[Area("Admin")]
+	[Authorize(Roles = "admin")]
+	public class AdminController : Controller
+	{
+		private readonly CategoryManager _categoryManager;
+		private readonly ReportManager _reportManager;
+		private readonly ProductManager _productManager;
+		private readonly UserManager _userManager;
+		const int pageSize = 5;
+		public AdminController(CategoryManager categoryManager, ReportManager invoiceManager, ProductManager productManager, UserManager userManager)
+		{
+			_categoryManager = categoryManager;
+			_reportManager = invoiceManager;
+			_productManager = productManager;
+			_userManager = userManager;
+		}
 
         public IActionResult Index(int sellerPage = 1, int categoryPage = 1, int productPage = 1, int adminPage = 1)
         {

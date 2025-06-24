@@ -1,325 +1,432 @@
 @model UsersTableVM
 
 <style>
-    .users-table-card {
-        border: none;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        border-radius: 0.75rem;
-        overflow: hidden;
-    }
+	.users-table-card {
+		border: none;
+		box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+		border-radius: 0.75rem;
+		overflow: hidden;
+	}
 
-    .users-table-header {
-        background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
-        color: white;
-        border: none;
-        padding: 1.5rem;
-    }
+	.users-table-header {
+		background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+		color: white;
+		border: none;
+		padding: 1.5rem;
+	}
 
-        .users-table-header h4 {
-            font-weight: 600;
-            margin: 0;
-        }
+		.users-table-header h4 {
+			font-weight: 600;
+			margin: 0;
+		}
 
-    .add-user-btn {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        border: none;
-        border-radius: 0.5rem;
-        padding: 0.75rem 1.5rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+	.add-user-btn {
+		background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+		border: none;
+		border-radius: 0.5rem;
+		padding: 0.75rem 1.5rem;
+		font-weight: 500;
+		transition: all 0.3s ease;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	}
 
-        .add-user-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-            background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
-        }
+		.add-user-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+			background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+		}
 
-    .search-container {
-        background: white;
-        border-radius: 0.5rem;
-        padding: 1rem;
-        margin: 1rem 0;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
+	.search-container {
+		background: white;
+		border-radius: 0.5rem;
+		padding: 1rem;
+		margin: 1rem 0;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+	}
 
-    .search-input-group {
-        border-radius: 0.5rem;
-        overflow: hidden;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+	.search-input-group {
+		border-radius: 0.5rem;
+		overflow: hidden;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	}
 
-        .search-input-group .input-group-text {
-            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
-            border: none;
-            color: white;
-            font-weight: 500;
-        }
+		.search-input-group .input-group-text {
+			background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+			border: none;
+			color: white;
+			font-weight: 500;
+		}
 
-        .search-input-group .form-control {
-            border: none;
-            padding: 0.75rem 1rem;
-            font-size: 1rem;
-        }
+		.search-input-group .form-control {
+			border: none;
+			padding: 0.75rem 1rem;
+			font-size: 1rem;
+		}
 
-            .search-input-group .form-control:focus {
-                box-shadow: none;
-                border-color: #00b894;
-            }
+			.search-input-group .form-control:focus {
+				box-shadow: none;
+				border-color: #00b894;
+			}
 
-    .table-container {
-        background: white;
-        border-radius: 0.5rem;
-        overflow: hidden;
-        margin: 1rem 0;
-    }
+	.table-container {
+		background: white;
+		border-radius: 0.5rem;
+		overflow: hidden;
+		margin: 1rem 0;
+	}
 
-    .users-table {
-        margin: 0;
-        border-collapse: separate;
-        border-spacing: 0;
-    }
+	.users-table {
+		margin: 0;
+		border-collapse: separate;
+		border-spacing: 0;
+	}
 
-        .users-table thead th {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border: none;
-            padding: 1rem 0.75rem;
-            font-weight: 600;
-            color: #495057;
-            text-align: center;
-            position: relative;
-        }
+		.users-table thead th {
+			background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+			border: none;
+			padding: 1rem 0.75rem;
+			font-weight: 600;
+			color: #495057;
+			text-align: center;
+			position: relative;
+		}
 
-            .users-table thead th:first-child {
-                border-top-right-radius: 0.5rem;
-            }
+			.users-table thead th:first-child {
+				border-top-right-radius: 0.5rem;
+			}
 
-            .users-table thead th:last-child {
-                border-top-left-radius: 0.5rem;
-            }
+			.users-table thead th:last-child {
+				border-top-left-radius: 0.5rem;
+			}
 
-        .users-table tbody tr {
-            transition: all 0.2s ease;
-            border-bottom: 1px solid #f1f3f4;
-        }
+		.users-table tbody tr {
+			transition: all 0.2s ease;
+			border-bottom: 1px solid #f1f3f4;
+		}
 
-            .users-table tbody tr:hover {
-                background: linear-gradient(135deg, #f0fff4 0%, #e8f5e8 100%);
-                transform: scale(1.01);
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            }
+			.users-table tbody tr:hover {
+				background: linear-gradient(135deg, #f0fff4 0%, #e8f5e8 100%);
+				transform: scale(1.01);
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+			}
 
-        .users-table tbody td {
-            padding: 1rem 0.75rem;
-            vertical-align: middle;
-            border: none;
-            text-align: center;
-        }
+		.users-table tbody td {
+			padding: 1rem 0.75rem;
+			vertical-align: middle;
+			border: none;
+			text-align: center;
+		}
 
-    .user-id {
-        background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
-        color: #155724;
-        font-weight: 600;
-        padding: 0.5rem 1rem;
-        border-radius: 1rem;
-        display: inline-block;
-        min-width: 40px;
-    }
+	.user-id {
+		background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+		color: #155724;
+		font-weight: 600;
+		padding: 0.5rem 1rem;
+		border-radius: 1rem;
+		display: inline-block;
+		min-width: 40px;
+	}
 
-    .user-name {
-        font-weight: 600;
-        color: #2c3e50;
-        font-size: 1.1rem;
-    }
+	.user-name {
+		font-weight: 600;
+		color: #2c3e50;
+		font-size: 1.1rem;
+	}
 
-    .user-phone {
-        color: #495057;
-        font-weight: 500;
-    }
+	.user-phone {
+		color: #495057;
+		font-weight: 500;
+	}
 
-    .user-email {
-        color: #6c757d;
-        font-style: italic;
-    }
+	.user-email {
+		color: #6c757d;
+		font-style: italic;
+	}
 
-    .user-role {
-        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-        color: #1976d2;
-        padding: 0.5rem 1rem;
-        border-radius: 1rem;
-        font-weight: 500;
-        font-size: 0.875rem;
-    }
+	.user-role {
+		background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+		color: #1976d2;
+		padding: 0.5rem 1rem;
+		border-radius: 1rem;
+		font-weight: 500;
+		font-size: 0.875rem;
+	}
 
-    .action-buttons {
-        display: flex;
-        gap: 0.5rem;
-        justify-content: center;
-        align-items: center;
-    }
+	.action-buttons {
+		display: flex;
+		gap: 0.5rem;
+		justify-content: center;
+		align-items: center;
+	}
 
-    .action-btn {
-        width: 40px;
-        height: 40px;
-        border-radius: 0.5rem;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        font-size: 0.875rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+	.action-btn {
+		width: 40px;
+		height: 40px;
+		border-radius: 0.5rem;
+		border: none;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.3s ease;
+		font-size: 0.875rem;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	}
 
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
+		.action-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+		}
 
-        .action-btn.edit {
-            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
-            color: white;
-        }
+		.action-btn.edit {
+			background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+			color: white;
+		}
 
-        .action-btn.delete {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: white;
-        }
+		.action-btn.delete {
+			background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+			color: white;
+		}
 
-    .pagination-container {
-        background: white;
-        border-radius: 0.5rem;
-        padding: 1rem;
-        margin-top: 1rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
+	.pagination-container {
+		background: white;
+		border-radius: 0.5rem;
+		padding: 1rem;
+		margin-top: 1rem;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+	}
 
-    .pagination {
-        margin: 0;
-        gap: 0.25rem;
-    }
+	.pagination {
+		margin: 0;
+		gap: 0.25rem;
+	}
 
-    .page-item .page-link {
-        border: none;
-        border-radius: 0.5rem;
-        padding: 0.75rem 1rem;
-        color: #495057;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        margin: 0 0.125rem;
-    }
+	.page-item .page-link {
+		border: none;
+		border-radius: 0.5rem;
+		padding: 0.75rem 1rem;
+		color: #495057;
+		font-weight: 500;
+		transition: all 0.3s ease;
+		background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+		margin: 0 0.125rem;
+	}
 
-        .page-item .page-link:hover {
-            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+		.page-item .page-link:hover {
+			background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+			color: white;
+			transform: translateY(-1px);
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		}
 
-    .page-item.active .page-link {
-        background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
-        color: white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+	.page-item.active .page-link {
+		background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+		color: white;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	}
 
-    .page-item.disabled .page-link {
-        background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
-        color: #6c757d;
-        cursor: not-allowed;
-    }
+	.page-item.disabled .page-link {
+		background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+		color: #6c757d;
+		cursor: not-allowed;
+	}
 </style>
 
 <div class="card users-table-card" id="sellers-management">
-    <div class="card-header users-table-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <h4><i class="fas fa-users me-2"></i>إدارة المستخدمين</h4>
-            <a class="btn add-user-btn" asp-action="Index" asp-controller="UserManagement">
-                <i class="fas fa-plus me-2"></i>إضافة مستخدم جديد
-            </a>
-        </div>
-    </div>
-    <div class="card-body p-0">
-        <div class="search-container">
-            <div class="input-group search-input-group">
-                <span class="input-group-text">
-                    <i class="fas fa-search"></i>
-                </span>
-                <input type="text" class="form-control" placeholder="البحث عن المستخدمين بالاسم، البريد الإلكتروني، أو الدور...">
-            </div>
-        </div>
+	<div class="card-header users-table-header">
+		<div class="d-flex justify-content-between align-items-center">
+			<h4><i class="fas fa-users me-2"></i>إدارة المستخدمين</h4>
+			<a class="btn add-user-btn" asp-action="Index" asp-controller="UserManagement" onclick="toggleSpinner(true, 'جاري العرض ....');">
+				<i class="fas fa-plus me-2"></i>إضافة مستخدم جديد
+			</a>
+		</div>
+	</div>
+	<div class="card-body p-0">
+		<div class="search-container">
+			<div class="input-group search-input-group">
+				<span class="input-group-text">
+					<i class="fas fa-search"></i>
+				</span>
+				<input type="text" class="form-control" placeholder="البحث عن المستخدمين بالاسم، البريد الإلكتروني، أو الدور...">
+			</div>
+		</div>
 
-        <div class="table-container">
-            <div class="table-responsive">
-                <table class="table users-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>الاسم</th>
-                            <th>رقم الموبايل</th>
-                            <th>البريد الإلكتروني</th>
-                            <th>الدور</th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var seller in Model.Users)
-                        {
-                            <tr>
-                                <td>
-                                    <span class="user-id">@seller.Id</span>
-                                </td>
-                                <td>
-                                    <span class="user-name">@seller.Name</span>
-                                </td>
-                                <td>
-                                    <span class="user-phone">@seller.Phone</span>
-                                </td>
-                                <td>
-                                    <span class="user-email">@(seller.Email ?? "لا يوجد بريد الكتروني")</span>
-                                </td>
-                                <td>
-                                    <span class="user-role">@seller.Role</span>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <a class="action-btn edit" asp-action="Edit" asp-controller="UserManagement" asp-route-Id="@seller.Id" title="تعديل">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <button class="action-btn delete" onclick="deleteSeller(@seller.Id)" title="حذف">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+		<div class="table-container">
+			<div class="table-responsive">
+				<table class="table users-table">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>الاسم</th>
+							<th>رقم الموبايل</th>
+							<th>البريد الإلكتروني</th>
+							<th>الدور</th>
+							<th>الإجراءات</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var seller in Model.Users)
+						{
+							<tr>
+								<td>
+									<span class="user-id">@seller.Id</span>
+								</td>
+								<td>
+									<span class="user-name">@seller.Name</span>
+								</td>
+								<td>
+									<span class="user-phone">@seller.Phone</span>
+								</td>
+								<td>
+									<span class="user-email">@(seller.Email ?? "لا يوجد بريد الكتروني")</span>
+								</td>
+								<td>
+									<span class="user-role">@seller.Role</span>
+								</td>
+								<td>
+									<div class="action-buttons">
+										@if (seller.Id != int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)))
+										{
+											<a class="action-btn edit" asp-action="Edit" asp-controller="UserManagement"
+											   asp-route-Id="@seller.Id" title="تعديل"
+											   onclick="toggleSpinner(true, 'جاري العرض ....');">
+												<i class="fas fa-edit"></i>
+											</a>
+											<button class="action-btn delete"
+													onclick="showDeleteConfirmation({
+                        itemId: @seller.Id,
+                        confirmDescription:'لن تتمكن من استعادة هذا المستخدم مرة أخرى!',
+                        actionUrl: '@Url.Action("Delete", "UserManagement")',
+                        callback: function() {
+                            loadAdminContent('Users', @Model.CurrentUserPage);
                         }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                    })"
+													title="حذف">
+												<i class="fas fa-trash-alt"></i>
+											</button>
+										}
+										else
+										{
+											<span class="text-muted">الإجراءات غير متاحة</span>
+										}
+									</div>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
 
-        <div class="pagination-container">
-            <nav>
-                <ul class="pagination justify-content-center">
-                    <li class="page-item @(Model.CurrentUserPage == 1 ? "disabled" : "")">
-                        <a class="page-link" onclick="loadAdminContent('Users', @Model.CurrentUserPage-1)" tabindex="-1">
-                            <i class="fas fa-chevron-right me-1"></i>السابق
-                        </a>
-                    </li>
-                    @for (int i = 1; i <= Model.TotalUsersPages; i++)
-                    {
-                        <li class="page-item @(i == Model.CurrentUserPage ? "active" : "")">
-                            <a class="page-link" onclick="loadAdminContent('Users', @i)">@i</a>
-                        </li>
-                    }
-                    <li class="page-item @(Model.CurrentUserPage == Model.TotalUsersPages ? "disabled" : "")">
-                        <a class="page-link" onclick="loadAdminContent('Users', @Model.CurrentUserPage +1)">
-                            التالي<i class="fas fa-chevron-left me-1"></i>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </div>
+		<div class="pagination-container">
+			<nav>
+				<ul class="pagination justify-content-center">
+					<li class="page-item @(Model.CurrentUserPage == 1 ? "disabled" : "")">
+						<a class="page-link" onclick="loadAdminContent('Users', @Model.CurrentUserPage-1)" tabindex="-1">
+							<i class="fas fa-chevron-right me-1"></i>السابق
+						</a>
+					</li>
+					@for (int i = 1; i <= Model.TotalUsersPages; i++)
+					{
+						<li class="page-item @(i == Model.CurrentUserPage ? "active" : "")">
+							<a class="page-link" onclick="loadAdminContent('Users', @i)">@i</a>
+						</li>
+					}
+					<li class="page-item @(Model.CurrentUserPage == Model.TotalUsersPages ? "disabled" : "")">
+						<a class="page-link" onclick="loadAdminContent('Users', @Model.CurrentUserPage +1)">
+							التالي<i class="fas fa-chevron-left me-1"></i>
+						</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
 </div>
+
+<script>
+	function deleteSeller(userId) {
+		Swal.fire({
+			title: 'هل أنت متأكد من الحذف؟',
+			text: "لن تتمكن من استعادة هذا المستخدم مرة أخرى!",
+			icon: 'warning',
+			iconColor: '#dc3545',
+			showCancelButton: true,
+			confirmButtonColor: '#dc3545',
+			cancelButtonColor: '#6c757d',
+			confirmButtonText: 'نعم، احذفه!',
+			cancelButtonText: 'إلغاء',
+			background: 'white',
+			backdrop: `
+								rgba(220,53,69,0.1)
+								url("/images/trash-icon.gif")
+								center top
+								no-repeat
+							`,
+			showClass: {
+				popup: 'animate__animated animate__fadeInDown'
+			},
+			hideClass: {
+				popup: 'animate__animated animate__fadeOutUp'
+			},
+			customClass: {
+				confirmButton: 'btn btn-danger shadow-sm px-4 py-2',
+				cancelButton: 'btn btn-secondary shadow-sm px-4 py-2'
+			},
+			buttonsStyling: false
+		}).then((result) => {
+			if (result.isConfirmed) {
+				// Add loading state
+				Swal.fire({
+					title: 'جاري الحذف...',
+					html: 'الرجاء الانتظار بينما نعالج طلبك',
+					timerProgressBar: true,
+					didOpen: () => {
+						Swal.showLoading()
+					},
+					background: 'white',
+					backdrop: `
+										rgba(0,0,0,0.5)
+										center
+										no-repeat
+									`,
+					allowOutsideClick: false
+				});
+
+				// AJAX call
+				$.ajax({
+					url: '@Url.Action("Delete", "UserManagement")',
+					type: 'POST',
+					data: { id: userId },  // Fixed: Proper data format
+					success: function (response) {
+						Swal.close();  // Close loading dialog
+						if (response.success) {
+							Swal.fire({
+								title: 'تم الحذف!',
+								text: 'تم الحذف بنجاح.',
+								icon: 'success',
+								iconColor: '#28a745',
+								confirmButtonColor: '#28a745',
+								background: 'white',
+								showClass: {
+									popup: 'animate__animated animate__bounceIn'
+								},
+								customClass: {
+									confirmButton: 'btn btn-success shadow-sm px-4 py-2'
+								}
+							}).then(() => {
+								// Reload or update the table
+								loadAdminContent('Users', @Model.CurrentUserPage);
+							});
+						} else {
+							Swal.fire('خطأ!', response.message, 'error');
+						}
+					},
+					error: function (xhr) {
+						Swal.close();  // Close loading dialog
+						Swal.fire('خطأ!', 'فشل الاتصال بالخادم', 'error');
+					}
+				});
+			}
+		});
+	}
+
+</script>

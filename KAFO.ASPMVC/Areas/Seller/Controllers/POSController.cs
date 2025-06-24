@@ -7,7 +7,7 @@ using System.Security.Claims;
 namespace KAFO.ASPMVC.Controllers
 {
     [Area("Seller")]
-    //[Authorize(Roles = "admin, seller")]
+    [Authorize(Roles = "seller")]
     public class POSController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

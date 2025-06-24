@@ -38,7 +38,13 @@ namespace KAFO.ASPMVC.Areas.Identity.Controllers
                     Claim info2 = new Claim(ClaimTypes.Role, user.Role.ToLower().Trim());
                     ClaimsIdentity card = new ClaimsIdentity([info0, info1, info2], "CustomIdentity");
                     ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(card);
-                    await HttpContext.SignInAsync("CustomIdentity", claimsPrincipal);
+                    await HttpContext.SignInAsync("CustomIdentity", claimsPrincipal, new AuthenticationProperties
+                    {
+                        IsPersistent = true, // makes the cookie persist after browser close
+                     //   ExpiresUtc = DateTime.UtcNow.AddMinutes(60),
+                        AllowRefresh = true
+                       
+                    });
 
                     HttpContext.User = claimsPrincipal;
                     if (user.Role.ToLower() == UserRole.admin.ToString())
