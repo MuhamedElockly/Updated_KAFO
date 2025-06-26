@@ -2,10 +2,10 @@ let currentInvoiceType = '';
 
 function initializeInvoiceFunctionality() {
     console.log("Initializing invoice functionality");
-    
+
     // Remove any existing event handlers
     $('.invoice-type-btn').off('click');
-    
+
     // Add new event handlers
     $('.invoice-type-btn').on('click', function () {
         console.log("Invoice Type Btn Clicked");
@@ -116,16 +116,26 @@ function showAddInvoiceModal() {
         }
     }).then((result) => {
         if (result.isConfirmed) {
-            // Here you can redirect to the purchase invoice creation page
-            // For now, we'll show a success message
-            Swal.fire({
-                icon: 'success',
-                title: 'سيتم توجيهك قريباً',
-                text: 'صفحة إضافة فاتورة الشراء قيد التطوير',
-                timer: 2000,
-                showConfirmButton: false
-            });
+            console.log('User confirmed, about to show SweetAlert...');
+
+            //Swal.fire({
+            //    icon: 'success',
+            //    title: 'سيتم توجيهك قريباً',
+            //    text: 'صفحة إضافة فاتورة الشراء قيد التطوير',
+            //    timer: 3000,
+            //    showConfirmButton: false,
+            //    showProgressBar: true
+            //});
+
+            console.log('SweetAlert should be showing now...');
+
+            // Try navigation after a delay
+            setTimeout(() => {
+                console.log('Timeout reached, attempting navigation...');
+                window.location.href = '/Seller/Invoice/Create';
+            }, 4000);
         }
+    
     });
 }
 
@@ -299,7 +309,7 @@ function downloadInvoiceAsPDF(invoiceId, invoiceType) {
     setTimeout(() => {
         // Create a temporary div with invoice content for PDF generation
         const invoiceContent = createInvoiceContentForPDF(invoiceId, invoiceType);
-        
+
         const opt = {
             margin: 1,
             filename: `invoice_${invoiceId}_${invoiceType}.pdf`,
@@ -340,7 +350,7 @@ function printInvoice(invoiceId, invoiceType) {
     setTimeout(() => {
         // Create a temporary div with invoice content for printing
         const invoiceContent = createInvoiceContentForPrint(invoiceId, invoiceType);
-        
+
         // Create a new window for printing
         const printWindow = window.open('', '_blank');
         printWindow.document.write(`

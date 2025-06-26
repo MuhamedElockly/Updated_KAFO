@@ -16,7 +16,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label asp-for="Type" class="control-label">نوع الفاتورة</label>
-                    <select asp-for="Type" id="invoiceType" class="form-control" @* asp-items="Html.GetEnumSelectList<InvoiceType>()" *@>
+                    <select asp-for="Type" id="invoiceType" class="form-control">
                         <option value="2">شراء</option>
                     </select>
                     <span asp-validation-for="Type" class="text-danger"></span>

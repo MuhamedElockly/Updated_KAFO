@@ -59,7 +59,6 @@ function generateReport() {
         return;
     }
 
-    // Validate that end date is greater than start date
     if (new Date(endDate) <= new Date(startDate)) {
         Swal.fire({
             icon: 'error',
@@ -78,10 +77,8 @@ function generateReport() {
                     <p class="text-center text-muted">التقرير من <strong>${startDate}</strong> إلى <strong>${endDate}</strong></p>
                 </div>`;
 
-        // Show loading indicator
         reportResultsDiv.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';
 
-        // Make API call based on report type
         let url = '';
         switch (currentReportType) {
             case 'profit':
@@ -111,6 +108,30 @@ function generateReport() {
             url: url,
             type: 'GET',
             success: function(data) {
+                // Check if data is empty or has no items
+                let hasData = false;
+                
+                if (currentReportType === 'profit' || currentReportType === 'sales' || currentReportType === 'total_payments') {
+                    // For single value reports, check if the value is greater than 0
+                    const value = currentReportType === 'profit' ? data.totalProfit : 
+                                 currentReportType === 'sales' ? data.totalSales : 
+                                 data.totalPayments;
+                    hasData = value > 0;
+                } else {
+                    // For list reports, check if array has items
+                    hasData = Array.isArray(data) ? data.length > 0 : (data && data.length > 0);
+                }
+                
+                if (!hasData) {
+                    reportResultsDiv.innerHTML = `
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle fa-2x mb-3"></i>
+                            <h5>لا توجد بيانات</h5>
+                            <p>لا توجد بيانات متاحة للفترة المحددة.</p>
+                        </div>`;
+                    return;
+                }
+                
                 switch (currentReportType) {
                     case 'profit':
                         reportDataHtml += `
@@ -246,7 +267,7 @@ function generateReport() {
 
                 reportDataHtml += `</div>`;
 
-                // Add report actions
+                // Add report actions only if there is data
                 const reportActionsTemplate = document.getElementById('report-actions-template');
                 if (reportActionsTemplate) {
                     const reportActions = reportActionsTemplate.content.cloneNode(true);

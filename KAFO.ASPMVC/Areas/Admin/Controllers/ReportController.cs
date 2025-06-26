@@ -11,10 +11,10 @@ namespace KAFO.ASPMVC.Areas.Admin.Controllers
 	[Area("Admin")]
 	public class ReportController : Controller
 	{
-		private readonly ReportManager _invcoiceManager;
+		private readonly ReportManager _reportManager;
 		public ReportController(ReportManager invoiceManager)
 		{
-			_invcoiceManager = invoiceManager;
+			_reportManager = invoiceManager;
 
 		}
 
@@ -22,9 +22,15 @@ namespace KAFO.ASPMVC.Areas.Admin.Controllers
 		[HttpGet]
 		public IActionResult GetProfitReport(DateTime startDate, DateTime endDate)
 		{
-			double totalProfit = _invcoiceManager.GetTotalProfit(startDate, endDate);
-		//	double totalProfit = 345;
+			double totalProfit = _reportManager.GetTotalProfit(startDate, endDate);
 			return Json(new { totalProfit });
+		}
+		[HttpGet]
+		public IActionResult GetMostSoldProductsReport(DateTime startDate, DateTime endDate)
+		{
+			var mostSoldProudct = _reportManager.GetMostProductSold(startDate, endDate);
+
+			return Json(mostSoldProudct);
 		}
 
 
