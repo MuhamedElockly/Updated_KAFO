@@ -1,3 +1,4 @@
+@model KAFO.Domain.ViewModels.DailyInventoryVM
 @* Daily Inventory Section *@
 <link rel="stylesheet" href="~/css/dailyInventory.css" asp-append-version="true" />
 <div class="card products-table-card" id="daily-inventory-section">
@@ -12,6 +13,24 @@
     </div>
     <div class="card-body p-0 daily-inventory-scrollable">
         <div id="sellers-inventory-table-container" class="table-container">
+            <div class="d-flex justify-content-between align-items-center mb-3 p-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; margin: 20px; box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);">
+                <div class="table-header-info">
+                    <h5 class="mb-1" style="color: white; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                        <i class="fas fa-users me-2"></i>جرد البائعين اليومي
+                    </h5>
+                    <p class="mb-0" style="color: rgba(255,255,255,0.9); font-size: 14px;">
+                        عرض تفاصيل المبيعات والمدفوعات لكل بائع مع إجمالي التوريد
+                    </p>
+                </div>
+                <div class="d-flex">
+                    <button class="btn btn-lg me-5" onclick="downloadSellersInventoryAsPDF()" style="min-width: 140px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600; padding: 12px 24px; border-radius: 10px; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4); transition: all 0.3s ease; text-shadow: 0 1px 2px rgba(0,0,0,0.2); margin-right: 3rem;">
+                        <i class="fas fa-download me-2" style="font-size: 16px;"></i> تحميل PDF
+                    </button>
+                    <button class="btn btn-lg" onclick="printSellersInventory()" style="min-width: 140px; background: linear-gradient(135deg, #6c757d 0%, #495057 100%); border: none; color: white; font-weight: 600; padding: 12px 24px; border-radius: 10px; box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4); transition: all 0.3s ease; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
+                        <i class="fas fa-print me-2" style="font-size: 16px;"></i> طباعة
+                    </button>
+                </div>
+            </div>
             <div class="table-responsive">
                 <table class="table products-table" id="sellers-inventory-table">
                     <thead>
@@ -25,17 +44,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (ViewBag.SellersInventory != null)
+                        @if (Model.SellersInventory != null && Model.SellersInventory.Any())
                         {
-                            foreach (dynamic item in ViewBag.SellersInventory)
+                            foreach (var item in Model.SellersInventory)
                             {
                                 <tr>
-                                    <td>@item.sellerName</td>
-                                    <td>@item.phone</td>
-                                    <td>@item.totalCashPayment</td>
-                                    <td>@item.totalCreditPayment</td>
-                                    <td>@item.totalRefundCredit</td>
-                                    <td>@item.totalSupplyMoney</td>
+                                    <td>@item.SellerName</td>
+                                    <td>@item.Phone</td>
+                                    <td>@item.TotalCashPayment</td>
+                                    <td>@item.TotalCreditPayment</td>
+                                    <td>@item.TotalRefundCredit</td>
+                                    <td>@item.TotalSupplyMoney</td>
                                 </tr>
                             }
                         }
@@ -57,34 +76,54 @@
             </div>
         </div>
         <div id="products-remain-table-container" class="table-container" style="display:none;">
+            <div class="d-flex justify-content-between align-items-center mb-3 p-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; margin: 20px; box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);">
+                <div class="table-header-info">
+                    <h5 class="mb-1" style="color: white; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                        <i class="fas fa-boxes me-2"></i>جرد المنتجات المتبقية
+                    </h5>
+                    <p class="mb-0" style="color: rgba(255,255,255,0.9); font-size: 14px;">
+                        عرض كمية المنتجات المتبقية في المخزون مع تفاصيل الصناديق والقطع
+                    </p>
+                </div>
+                <div class="d-flex">
+                    <button class="btn btn-lg me-5" onclick="downloadProductsInventoryAsPDF()" style="min-width: 140px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; color: white; font-weight: 600; padding: 12px 24px; border-radius: 10px; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4); transition: all 0.3s ease; text-shadow: 0 1px 2px rgba(0,0,0,0.2); margin-right: 3rem;">
+                        <i class="fas fa-download me-2" style="font-size: 16px;"></i> تحميل PDF
+                    </button>
+                    <button class="btn btn-lg" onclick="printProductsInventory()" style="min-width: 140px; background: linear-gradient(135deg, #6c757d 0%, #495057 100%); border: none; color: white; font-weight: 600; padding: 12px 24px; border-radius: 10px; box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4); transition: all 0.3s ease; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
+                        <i class="fas fa-print me-2" style="font-size: 16px;"></i> طباعة
+                    </button>
+                </div>
+            </div>
             <div class="table-responsive">
                 <table class="table products-table" id="products-remain-table">
                     <thead>
                         <tr>
                             <th>صورة المنتج</th>
                             <th>اسم المنتج</th>
+                            <th>عدد القطع في الصندوق</th>
                             <th>المتبقي بالصناديق</th>
                             <th>المتبقي بالقطع</th>
-                            <th>إجمالي المتبقي</th>
+                            <th>إجمالي المتبقي بالقطع</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if (ViewBag.ProductsRemain != null)
+                        @if (Model.ProductsRemain != null && Model.ProductsRemain.Any())
                         {
-                            foreach (dynamic item in ViewBag.ProductsRemain)
+                            foreach (var item in Model.ProductsRemain)
                             {
                                 <tr>
-                                    <td><img src="@item.productImage" class="product-image" alt="صورة المنتج" /></td>
-                                    <td>@item.productName</td>
-                                    <td>@item.remainBox</td>
-                                    <td>@item.remainPlus</td>
-                                    <td>@item.totalRemain</td>
+                                    <td><img src="@item.ProductImage" class="product-image" alt="صورة المنتج" /></td>
+                                    <td>@item.ProductName</td>
+                                    <td>@item.ItemsPerBox</td>
+                                    <td>@item.RemainBox</td>
+                                    <td>@item.RemainPlus</td>
+                                    <td>@item.TotalRemain</td>
                                 </tr>
                             }
                         }
                         else
                         {
-                            <tr><td colspan="5">لا توجد بيانات</td></tr>
+                            <tr><td colspan="6">لا توجد بيانات</td></tr>
                         }
                     </tbody>
                 </table>

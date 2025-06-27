@@ -1,4 +1,6 @@
-﻿namespace Kafo.DAL.Repository
+﻿using KAFO.DAL.Repository.IRepository;
+
+namespace Kafo.DAL.Repository
 {
     public interface IUnitOfWork
     {
@@ -8,6 +10,7 @@
         IInvoiceItemRepository InvoiceItems { get; }
         IInvoiceRepository Invoices { get; }
         IUserRepository Users { get; }
+        ICreditTerminateInvoice CreditTerminateInvoice { get; }
 
         void Save();
     }

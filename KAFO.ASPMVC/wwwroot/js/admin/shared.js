@@ -24,6 +24,16 @@ function loadAdminContent(action, pageNumber) {
             if (action === 'Invoices' && typeof initializeInvoiceFunctionality === 'function') {
                 initializeInvoiceFunctionality();
             }
+            
+            // Initialize daily inventory functionality if we're on the daily inventory page
+            if (action === 'DailyInventory' && typeof initializeDailyInventory === 'function') {
+                // Reset and re-initialize to prevent duplicate pagination
+                if (typeof resetDailyInventory === 'function') {
+                    resetDailyInventory();
+                } else {
+                    initializeDailyInventory();
+                }
+            }
         },
         error: function (error) {
             $('#mainContent').html('<div class="alert alert-danger">Error loading content</div>');
