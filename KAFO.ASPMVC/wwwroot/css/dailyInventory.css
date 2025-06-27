@@ -1,0 +1,135 @@
+#daily-inventory-section .products-table-header {
+    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+    color: white;
+    border: none;
+    padding: 1.5rem;
+}
+#daily-inventory-section .products-table {
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 1.05rem;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+#daily-inventory-section .products-table thead th {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: none;
+    padding: 1rem 0.75rem;
+    font-weight: 700;
+    color: #495057;
+    text-align: center;
+    position: relative;
+    font-size: 1.1em;
+}
+#daily-inventory-section .products-table tbody td {
+    padding: 1rem 0.75rem;
+    vertical-align: middle;
+    border: none;
+    text-align: center;
+    background: #fcfcfc;
+}
+#daily-inventory-section .products-table tbody tr {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f1f3f4;
+}
+#daily-inventory-section .products-table tbody tr:hover {
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+    transform: scale(1.01);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+#daily-inventory-section .table-container {
+    background: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    margin: 1rem 0;
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.04);
+}
+#daily-inventory-section .product-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+#daily-inventory-section .product-image:hover {
+    transform: scale(1.1);
+    border-color: #74b9ff;
+}
+.daily-inventory-scrollable {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+#daily-inventory-section .btn {
+    font-weight: 600;
+    border-radius: 0.5rem;
+    padding: 0.6rem 1.5rem;
+    font-size: 1.05rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.07);
+    transition: all 0.2s;
+}
+#daily-inventory-section .btn-primary {
+    background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
+    border: none;
+    color: #fff;
+}
+#daily-inventory-section .btn-primary:hover, #daily-inventory-section .btn-primary.active {
+    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+    color: #fff;
+    transform: translateY(-2px) scale(1.03);
+}
+#daily-inventory-section .btn-info {
+    background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+    border: none;
+    color: #fff;
+}
+#daily-inventory-section .btn-info:hover, #daily-inventory-section .btn-info.active {
+    background: linear-gradient(135deg, #00cec9 0%, #00b894 100%);
+    color: #fff;
+    transform: translateY(-2px) scale(1.03);
+}
+#daily-inventory-section .pagination-container {
+    background: #fff;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-top: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#daily-inventory-section .pagination {
+    margin: 0;
+    gap: 0.25rem;
+    display: flex;
+    list-style: none;
+    padding: 0;
+}
+#daily-inventory-section .page-item .page-link {
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.2rem;
+    color: #495057;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    margin: 0 0.125rem;
+    font-size: 1.05rem;
+}
+#daily-inventory-section .page-item .page-link:hover {
+    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+#daily-inventory-section .page-item.active .page-link {
+    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+#daily-inventory-section .page-item.disabled .page-link {
+    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    color: #6c757d;
+    cursor: not-allowed;
+} 

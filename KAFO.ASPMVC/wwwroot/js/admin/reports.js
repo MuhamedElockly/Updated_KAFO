@@ -125,9 +125,12 @@ function generateReport() {
         let reportDataHtml = `
             <div class="report-content">
                 <div class="report-header mb-4">
-                    <h4 class="text-center mb-3">${document.getElementById('report-title').innerText}</h4>
-                    <p class="text-center text-muted">التقرير من <strong>${startDate}</strong> إلى <strong>${endDate}</strong></p>
-                </div>`;
+                    <h4 class="text-center mb-3">${document.getElementById('report-title').innerText}</h4>`;
+        // Only show date range for date-based reports
+        if (currentReportType !== 'stock_money' && currentReportType !== 'expected_profits') {
+            reportDataHtml += `<p class="text-center text-muted">التقرير من <strong>${startDate}</strong> إلى <strong>${endDate}</strong></p>`;
+        }
+        reportDataHtml += `</div>`;
 
         reportResultsDiv.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';
 

@@ -1,0 +1,104 @@
+@* Daily Inventory Section *@
+<link rel="stylesheet" href="~/css/dailyInventory.css" asp-append-version="true" />
+<div class="card products-table-card" id="daily-inventory-section">
+    <div class="card-header products-table-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4><i class="fas fa-clipboard-list me-2"></i> الجرد اليومي</h4>
+            <div>
+                <button class="btn btn-primary me-2" id="btnShowSellersInventory">جرد البائعين اليومي</button>
+                <button class="btn btn-info" id="btnShowProductsRemain">جرد المنتجات المتبقية</button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0 daily-inventory-scrollable">
+        <div id="sellers-inventory-table-container" class="table-container">
+            <div class="table-responsive">
+                <table class="table products-table" id="sellers-inventory-table">
+                    <thead>
+                        <tr>
+                            <th>اسم البائع</th>
+                            <th>رقم الهاتف</th>
+                            <th>إجمالي الدفع النقدي</th>
+                            <th>إجمالي الدفع الآجل</th>
+                            <th>إجمالي المرتجعات الآجلة</th>
+                            <th>إجمالي التوريد</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.SellersInventory != null)
+                        {
+                            foreach (dynamic item in ViewBag.SellersInventory)
+                            {
+                                <tr>
+                                    <td>@item.sellerName</td>
+                                    <td>@item.phone</td>
+                                    <td>@item.totalCashPayment</td>
+                                    <td>@item.totalCreditPayment</td>
+                                    <td>@item.totalRefundCredit</td>
+                                    <td>@item.totalSupplyMoney</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="6">لا توجد بيانات</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination-container">
+                <ul class="pagination">
+                    <li class="page-item disabled"><span class="page-link">السابق</span></li>
+                    <li class="page-item active"><span class="page-link">1</span></li>
+                    <li class="page-item"><span class="page-link">2</span></li>
+                    <li class="page-item"><span class="page-link">3</span></li>
+                    <li class="page-item"><span class="page-link">التالي</span></li>
+                </ul>
+            </div>
+        </div>
+        <div id="products-remain-table-container" class="table-container" style="display:none;">
+            <div class="table-responsive">
+                <table class="table products-table" id="products-remain-table">
+                    <thead>
+                        <tr>
+                            <th>صورة المنتج</th>
+                            <th>اسم المنتج</th>
+                            <th>المتبقي بالصناديق</th>
+                            <th>المتبقي بالقطع</th>
+                            <th>إجمالي المتبقي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.ProductsRemain != null)
+                        {
+                            foreach (dynamic item in ViewBag.ProductsRemain)
+                            {
+                                <tr>
+                                    <td><img src="@item.productImage" class="product-image" alt="صورة المنتج" /></td>
+                                    <td>@item.productName</td>
+                                    <td>@item.remainBox</td>
+                                    <td>@item.remainPlus</td>
+                                    <td>@item.totalRemain</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="5">لا توجد بيانات</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination-container">
+                <ul class="pagination">
+                    <li class="page-item disabled"><span class="page-link">السابق</span></li>
+                    <li class="page-item active"><span class="page-link">1</span></li>
+                    <li class="page-item"><span class="page-link">2</span></li>
+                    <li class="page-item"><span class="page-link">3</span></li>
+                    <li class="page-item"><span class="page-link">التالي</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/admin/dailyInventory.js" asp-append-version="true"></script> 

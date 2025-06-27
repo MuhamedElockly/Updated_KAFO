@@ -264,5 +264,50 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 
             return PartialView("_InvoicesManagement", invoicesTableVM);
         }
+
+        public IActionResult DailyInventory()
+        {
+            // Temporary test data for sellers inventory
+            var sellersInventory = new[]
+            {
+                new { sellerName = "أحمد علي", phone = "01012345678", totalCashPayment = 1500, totalCreditPayment = 2000, totalRefundCredit = 300, totalSupplyMoney = 3200 },
+                new { sellerName = "محمد حسن", phone = "01087654321", totalCashPayment = 1200, totalCreditPayment = 1800, totalRefundCredit = 200, totalSupplyMoney = 2800 },
+                new { sellerName = "سالم محمود", phone = "01011112222", totalCashPayment = 1100, totalCreditPayment = 1700, totalRefundCredit = 100, totalSupplyMoney = 2500 },
+                new { sellerName = "خالد يوسف", phone = "01033334444", totalCashPayment = 1300, totalCreditPayment = 1600, totalRefundCredit = 150, totalSupplyMoney = 2600 },
+                new { sellerName = "محمود سعيد", phone = "01055556666", totalCashPayment = 1400, totalCreditPayment = 2100, totalRefundCredit = 250, totalSupplyMoney = 3200 },
+                new { sellerName = "علي إبراهيم", phone = "01077778888", totalCashPayment = 1250, totalCreditPayment = 1950, totalRefundCredit = 180, totalSupplyMoney = 3100 },
+                new { sellerName = "حسن فؤاد", phone = "01099990000", totalCashPayment = 1350, totalCreditPayment = 1850, totalRefundCredit = 220, totalSupplyMoney = 3200 },
+                new { sellerName = "طارق عبد الله", phone = "01112345678", totalCashPayment = 1500, totalCreditPayment = 2000, totalRefundCredit = 300, totalSupplyMoney = 3200 },
+                new { sellerName = "سعيد أحمد", phone = "01187654321", totalCashPayment = 1200, totalCreditPayment = 1800, totalRefundCredit = 200, totalSupplyMoney = 2800 },
+                new { sellerName = "يوسف سالم", phone = "01111112222", totalCashPayment = 1100, totalCreditPayment = 1700, totalRefundCredit = 100, totalSupplyMoney = 2500 },
+                new { sellerName = "إبراهيم خالد", phone = "01133334444", totalCashPayment = 1300, totalCreditPayment = 1600, totalRefundCredit = 150, totalSupplyMoney = 2600 },
+                new { sellerName = "سعيد محمود", phone = "01155556666", totalCashPayment = 1400, totalCreditPayment = 2100, totalRefundCredit = 250, totalSupplyMoney = 3200 },
+                new { sellerName = "فؤاد علي", phone = "01177778888", totalCashPayment = 1250, totalCreditPayment = 1950, totalRefundCredit = 180, totalSupplyMoney = 3100 },
+                new { sellerName = "عبد الله حسن", phone = "01199990000", totalCashPayment = 1350, totalCreditPayment = 1850, totalRefundCredit = 220, totalSupplyMoney = 3200 },
+                new { sellerName = "مروان طارق", phone = "01212345678", totalCashPayment = 1500, totalCreditPayment = 2000, totalRefundCredit = 300, totalSupplyMoney = 3200 }
+            };
+            // Temporary test data for products remain
+            var productsRemain = new[]
+            {
+                new { productImage = "/images/Upload/products/sample1.jpg", productName = "منتج 1", remainBox = 10, remainPlus = 5, totalRemain = 105 },
+                new { productImage = "/images/Upload/products/sample2.jpg", productName = "منتج 2", remainBox = 7, remainPlus = 2, totalRemain = 72 },
+                new { productImage = "/images/Upload/products/sample3.jpg", productName = "منتج 3", remainBox = 12, remainPlus = 6, totalRemain = 126 },
+                new { productImage = "/images/Upload/products/sample4.jpg", productName = "منتج 4", remainBox = 8, remainPlus = 3, totalRemain = 83 },
+                new { productImage = "/images/Upload/products/sample5.jpg", productName = "منتج 5", remainBox = 15, remainPlus = 7, totalRemain = 157 },
+                new { productImage = "/images/Upload/products/sample6.jpg", productName = "منتج 6", remainBox = 9, remainPlus = 4, totalRemain = 94 },
+                new { productImage = "/images/Upload/products/sample7.jpg", productName = "منتج 7", remainBox = 11, remainPlus = 5, totalRemain = 115 },
+                new { productImage = "/images/Upload/products/sample8.jpg", productName = "منتج 8", remainBox = 13, remainPlus = 6, totalRemain = 136 },
+                new { productImage = "/images/Upload/products/sample9.jpg", productName = "منتج 9", remainBox = 6, remainPlus = 2, totalRemain = 62 },
+                new { productImage = "/images/Upload/products/sample10.jpg", productName = "منتج 10", remainBox = 14, remainPlus = 7, totalRemain = 147 },
+                new { productImage = "/images/Upload/products/sample11.jpg", productName = "منتج 11", remainBox = 10, remainPlus = 5, totalRemain = 105 },
+                new { productImage = "/images/Upload/products/sample12.jpg", productName = "منتج 12", remainBox = 7, remainPlus = 2, totalRemain = 72 },
+                new { productImage = "/images/Upload/products/sample13.jpg", productName = "منتج 13", remainBox = 12, remainPlus = 6, totalRemain = 126 },
+                new { productImage = "/images/Upload/products/sample14.jpg", productName = "منتج 14", remainBox = 8, remainPlus = 3, totalRemain = 83 },
+                new { productImage = "/images/Upload/products/sample15.jpg", productName = "منتج 15", remainBox = 15, remainPlus = 7, totalRemain = 157 }
+            };
+            ViewBag.SellersInventory = sellersInventory;
+            ViewBag.ProductsRemain = productsRemain;
+            return PartialView("_DailyInventory");
+        }
     }
 }
