@@ -72,6 +72,12 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 			var model = new HomeViewModel(); // Replace with your actual model
 			return PartialView("_ReportsManagement", model);
 		}
+
+		public IActionResult Profile()
+		{
+			return RedirectToAction("Index", "Profile", new { area = "Admin" });
+		}
+
 		public IActionResult Users(int? page)
 		{
 			if (page == null)
