@@ -30,6 +30,7 @@ namespace KAFO.ASPMVC
             builder.Services.AddScoped<UserManager>();
             builder.Services.AddScoped<InvoicesManager>();
             builder.Services.AddScoped<InventoryManager>();
+            builder.Services.AddScoped<CreditCustomerManager>();
 
             // Identity
             builder.Services.AddAuthentication(options =>

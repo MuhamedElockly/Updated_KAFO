@@ -313,3 +313,95 @@ function showDeleteConfirmation(options) {
         }
     });
 }
+
+function showAddCreditCustomerModal() {
+    $.get('/Admin/CreditCustomerManagement/Edit/0', function (data) {
+        $('#creditCustomerModal').html(data);
+        $('#creditCustomerModal').modal('show');
+    });
+}
+
+function editCreditCustomer(id) {
+    $.get('/Admin/CreditCustomerManagement/Edit/' + id, function (data) {
+        $('#creditCustomerModal').html(data);
+        $('#creditCustomerModal').modal('show');
+    });
+}
+
+function deleteCreditCustomer(id) {
+    Swal.fire({
+        title: 'هل أنت متأكد من الحذف؟',
+        text: 'لن تتمكن من استعادة هذا العميل مرة أخرى!',
+        icon: 'warning',
+        iconColor: '#dc3545',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'نعم، احذفه!',
+        cancelButtonText: 'إلغاء',
+        background: 'white',
+        showClass: { popup: 'animate__animated animate__fadeInDown' },
+        hideClass: { popup: 'animate__animated animate__fadeOutUp' },
+        customClass: {
+            confirmButton: 'btn btn-danger shadow-sm px-4 py-2',
+            cancelButton: 'btn btn-secondary shadow-sm px-4 py-2'
+        },
+        buttonsStyling: false
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'جاري الحذف...',
+                html: 'الرجاء الانتظار بينما نعالج طلبك',
+                timerProgressBar: true,
+                didOpen: () => { Swal.showLoading(); },
+                background: 'white',
+                allowOutsideClick: false
+            });
+            $.post('/Admin/CreditCustomerManagement/Delete', { id: id }, function (response) {
+                Swal.close();
+                if (response.success) {
+                    Swal.fire({
+                        title: 'تم الحذف!',
+                        text: 'تم الحذف بنجاح.',
+                        icon: 'success',
+                        iconColor: '#28a745',
+                        confirmButtonColor: '#28a745',
+                        background: 'white',
+                        showClass: { popup: 'animate__animated animate__bounceIn' },
+                        customClass: { confirmButton: 'btn btn-success shadow-sm px-4 py-2' }
+                    }).then(() => {
+                        loadAdminContent('CreditCustomerManagement', 1);
+                    });
+                } else {
+                    Swal.fire('خطأ!', response.message, 'error');
+                }
+            }).fail(function () {
+                Swal.close();
+                Swal.fire('خطأ!', 'فشل الاتصال بالخادم', 'error');
+            });
+        }
+    });
+}
+
+function viewCreditCustomer(id) {
+    $.get('/Admin/CreditCustomerManagement/Details/' + id, function (data) {
+        Swal.fire({
+            title: `<span style='color:#6a11cb'><i class='fas fa-user-credit me-2'></i>بيانات العميل</span>`,
+            html: `
+                <div style='text-align:right;font-size:1.1rem;'>
+                    <div><strong>الاسم:</strong> <span style='color:#2575fc'>${data.name}</span></div>
+                    <div><strong>الرصيد:</strong> <span style='color:#43cea2'>${data.balance}</span></div>
+                    <div><strong>الآجل:</strong> <span style='color:#185a9d'>${data.credit}</span></div>
+                </div>
+            `,
+            icon: 'info',
+            showConfirmButton: true,
+            confirmButtonText: 'إغلاق',
+            confirmButtonColor: '#6a11cb',
+            background: 'white',
+            customClass: {
+                confirmButton: 'btn add-credit-customer-btn px-4 py-2'
+            }
+        });
+    });
+}

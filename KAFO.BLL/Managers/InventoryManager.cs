@@ -48,7 +48,7 @@ namespace KAFO.BLL.Managers
                     .Where(t => t.User.PhoneNumber == group.Key.PhoneNumber)
                     .Sum(t => t.TotalInvoice);
 
-                var totalSupply = totalCash + totalTerminate - totalCredit;
+                var totalSupply = totalCash + totalTerminate ;
 
                 return new SellerInventoryVM
                 {

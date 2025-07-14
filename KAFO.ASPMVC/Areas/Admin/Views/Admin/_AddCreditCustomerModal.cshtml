@@ -1,0 +1,32 @@
+@model KAFO.ASPMVC.Areas.Admin.ViewModels.CreditCustomerVM
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <form id="creditCustomerForm" asp-action="UpSert" asp-controller="CreditCustomerManagement" method="post">
+            <div class="modal-header">
+                <h5 class="modal-title">إضافة/تعديل عميل آجل</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" asp-for="Id" />
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Phone" class="form-label"></label>
+                    <input asp-for="Phone" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                </div>
+               
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success">حفظ</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+            </div>
+        </form>
+    </div>
+</div> 

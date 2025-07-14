@@ -21,8 +21,9 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 		private readonly ProductManager _productManager;
 		private readonly UserManager _userManager;
 		private readonly IUnitOfWork _unitOfWork;
+		private readonly CreditCustomerManager _creditCustomerManager;
 		const int pageSize = 5;
-		public AdminController(CategoryManager categoryManager, ReportManager invoiceManager, InventoryManager inventoryManager, ProductManager productManager, UserManager userManager, IUnitOfWork unitOfWork)
+		public AdminController(CategoryManager categoryManager, ReportManager invoiceManager, InventoryManager inventoryManager, ProductManager productManager, UserManager userManager, IUnitOfWork unitOfWork, CreditCustomerManager creditCustomerManager)
 		{
 			_categoryManager = categoryManager;
 			_reportManager = invoiceManager;
@@ -30,6 +31,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 			_userManager = userManager;
 			_unitOfWork = unitOfWork;
 			_inventoryManager = inventoryManager;
+			_creditCustomerManager = creditCustomerManager;
 		}
 
 		public IActionResult Index(int sellerPage = 1, int categoryPage = 1, int productPage = 1, int adminPage = 1)
@@ -290,6 +292,33 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 			};
 
 			return PartialView("_DailyInventory", dailyInventoryVM);
+		}
+
+		public IActionResult CreditCustomerManagement(int? page)
+		{
+			int pageSize = 5;
+			int currentPage = page ?? 1;
+			// Use real data from the manager
+			var allCustomers = _creditCustomerManager.GetAll();
+			var pagedCustomers = allCustomers.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+
+			var vm = new KAFO.ASPMVC.Areas.Admin.ViewModels.CreditCustomersTableVM
+			{
+				CreditCustomers = pagedCustomers.Select(c => new KAFO.ASPMVC.Areas.Admin.ViewModels.CreditCustomerDisplayVM
+				{
+					Id = c.Id,
+					Name = c.CustomerName,
+					Phone = c.PhoneNumber ?? "", // Use real phone if available
+					Email = c.Email, // Use real email if available
+					Gender = c.Gender ?? "", // Use real gender if available
+					Balance = c.Balance,
+					Credit = c.TotalOwed
+				}).ToList(),
+				CurrentPage = currentPage,
+				TotalPages = (int)System.Math.Ceiling(allCustomers.Count / (double)pageSize)
+			};
+
+			return PartialView("_CreditCustomersManagement", vm);
 		}
 	}
 }

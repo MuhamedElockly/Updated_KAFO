@@ -12,8 +12,12 @@ namespace KAFO.Domain.Users
         public decimal TotalPaid { get; set; }
         [Display(Name = "اجمالي ما عليه")]
         public decimal TotalOwed { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Gender { get; set; }
+        public string? Email { get; set; }
         public decimal Balance => TotalPaid - TotalOwed;
         public virtual ICollection<Invoice> Invoices { get; set; } = [];
+        public virtual ICollection<CreditTerminateInvoice> Deposits { get; set; } = [];
         public bool IsDeleted { get; set; } = false;
 
         public CustomerAccount()

@@ -4,6 +4,7 @@ using Kafo.DAL.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KAFO.DAL.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250714185031_updateCrediteCustomerData")]
+    partial class updateCrediteCustomerData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -274,7 +277,7 @@ namespace KAFO.DAL.Migrations
             modelBuilder.Entity("KAFO.Domain.Invoices.CreditTerminateInvoice", b =>
                 {
                     b.HasOne("KAFO.Domain.Users.CustomerAccount", "CustomerAccount")
-                        .WithMany("Deposits")
+                        .WithMany()
                         .HasForeignKey("CustomerAccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -349,8 +352,6 @@ namespace KAFO.DAL.Migrations
 
             modelBuilder.Entity("KAFO.Domain.Users.CustomerAccount", b =>
                 {
-                    b.Navigation("Deposits");
-
                     b.Navigation("Invoices");
                 });
 #pragma warning restore 612, 618
