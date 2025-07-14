@@ -69,19 +69,19 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        $(function () {
-            var success = '@TempData["Success"]';
-            if (success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'تمت العملية بنجاح',
-                    text: success,
-                    confirmButtonColor: '#43cea2',
-                    background: 'white',
-                    customClass: { confirmButton: 'btn btn-success px-4 py-2' }
-                });
-            }
-        });
+        // $(function () {
+        //     var success = '@TempData["Success"]';
+        //     if (success) {
+        //         Swal.fire({
+        //             icon: 'success',
+        //             title: 'تمت العملية بنجاح',
+        //             text: success,
+        //             confirmButtonColor: '#43cea2',
+        //             background: 'white',
+        //             customClass: { confirmButton: 'btn btn-success px-4 py-2' }
+        //         });
+        //     }
+        // });
         // function editSeller(id) { alert('تعديل البائع رقم ' + id); }
         // function deleteSeller(id) { if (confirm('هل أنت متأكد من حذف هذا البائع؟')) { alert('حذف البائع رقم ' + id); } }
         // function editCategory(id) { window.location.href = '/Admin/CategoryManagement/Index'; }

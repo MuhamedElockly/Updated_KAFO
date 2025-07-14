@@ -4,6 +4,7 @@ namespace KAFO.ASPMVC.Areas.Admin.ViewModels
 {
     public class CreditCustomerAddVM
     {
+        public int Id { get; set; }
         [Required(ErrorMessage = "الاسم مطلوب")] 
         public string Name { get; set; }
 

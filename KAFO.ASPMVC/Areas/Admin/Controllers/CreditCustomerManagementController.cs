@@ -62,14 +62,32 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
         {
             try
             {
-                // Simulate add (no DB)
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
+                if (_creditCustomerManager.PhoneExists(model.Phone))
+                {
+                    TempData["Error"] = "رقم الهاتف مستخدم بالفعل لعميل آخر.";
+                    return View(model);
+                }
+                var customer = new CustomerAccount
+                {
+                    CustomerName = model.Name,
+                    PhoneNumber = model.Phone,
+                    Email = model.Email,
+                    Gender = model.Gender,
+                    TotalPaid = 0,
+                    TotalOwed = 0
+                };
+                _creditCustomerManager.Add(customer);
                 TempData["Success"] = "تم إضافة العميل بنجاح!";
                 return RedirectToAction("Index", "Admin", new { area = "Admin" });
             }
             catch (Exception ex)
             {
                 TempData["Error"] = "حدث خطأ غير متوقع: " + ex.Message;
-                return RedirectToAction("Index");
+                return View(model);
             }
         }
 
@@ -143,53 +161,60 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 
         }
 
-        [HttpPost]
-        public IActionResult UpSert(CreditCustomerVM model)
-        {
-            try
-            {
-                //if (!ModelState.IsValid)
-                //    return View("Index", model);
+        //[HttpPost]
+        //public IActionResult UpSert(CreditCustomerVM model)
+        //{
+        //    try
+        //    {
+        //        //if (!ModelState.IsValid)
+        //        //    return View("Index", model);
 
-                //if (model.Id == 0)
-                //{
-                //    var customer = new CustomerAccount
-                //    {
-                //        Name = model.Name,
-                //        Email = model.Email,
-                //        PhoneNumber = model.Phone,
-                //        Balance = model.Balance ?? 0,
-                //        Credit = model.Credit ?? 0
-                //    };
-                //    _creditCustomerManager.Add(customer);
-                //}
-                //else
-                //{
-                //    var customer = _creditCustomerManager.Get(model.Id);
-                //    if (customer == null) return NotFound();
-                //    customer.Name = model.Name;
-                //    customer.Email = model.Email;
-                //    customer.PhoneNumber = model.Phone;
-                //    customer.Balance = model.Balance ?? 0;
-                //    customer.Credit = model.Credit ?? 0;
-                //    _creditCustomerManager.Update(customer);
-                //}
-                return RedirectToAction("Index");
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "حدث خطأ غير متوقع: " + ex.Message;
-                return RedirectToAction("Index");
-            }
-        }
+        //        //if (model.Id == 0)
+        //        //{
+        //        //    var customer = new CustomerAccount
+        //        //    {
+        //        //        Name = model.Name,
+        //        //        Email = model.Email,
+        //        //        PhoneNumber = model.Phone,
+        //        //        Balance = model.Balance ?? 0,
+        //        //        Credit = model.Credit ?? 0
+        //        //    };
+        //        //    _creditCustomerManager.Add(customer);
+        //        //}
+        //        //else
+        //        //{
+        //        //    var customer = _creditCustomerManager.Get(model.Id);
+        //        //    if (customer == null) return NotFound();
+        //        //    customer.Name = model.Name;
+        //        //    customer.Email = model.Email;
+        //        //    customer.PhoneNumber = model.Phone;
+        //        //    customer.Balance = model.Balance ?? 0;
+        //        //    customer.Credit = model.Credit ?? 0;
+        //        //    _creditCustomerManager.Update(customer);
+        //        //}
+        //        return RedirectToAction("Index");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TempData["Error"] = "حدث خطأ غير متوقع: " + ex.Message;
+        //        return RedirectToAction("Index");
+        //    }
+        //}
 
         [HttpPost]
         public IActionResult Delete(int id)
         {
             try
             {
-                _creditCustomerManager.Delete(id);
-                return Json(new { success = true });
+                var result = _creditCustomerManager.Delete(id);
+                if (result == null)
+                {
+                    return Json(new { success = true });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result });
+                }
             }
             catch (Exception ex)
             {
@@ -197,20 +222,62 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
             }
         }
 
-        //public IActionResult Edit(int id)
-        //{
-        //    //var customer = _creditCustomerManager.Get(id);
-        //    //if (customer == null) return NotFound();
-        //    //var vm = new CreditCustomerVM
-        //    //{
-        //    //    Id = customer.Id,
-        //    //    Name = customer.Name,
-        //    //    Email = customer.Email,
-        //    //    Phone = customer.PhoneNumber,
-        //    //    Balance = customer.Balance,
-        //    //    Credit = customer.Credit
-        //    //};
-        //    return View("Index", vm);
-        //}
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var customer = _creditCustomerManager.Get(id);
+            if (customer == null)
+            {
+                TempData["Error"] = "العميل غير موجود";
+                return RedirectToAction("CreditCustomerManagement");
+            }
+            var vm = new CreditCustomerAddVM
+            {
+                Id = customer.Id,
+                Name = customer.CustomerName,
+                Phone = customer.PhoneNumber,
+                Email = customer.Email,
+                Gender = customer.Gender
+            };
+            ViewData["IsEdit"] = true;
+            return View("Create", vm);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(CreditCustomerAddVM model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return View("Create", model);
+
+                if (_creditCustomerManager.PhoneExists(model.Phone, model.Id))
+                {
+                    TempData["Error"] = "رقم الهاتف مستخدم بالفعل لعميل آخر.";
+                    ViewData["IsEdit"] = true;
+                    return View("Create", model);
+                }
+
+                var customer = _creditCustomerManager.Get(model.Id);
+                if (customer == null)
+                {
+                    TempData["Error"] = "العميل غير موجود";
+                    return View("Create", model);
+                }
+                customer.CustomerName = model.Name;
+                customer.PhoneNumber = model.Phone;
+                customer.Email = model.Email;
+                customer.Gender = model.Gender;
+                _creditCustomerManager.Update(customer);
+
+                TempData["Success"] = "تم تعديل العميل بنجاح!";
+                return RedirectToAction("Index", "Admin", new { area = "Admin" });
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "حدث خطأ غير متوقع: " + ex.Message;
+                return View("Create", model);
+            }
+        }
     }
 } 

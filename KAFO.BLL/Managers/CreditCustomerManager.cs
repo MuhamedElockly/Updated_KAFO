@@ -37,14 +37,36 @@ namespace KAFO.BLL.Managers
             _unitOfWork.Save();
         }
 
-        public void Delete(int id)
+        public string Delete(int id)
         {
             var customer = Get(id);
             if (customer != null)
             {
+              
+                if (customer.TotalOwed != 0)
+                {
+                    return "لا يمكن حذف العميل لأن لديه رصيد غير مسدد.";
+                }
+                if (customer.Balance!=0)
+                {
+                    return "لا يمكن حذف العميل لأن لديه أموال في الحساب.";
+                }
                 _unitOfWork.CustomerAccounts.Remove(customer);
                 _unitOfWork.Save();
+                return null;
             }
+            return "العميل غير موجود.";
+        }
+
+        public bool PhoneExists(string phone, int? excludeId = null)
+        {
+            if (excludeId.HasValue)
+            {
+                return _unitOfWork.CustomerAccounts.GetAll()
+                    .Any(c => c.PhoneNumber == phone && c.Id != excludeId.Value);
+            }
+            return _unitOfWork.CustomerAccounts.GetAll()
+                .Any(c => c.PhoneNumber == phone);
         }
 
         //public CreditCustomerAccountVM GetAccountVM(int customerId)
