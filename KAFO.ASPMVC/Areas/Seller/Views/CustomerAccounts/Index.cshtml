@@ -1,53 +1,507 @@
 ﻿@model IEnumerable<KAFO.Domain.Users.CustomerAccount>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "عملاء الآجل";
 }
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.CustomerName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TotalPaid)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TotalOwed)
-            </th>
-            <th>
-                المستحق
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustomerName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TotalPaid)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TotalOwed)
-            </td>
-            <td>
-                    @(item.TotalPaid - item.TotalOwed > 0 ? $"له {item.TotalPaid - item.TotalOwed}" : $"عليه {item.TotalOwed - item.TotalPaid}")
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+@section Styles {
+    <link rel="stylesheet" href="~/css/customer-accounts.css" asp-append-version="true" />
 }
-    </tbody>
-</table>
+
+<div class="customer-accounts-bg">
+    <div class="container-fluid py-4">
+        <!-- Header Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="glass-card">
+                    <div class="customer-accounts-header">
+                        <i class="fas fa-users fa-2x"></i>
+                        <div>
+                            <h4 class="mb-1">إدارة عملاء الآجل</h4>
+                            <p class="mb-0 opacity-75">عرض وإدارة حسابات العملاء على الآجل</p>
+                        </div>
+                        <div class="ms-auto">
+                            <a asp-action="Create" class="add-customer-btn">
+                                <i class="fas fa-plus me-2"></i>
+                                إضافة عميل جديد
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card">
+                    <div class="stats-badge bg-primary text-white">
+                        <i class="fas fa-users me-2"></i>
+                        إجمالي العملاء
+                    </div>
+                    <h3 class="stats-value text-primary">@Model.Count()</h3>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card">
+                    <div class="stats-badge bg-success text-white">
+                        <i class="fas fa-money-bill-wave me-2"></i>
+                        إجمالي المدفوع
+                    </div>
+                    <h3 class="stats-value text-success">@Model.Sum(c => c.TotalPaid).ToString("C")</h3>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card">
+                    <div class="stats-badge bg-warning text-white">
+                        <i class="fas fa-credit-card me-2"></i>
+                        إجمالي المستحق
+                    </div>
+                    <h3 class="stats-value text-warning">@Model.Sum(c => c.TotalOwed).ToString("C")</h3>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card">
+                    <div class="stats-badge bg-info text-white">
+                        <i class="fas fa-balance-scale me-2"></i>
+                        الرصيد الإجمالي
+                    </div>
+                    <h3 class="stats-value text-info">@Model.Sum(c => c.Balance).ToString("C")</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customers Table -->
+        <div class="row">
+            <div class="col-12">
+                <div class="glass-card">
+                    <div class="table-container">
+                        <div class="table-responsive">
+                            <table class="table customer-accounts-table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">
+                                            <i class="fas fa-hashtag me-2"></i>
+                                            رقم العميل
+                                        </th>
+                                        <th class="text-center">
+                                            <i class="fas fa-user me-2"></i>
+                                            اسم العميل
+                                        </th>
+                                        <th class="text-center">
+                                            <i class="fas fa-phone me-2"></i>
+                                            رقم الهاتف
+                                        </th>
+                                        <th class="text-center">
+                                            <i class="fas fa-money-bill-wave me-2"></i>
+                                            إجمالي المدفوع
+                                        </th>
+                                        <th class="text-center">
+                                            <i class="fas fa-credit-card me-2"></i>
+                                            إجمالي المستحق
+                                        </th>
+                                        <th class="text-center">
+                                            <i class="fas fa-balance-scale me-2"></i>
+                                            الرصيد
+                                        </th>
+                                        <th class="text-center">
+                                            <i class="fas fa-money-bill-wave me-2"></i>
+                                            تصفية الحساب
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td class="text-center">
+                                                <span class="customer-id">@item.Id</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="customer-name">@item.CustomerName</span>
+                                            </td>
+                                            <td class="text-center">
+                                                @if (!string.IsNullOrEmpty(item.PhoneNumber))
+                                                {
+                                                    <span class="badge badge-phone">
+                                                        <i class="fas fa-phone me-1"></i>
+                                                        @item.PhoneNumber
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">غير محدد</span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge badge-amount positive">
+                                                    <i class="fas fa-plus me-1"></i>
+                                                    @item.TotalPaid.ToString("C")
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge badge-amount negative">
+                                                    <i class="fas fa-minus me-1"></i>
+                                                    @item.TotalOwed.ToString("C")
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                @{
+                                                    var balance = item.Balance;
+                                                    var balanceClass = balance >= 0 ? "positive" : "negative";
+                                                    var balanceIcon = balance >= 0 ? "fa-plus" : "fa-minus";
+                                                }
+                                                <span class="badge badge-amount @balanceClass">
+                                                    <i class="fas @balanceIcon me-1"></i>
+                                                    @balance.ToString("C")
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" 
+                                                        class="btn btn-settle-account" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#settleAccountModal" 
+                                                        data-customer-id="@item.Id"
+                                                        data-customer-name="@item.CustomerName"
+                                                        data-customer-balance="@item.Balance"
+                                                        title="تصفية الحساب">
+                                                    <i class="fas fa-money-bill-wave me-2"></i>
+                                                    تصفية الحساب
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    @if (!Model.Any())
+                    {
+                        <div class="empty-state">
+                            <i class="fas fa-users"></i>
+                            <h4>لا يوجد عملاء حالياً</h4>
+                            <p>ابدأ بإضافة عميل جديد للبدء في إدارة حسابات العملاء</p>
+                            <a asp-action="Create" class="add-customer-btn">
+                                <i class="fas fa-plus me-2"></i>
+                                إضافة عميل جديد
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Settlement Account Modal -->
+<div class="modal fade" id="settleAccountModal" tabindex="-1" aria-labelledby="settleAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-primary text-white">
+                <h5 class="modal-title" id="settleAccountModalLabel">
+                    <i class="fas fa-money-bill-wave me-2"></i>
+                    تصفية حساب العميل
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="settleAccountForm" asp-action="SettleAccount" method="post">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <div class="customer-info-card">
+                                <div class="customer-info-header">
+                                    <i class="fas fa-user-circle fa-2x text-primary"></i>
+                                    <div class="customer-details">
+                                        <h6 class="customer-name mb-1" id="modalCustomerName"></h6>
+                                        <span class="customer-balance" id="modalCustomerBalance"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="settlementAmount" class="form-label fw-bold">
+                                <i class="fas fa-coins me-2"></i>
+                                مبلغ التصفية
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-money-bill-wave text-success"></i>
+                                </span>
+                                <input type="number" 
+                                       class="form-control form-control-lg" 
+                                       id="settlementAmount" 
+                                       name="amount" 
+                                       step="0.01" 
+                                       min="0.01" 
+                                       required 
+                                       placeholder="أدخل المبلغ">
+                                <span class="input-group-text bg-light">ج.م</span>
+                            </div>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                أدخل المبلغ المراد إضافته لحساب العميل
+                            </div>
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label for="settlementNotes" class="form-label fw-bold">
+                                <i class="fas fa-sticky-note me-2"></i>
+                                ملاحظات (اختياري)
+                            </label>
+                            <textarea class="form-control" 
+                                      id="settlementNotes" 
+                                      name="notes" 
+                                      rows="3" 
+                                      placeholder="أضف ملاحظات حول عملية التصفية..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>
+                        إلغاء
+                    </button>
+                    <button type="submit" class="btn btn-settle-submit">
+                        <i class="fas fa-check me-2"></i>
+                        تأكيد التصفية
+                    </button>
+                </div>
+                <input type="hidden" id="customerId" name="customerId" />
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Add smooth animations and interactions
+        $(document).ready(function() {
+            // Animate statistics cards on load
+            $('.glass-card').each(function(index) {
+                $(this).css('animation-delay', (index * 0.1) + 's');
+            });
+
+            // Add hover effects to settlement buttons
+            $('.btn-settle-account').hover(
+                function() {
+                    $(this).addClass('shadow-sm');
+                },
+                function() {
+                    $(this).removeClass('shadow-sm');
+                }
+            );
+
+            // Add tooltip functionality
+            $('[title]').tooltip({
+                placement: 'top',
+                trigger: 'hover'
+            });
+
+            // Settlement modal functionality
+            $('#settleAccountModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var customerId = button.data('customer-id');
+                var customerName = button.data('customer-name');
+                var customerBalance = button.data('customer-balance');
+                
+                var modal = $(this);
+                modal.find('#modalCustomerName').text(customerName);
+                modal.find('#modalCustomerBalance').text('الرصيد الحالي: ' + customerBalance.toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }));
+                modal.find('#customerId').val(customerId);
+                modal.find('#settlementAmount').val('');
+                modal.find('#settlementNotes').val('');
+            });
+
+            // Form submission with loading state
+            $('#settleAccountForm').on('submit', function(e) {
+                var submitBtn = $(this).find('.btn-settle-submit');
+                var originalText = submitBtn.html();
+                
+                submitBtn.html('<i class="fas fa-spinner fa-spin me-2"></i>جاري التصفية...');
+                submitBtn.prop('disabled', true);
+                
+                // Re-enable after 3 seconds if no response
+                setTimeout(function() {
+                    submitBtn.html(originalText);
+                    submitBtn.prop('disabled', false);
+                }, 3000);
+            });
+
+            // Add loading animation for links
+            $('a').click(function() {
+                if (!$(this).hasClass('btn')) {
+                    $('body').append('<div class="loading-overlay"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">جاري التحميل...</span></div></div>');
+                }
+            });
+        });
+
+        // Handle window resize for responsive design
+        $(window).resize(function() {
+            if ($(window).width() < 768) {
+                $('.customer-accounts-table').addClass('table-sm');
+            } else {
+                $('.customer-accounts-table').removeClass('table-sm');
+            }
+        });
+    </script>
+}
+
+<style>
+    /* Additional responsive styles */
+    @@media (max-width: 767.98px) {
+        .customer-accounts-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+        
+        .customer-accounts-header .ms-auto {
+            margin: 0 !important;
+        }
+        
+        .btn-settle-account {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+        
+        .customer-accounts-table th,
+        .customer-accounts-table td {
+            font-size: 0.875rem;
+            padding: 0.5rem 0.25rem;
+        }
+        
+        .stats-badge {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+        }
+        
+        .stats-value {
+            font-size: 1.5rem;
+        }
+    }
+
+    /* Loading overlay */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    /* Settlement button styles */
+    .btn-settle-account {
+        background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+        border: none;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(67, 206, 162, 0.3);
+        font-size: 0.9rem;
+    }
+
+    .btn-settle-account:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(67, 206, 162, 0.4);
+        background: linear-gradient(135deg, #185a9d 0%, #43cea2 100%);
+        color: white;
+    }
+
+    .btn-settle-account:focus {
+        box-shadow: 0 0 0 0.25rem rgba(67, 206, 162, 0.25);
+    }
+
+    /* Modal styles */
+    .modal-content {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header.bg-gradient-primary {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        border-radius: 1rem 1rem 0 0;
+        border: none;
+    }
+
+    .customer-info-card {
+        background: linear-gradient(135deg, #f8fafc 0%, #e0eafc 100%);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        border: 1px solid #e0eafc;
+    }
+
+    .customer-info-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .customer-details {
+        flex: 1;
+    }
+
+    .customer-name {
+        color: #1e293b;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .customer-balance {
+        color: #64748b;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .btn-settle-submit {
+        background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .btn-settle-submit:hover {
+        background: linear-gradient(135deg, #185a9d 0%, #43cea2 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(67, 206, 162, 0.3);
+        color: white;
+    }
+
+    .form-control-lg {
+        font-size: 1.1rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .input-group-text {
+        border: none;
+        font-weight: 600;
+    }
+
+    /* Currency formatting */
+    .egp-currency::before {
+        content: "ج.م ";
+    }
+
+    /* Enhanced table responsiveness */
+    .table-responsive {
+        border-radius: 0.75rem;
+        overflow: hidden;
+    }
+
+    /* Smooth transitions for all interactive elements */
+    * {
+        transition: all 0.2s ease;
+    }
+</style>
