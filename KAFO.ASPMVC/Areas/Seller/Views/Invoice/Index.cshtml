@@ -33,32 +33,31 @@
                                 @foreach (var invoice in Model)
                                 {
                                     <tr>
-                                        <td>@invoice.Id</td>
-                                        <td>
-                                            <span class="badge
-                                                @(invoice.Type == InvoiceType.Cash ? "bg-success" :
-                                                  invoice.Type == InvoiceType.Credit ? "bg-info" :
-                                                  invoice.Type == InvoiceType.Purchasing ? "bg-warning" :
-                                                  "bg-secondary")">
+                                        <td data-label="#">@invoice.Id</td>
+                                        <td data-label="نوع الفاتورة">
+                                            <span class="badge invoice-type-badge
+                                                @(invoice.Type == InvoiceType.Cash ? "bg-success-gradient" :
+                                                  invoice.Type == InvoiceType.Credit ? "bg-info-gradient" :
+                                                  invoice.Type == InvoiceType.Purchasing ? "bg-warning-gradient" :
+                                                  "bg-secondary-gradient")">
                                                 @invoice.Type.GetDisplayName()
                                             </span>
                                         </td>
-                                        <td>@invoice.CreatedAt.ToString("dd/MM/yyyy hh:mm tt")</td>
-                                        <td>@(invoice.CustomerAccount?.CustomerName ?? "نقدي")</td>
-                                        <td>@invoice.TotalInvoice.ToString("N2") ج.م</td>
-                                        <td>@invoice.Items.Count</td>
-                                        <td>
-                                            <div class="btn-group btn-group-sm">
-                                                <a asp-action="Details" asp-route-id="@invoice.Id" class="btn btn-outline-primary">
+                                        <td data-label="التاريخ">@invoice.CreatedAt.ToString("dd/MM/yyyy hh:mm tt")</td>
+                                        <td data-label="العميل">@(invoice.CustomerAccount?.CustomerName ?? "نقدي")</td>
+                                        <td data-label="المبلغ الإجمالي">@invoice.TotalInvoice.ToString("N2") ج.م</td>
+                                        <td data-label="المنتجات">@invoice.Items.Count</td>
+                                        <td data-label="الإجراءات">
+                                            <div class="btn-group btn-group-sm invoice-action-group d-flex flex-wrap gap-1 justify-content-center">
+                                                <a asp-action="Details" asp-route-id="@invoice.Id" class="btn action-btn btn-outline-primary" title="عرض التفاصيل">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                                <a asp-action="Print" asp-route-id="@invoice.Id" class="btn btn-outline-secondary">
+                                                <a asp-action="Print" asp-route-id="@invoice.Id" class="btn action-btn btn-outline-secondary" title="طباعة">
                                                     <i class="fas fa-print"></i>
                                                 </a>
-                                                <a asp-action="Delete" asp-route-id="@invoice.Id" class="btn btn-outline-danger">
+                                                <a asp-action="Delete" asp-route-id="@invoice.Id" class="btn action-btn btn-outline-danger" title="حذف">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
-                                                
                                             </div>
                                         </td>
                                     </tr>
@@ -182,6 +181,70 @@
     .btn-group-sm > .btn {
         padding: 0.25rem 0.5rem;
         font-size: 0.75rem;
+    }
+
+    @@media (max-width: 575.98px) {
+        .invoice-glass-card {
+            padding: 0.5rem 0.1rem;
+        }
+        .invoice-header-gradient {
+            padding: 0.75rem 0.25rem;
+            font-size: 1.1rem;
+        }
+        .modern-table {
+            font-size: 1.05rem;
+            min-width: 600px;
+        }
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .modern-table thead {
+            display: none;
+        }
+        .modern-table tbody tr {
+            display: block;
+            margin-bottom: 1.2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(67,97,238,0.08);
+            background: rgba(255,255,255,0.95);
+            border: 1px solid #e0e7ef;
+        }
+        .modern-table tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-bottom: 1px solid #f1f3fa;
+            font-size: 1.05rem;
+            position: relative;
+        }
+        .modern-table tbody td:before {
+            content: attr(data-label);
+            font-weight: 700;
+            color: #4361ee;
+            flex-basis: 50%;
+            text-align: right;
+            padding-left: 1rem;
+            font-size: 0.98em;
+        }
+        .invoice-action-group .action-btn {
+            font-size: 1.3rem;
+            padding: 0.6rem 1rem;
+            min-width: 44px;
+            min-height: 44px;
+            margin-bottom: 0.5rem;
+        }
+        .invoice-action-group {
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .invoice-type-badge {
+            font-size: 1.05rem;
+            padding: 0.5rem 1rem;
+        }
     }
 </style>
 
