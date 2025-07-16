@@ -207,18 +207,10 @@ function downloadSellersInventoryAsPDF() {
         day: 'numeric' 
     });
 
-    // Temporarily show all rows for PDF generation
-    const sellersTable = document.getElementById('sellers-inventory-table');
-    const originalSellersRows = sellersRows.map(row => row.cloneNode(true));
-    sellersTable.querySelector('tbody').innerHTML = '';
-    originalSellersRows.forEach(row => {
-        sellersTable.querySelector('tbody').appendChild(row);
-    });
-
-    // Get the entire sellers inventory table container
+    // Get the visible sellers inventory table container
     const sellersTableContainer = document.getElementById('sellers-inventory-table-container');
-    
-    // Create a temporary container for PDF generation
+
+    // Clone the container for PDF generation
     const pdfContainer = document.createElement('div');
     pdfContainer.style.cssText = `
         direction: rtl;
@@ -228,23 +220,20 @@ function downloadSellersInventoryAsPDF() {
         background: white;
         color: black;
         max-width: 100%;
-        position: absolute;
-        left: -9999px;
-        top: -9999px;
     `;
 
-    // Add report header with enhanced design
+    // Add report header
     let pdfContent = `
-        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #17a2b8; padding-bottom: 20px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 20px; border-radius: 10px;">
-            <h1 style="color: #17a2b8; margin-bottom: 10px; font-size: 28px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">كافو</h1>
-            <h2 style="color: #333; margin-bottom: 10px; font-size: 20px;">${reportTitle}</h2>
-            <p style="color: #666; margin: 0; font-size: 14px;">تقرير شامل - ${currentDate}</p>
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px;">
+            <h1 style="color: #17a2b8; margin-bottom: 10px;">كافو</h1>
+            <h2 style="color: #333; margin-bottom: 10px;">${reportTitle}</h2>
+            <p style="color: #666; margin: 0;">تقرير شامل - ${currentDate}</p>
         </div>
     `;
 
     // Clone the table container and clean it up for PDF
     const tableClone = sellersTableContainer.cloneNode(true);
-    
+
     // Remove action buttons and pagination from PDF
     const actionButtons = tableClone.querySelectorAll('.btn, .pagination-container, .d-flex.justify-content-end');
     actionButtons.forEach(btn => btn.remove());
@@ -252,16 +241,16 @@ function downloadSellersInventoryAsPDF() {
     // Style the table for PDF
     const table = tableClone.querySelector('table');
     if (table) {
-        table.style.cssText = 'width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 12px;';
+        table.style.cssText = 'width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px;';
         
         const headers = table.querySelectorAll('th');
         headers.forEach(th => {
-            th.style.cssText = 'background: #343a40; color: white; padding: 10px; text-align: center; border: 1px solid #ddd; font-weight: bold;';
+            th.style.cssText = 'background: #343a40; color: white; padding: 12px; text-align: center; border: 1px solid #ddd; font-weight: bold;';
         });
         
         const cells = table.querySelectorAll('td');
         cells.forEach(td => {
-            td.style.cssText = 'padding: 8px; text-align: center; border: 1px solid #ddd;';
+            td.style.cssText = 'padding: 10px; text-align: center; border: 1px solid #ddd;';
         });
         
         const rows = table.querySelectorAll('tr:nth-child(even)');
@@ -275,14 +264,13 @@ function downloadSellersInventoryAsPDF() {
 
     // Add footer
     pdfContent += `
-        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #dee2e6; text-align: center; color: #666; font-size: 12px; background: #f8f9fa; padding: 15px; border-radius: 5px;">
-            <p style="margin: 0;">تم إنشاء هذا التقرير في: ${currentDate}</p>
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666; font-size: 12px;">
+            <p>تم إنشاء هذا التقرير في: ${currentDate}</p>
         </div>
     `;
 
     pdfContainer.innerHTML = pdfContent;
-    
-    // Add container to document body
+
     document.body.appendChild(pdfContainer);
 
     const opt = {
@@ -306,23 +294,12 @@ function downloadSellersInventoryAsPDF() {
 
     // Generate PDF
     html2pdf().set(opt).from(pdfContainer).save().then(() => {
-        console.log('PDF generated successfully');
-        // Clean up
-        if (document.body.contains(pdfContainer)) {
-            document.body.removeChild(pdfContainer);
-        }
-        // Restore pagination
-        paginateSellersTable(sellersCurrentPage);
+        document.body.removeChild(pdfContainer);
     }).catch(error => {
         console.error('PDF generation error:', error);
-        // Clean up on error
         if (document.body.contains(pdfContainer)) {
             document.body.removeChild(pdfContainer);
         }
-        // Restore pagination on error
-        paginateSellersTable(sellersCurrentPage);
-        // Show error message to user
-        alert('حدث خطأ أثناء إنشاء ملف PDF. يرجى المحاولة مرة أخرى.');
     });
 }
 
@@ -335,18 +312,10 @@ function downloadProductsInventoryAsPDF() {
         day: 'numeric' 
     });
 
-    // Temporarily show all rows for PDF generation
-    const productsTable = document.getElementById('products-remain-table');
-    const originalProductsRows = productsRows.map(row => row.cloneNode(true));
-    productsTable.querySelector('tbody').innerHTML = '';
-    originalProductsRows.forEach(row => {
-        productsTable.querySelector('tbody').appendChild(row);
-    });
-
-    // Get the entire products inventory table container
+    // Get the visible products inventory table container
     const productsTableContainer = document.getElementById('products-remain-table-container');
-    
-    // Create a temporary container for PDF generation
+
+    // Clone the container for PDF generation
     const pdfContainer = document.createElement('div');
     pdfContainer.style.cssText = `
         direction: rtl;
@@ -356,40 +325,53 @@ function downloadProductsInventoryAsPDF() {
         background: white;
         color: black;
         max-width: 100%;
-        position: absolute;
-        left: -9999px;
-        top: -9999px;
     `;
 
-    // Add report header with enhanced design
+    // Add report header
     let pdfContent = `
-        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #17a2b8; padding-bottom: 20px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 20px; border-radius: 10px;">
-            <h1 style="color: #17a2b8; margin-bottom: 10px; font-size: 28px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">كافو</h1>
-            <h2 style="color: #333; margin-bottom: 10px; font-size: 20px;">${reportTitle}</h2>
-            <p style="color: #666; margin: 0; font-size: 14px;">تقرير شامل - ${currentDate}</p>
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px;">
+            <h1 style="color: #17a2b8; margin-bottom: 10px;">كافو</h1>
+            <h2 style="color: #333; margin-bottom: 10px;">${reportTitle}</h2>
+            <p style="color: #666; margin: 0;">تقرير شامل - ${currentDate}</p>
         </div>
     `;
 
     // Clone the table container and clean it up for PDF
     const tableClone = productsTableContainer.cloneNode(true);
-    
+
+    // Remove product image column (header and cells)
+    const table = tableClone.querySelector('table');
+    if (table) {
+        // Remove the first column (image) from header
+        const headerRow = table.querySelector('thead tr');
+        if (headerRow) {
+            const ths = headerRow.querySelectorAll('th');
+            if (ths.length > 0) ths[0].remove();
+        }
+        // Remove the first cell from each body row
+        const bodyRows = table.querySelectorAll('tbody tr');
+        bodyRows.forEach(row => {
+            const tds = row.querySelectorAll('td');
+            if (tds.length > 0) tds[0].remove();
+        });
+    }
+
     // Remove action buttons and pagination from PDF
     const actionButtons = tableClone.querySelectorAll('.btn, .pagination-container, .d-flex.justify-content-end');
     actionButtons.forEach(btn => btn.remove());
 
     // Style the table for PDF
-    const table = tableClone.querySelector('table');
     if (table) {
-        table.style.cssText = 'width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 12px;';
+        table.style.cssText = 'width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px;';
         
         const headers = table.querySelectorAll('th');
         headers.forEach(th => {
-            th.style.cssText = 'background: #343a40; color: white; padding: 10px; text-align: center; border: 1px solid #ddd; font-weight: bold;';
+            th.style.cssText = 'background: #343a40; color: white; padding: 12px; text-align: center; border: 1px solid #ddd; font-weight: bold;';
         });
         
         const cells = table.querySelectorAll('td');
         cells.forEach(td => {
-            td.style.cssText = 'padding: 8px; text-align: center; border: 1px solid #ddd;';
+            td.style.cssText = 'padding: 10px; text-align: center; border: 1px solid #ddd;';
         });
         
         const rows = table.querySelectorAll('tr:nth-child(even)');
@@ -403,14 +385,13 @@ function downloadProductsInventoryAsPDF() {
 
     // Add footer
     pdfContent += `
-        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #dee2e6; text-align: center; color: #666; font-size: 12px; background: #f8f9fa; padding: 15px; border-radius: 5px;">
-            <p style="margin: 0;">تم إنشاء هذا التقرير في: ${currentDate}</p>
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666; font-size: 12px;">
+            <p>تم إنشاء هذا التقرير في: ${currentDate}</p>
         </div>
     `;
 
     pdfContainer.innerHTML = pdfContent;
-    
-    // Add container to document body
+
     document.body.appendChild(pdfContainer);
 
     const opt = {
@@ -434,23 +415,12 @@ function downloadProductsInventoryAsPDF() {
 
     // Generate PDF
     html2pdf().set(opt).from(pdfContainer).save().then(() => {
-        console.log('PDF generated successfully');
-        // Clean up
-        if (document.body.contains(pdfContainer)) {
-            document.body.removeChild(pdfContainer);
-        }
-        // Restore pagination
-        paginateProductsTable(productsCurrentPage);
+        document.body.removeChild(pdfContainer);
     }).catch(error => {
         console.error('PDF generation error:', error);
-        // Clean up on error
         if (document.body.contains(pdfContainer)) {
             document.body.removeChild(pdfContainer);
         }
-        // Restore pagination on error
-        paginateProductsTable(productsCurrentPage);
-        // Show error message to user
-        alert('حدث خطأ أثناء إنشاء ملف PDF. يرجى المحاولة مرة أخرى.');
     });
 }
 

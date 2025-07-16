@@ -222,6 +222,9 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         // Update quantity function with zero check
         function updateQuantity(id, change) {
@@ -244,6 +247,14 @@
                         showAlert('تنبيه', 'لا يوجد كمية كافية في المخزن', 'warning');
                         return;
                     }
+                    // SweetAlert for quantity increased
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'تمت الزيادة',
+                        text: 'تمت زيادة الكمية في السلة',
+                        timer: 900,
+                        showConfirmButton: false
+                    });
                 }
                 item.quantity += change;
                 if (item.quantity <= 0) {
@@ -457,6 +468,14 @@
                     return;
                 }
                 existingItem.quantity += 1;
+                // SweetAlert for quantity increased
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تمت الزيادة',
+                    text: 'تمت زيادة الكمية في السلة',
+                    timer: 900,
+                    showConfirmButton: false
+                });
             } else {
                 cart.push({
                     id: id,
@@ -464,6 +483,14 @@
                     price: price,
                     image: image,
                     quantity: 1
+                });
+                // SweetAlert for new product added
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تمت الإضافة',
+                    text: 'تمت إضافة المنتج إلى السلة',
+                    timer: 1200,
+                    showConfirmButton: false
                 });
             }
 
@@ -515,6 +542,14 @@
                         showAlert('تنبيه', 'لا يوجد كمية كافية في المخزن', 'warning');
                         return;
                     }
+                    // SweetAlert for quantity increased
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'تمت الزيادة',
+                        text: 'تمت زيادة الكمية في السلة',
+                        timer: 900,
+                        showConfirmButton: false
+                    });
                 }
                 item.quantity += change;
                 if (item.quantity <= 0) {
@@ -672,6 +707,58 @@
                 timeElement.text(timeString);
             }
         }
+
+        $(document).ready(function() {
+            $('#invoiceForm').on('submit', function(e) {
+                e.preventDefault();
+                var form = $(this);
+                var formData = form.serialize() + '&dist=pos';
+                // Show SweetAlert loading spinner
+                Swal.fire({
+                    title: 'جاري المعالجة...',
+                    text: 'يرجى الانتظار حتى يتم حفظ الفاتورة',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'نجاح',
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload(); // or clearCart();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'خطأ',
+                                text: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'خطأ',
+                            text: 'حدث خطأ غير متوقع.'
+                        });
+                    }
+                });
+            });
+        });
     </script>
 }
 <style>

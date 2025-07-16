@@ -3,6 +3,7 @@ using KAFO.BLL.Managers;
 using KAFO.Domain.Invoices;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace KAFO.ASPMVC.Areas.Seller.Controllers
 {
@@ -43,12 +44,19 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 		// POST: InvoiceController/Create
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public IActionResult Create(Invoice invoice, string dist = "")
+		public IActionResult Create(Invoice invoice, string dist = "", string redirectTo = "")
 		{
-			invoice.CreatedAt = DateTime.Now;
+           
+            invoice.CreatedAt = DateTime.Now;
 			int checkResult = CheckInvoice(invoice);
 			if (checkResult < 0)
 			{
+				if (dist.Trim().ToLower() == "pos" || Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+				{
+					// Collect model errors
+					var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+					return Json(new { success = false, message = string.Join(" ", errors) });
+				}
 				return View(invoice);
 			}
 
@@ -60,15 +68,24 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 				{
 					ModelState.AddModelError(item.Key, item.Value);
 				}
-
+				if (dist.Trim().ToLower() == "pos" || Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+				{
+					var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+					return Json(new { success = false, message = string.Join(" ", errors) });
+				}
 				return View(invoice);
 			}
+
+			if (dist.Trim().ToLower() == "pos" || Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+			{
+				return Json(new { success = true, message = "تم إنشاء الفاتورة بنجاح!" });
+			}
+
 			if (dist.Trim().ToLower() == "pos")
 			{
-				return RedirectToAction("Index", "pos");
+				return RedirectToAction("Index", "POS", new { area = "Seller" });
 			}
 			return RedirectToAction(nameof(Index));
-
 		}
 
 		// GET: InvoiceController/Edit/5
@@ -174,3 +191,4 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 		}
 	}
 }
+
