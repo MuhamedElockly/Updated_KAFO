@@ -225,35 +225,30 @@
         function updateQuantity(id, change) {
             const item = cart.find(item => item.id === id);
             if (item) {
+                if (change > 0) {
+                    // Find the product card to check stock
+                    const productCard = $(`.product-card[onclick*="${id}"]`);
+                    let availableStock = 0;
+                    let stockDisplay;
+                    if (productCard.length) {
+                        stockDisplay = productCard.find('.product-price:contains("متبقي")');
+                        if (stockDisplay.length) {
+                            availableStock = parseInt(stockDisplay.text().match(/\d+/)[0]);
+                        }
+                    }
+                    let InvoiceTypeSelectedval = $('#InvoiceTypeSelect').val();
+                    let ifDecreaseItemsInvoice = (InvoiceTypeSelectedval === "0") || (InvoiceTypeSelectedval === "1") || (InvoiceTypeSelectedval === "5");
+                    if (item.quantity >= availableStock && ifDecreaseItemsInvoice) {
+                        showAlert('تنبيه', 'لا يوجد كمية كافية في المخزن', 'warning');
+                        return;
+                    }
+                }
                 item.quantity += change;
-
-                // Prevent quantity from going below zero
                 if (item.quantity <= 0) {
                     removeFromCart(id);
                 } else {
                     updateCartDisplay();
                     updateInvoiceItemsInputs();
-
-                    // Find the product card and update its stock display
-                    const productCard = $(`.product-card[onclick*="${id}"]`);
-                    if (productCard.length) {
-                        const stockDisplay = productCard.find('.product-price:contains("متبقي")');
-                        if (stockDisplay.length) {
-                            const currentText = stockDisplay.text();
-                            const currentStock = parseInt(currentText.match(/\d+/)[0]);
-                            const newStock = currentStock - change;
-                            stockDisplay.text(currentText.replace(/\d+/, newStock));
-
-                            // Disable add button if stock reaches zero
-                            const addButton = productCard.find('.add-to-cart-btn');
-                            if (newStock <= 0) {
-                                addButton.prop('disabled', true)
-                                    .removeClass('add-to-cart-btn')
-                                    .addClass('btn-outline-secondary')
-                                    .html('<i class="fas fa-times me-1"></i> غير متوفر');
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -501,6 +496,24 @@
         function updateQuantity(id, change) {
             const item = cart.find(item => item.id === id);
             if (item) {
+                if (change > 0) {
+                    // Find the product card to check stock
+                    const productCard = $(`.product-card[onclick*="${id}"]`);
+                    let availableStock = 0;
+                    let stockDisplay;
+                    if (productCard.length) {
+                        stockDisplay = productCard.find('.product-price:contains("متبقي")');
+                        if (stockDisplay.length) {
+                            availableStock = parseInt(stockDisplay.text().match(/\d+/)[0]);
+                        }
+                    }
+                    let InvoiceTypeSelectedval = $('#InvoiceTypeSelect').val();
+                    let ifDecreaseItemsInvoice = (InvoiceTypeSelectedval === "0") || (InvoiceTypeSelectedval === "1") || (InvoiceTypeSelectedval === "5");
+                    if (item.quantity >= availableStock && ifDecreaseItemsInvoice) {
+                        showAlert('تنبيه', 'لا يوجد كمية كافية في المخزن', 'warning');
+                        return;
+                    }
+                }
                 item.quantity += change;
                 if (item.quantity <= 0) {
                     removeFromCart(id);
