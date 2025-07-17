@@ -579,18 +579,18 @@
                     <nav>
                         <ul class="pagination justify-content-center">
                             <li class="page-item @(Model.CurrentInvoicePage == 1 ? "disabled" : "")">
-                                <a class="page-link" onclick="loadInvoices('@Model.InvoiceType', @Model.CurrentInvoicePage-1)" tabindex="-1">
+                                <a class="page-link" onclick="loadInvoicesWithCurrentDates('@Model.InvoiceType', @Model.CurrentInvoicePage-1)" tabindex="-1">
                                     <i class="fas fa-chevron-right me-1"></i>السابق
                                 </a>
                             </li>
                             @for (int i = 1; i <= Model.TotalInvoicesPages; i++)
                             {
                                 <li class="page-item @(i == Model.CurrentInvoicePage ? "active" : "")">
-                                    <a class="page-link" onclick="loadInvoices('@Model.InvoiceType', @i)">@i</a>
+                                    <a class="page-link" onclick="loadInvoicesWithCurrentDates('@Model.InvoiceType', @i)">@i</a>
                                 </li>
                             }
                             <li class="page-item @(Model.CurrentInvoicePage == Model.TotalInvoicesPages ? "disabled" : "")">
-                                <a class="page-link" onclick="loadInvoices('@Model.InvoiceType', @Model.CurrentInvoicePage+1)">
+                                <a class="page-link" onclick="loadInvoicesWithCurrentDates('@Model.InvoiceType', @Model.CurrentInvoicePage+1)">
                                     التالي<i class="fas fa-chevron-left me-1"></i>
                                 </a>
                             </li>
@@ -610,8 +610,6 @@
 </div>
 
 <script>
-    let currentInvoiceType = '@Model.InvoiceType';
-
     function initializeInvoiceFunctionality() {
         console.log("Initializing invoice functionality");
         
@@ -621,13 +619,12 @@
         // Add new event handlers
         $('.invoice-type-btn').on('click', function () {
             console.log("Invoice Type Btn Clicked");
-            currentInvoiceType = $(this).data('invoice-type');
             const invoiceTitleElement = document.getElementById('invoice-title');
 
             $('.invoice-type-btn').removeClass('active');
             $(this).addClass('active');
 
-            switch (currentInvoiceType) {
+            switch ($(this).data('invoice-type')) {
                 case 'sell':
                     invoiceTitleElement.innerText = 'فواتير البيع';
                     break;
@@ -690,12 +687,21 @@
             type: 'GET',
             success: function (result) {
                 $('#invoice-details-section').html($(result).find('#invoice-details-section').html());
+                // Restore date inputs
+                document.getElementById('invoiceStartDate').value = selectedStartDate;
+                document.getElementById('invoiceEndDate').value = selectedEndDate;
                 initializeInvoiceFunctionality();
             },
             error: function (error) {
                 $('#invoice-details-section').html('<div class="alert alert-danger">خطأ في تحميل الفواتير</div>');
             }
         });
+    }
+
+    function loadInvoicesWithCurrentDates(invoiceType, page) {
+        selectedStartDate = document.getElementById('invoiceStartDate').value;
+        selectedEndDate = document.getElementById('invoiceEndDate').value;
+        loadInvoices(invoiceType, page, selectedStartDate, selectedEndDate);
     }
 
     // Function to show add invoice modal

@@ -473,3 +473,12 @@ function createInvoiceContentForPrint(invoiceId, invoiceType) {
 $(document).ready(function () {
     initializeInvoiceFunctionality();
 }); 
+
+window.selectedStartDate = '';
+window.selectedEndDate = '';
+
+window.loadInvoicesWithCurrentDates = function(invoiceType, page) {
+    window.selectedStartDate = document.getElementById('invoiceStartDate').value;
+    window.selectedEndDate = document.getElementById('invoiceEndDate').value;
+    loadInvoices(invoiceType, page, window.selectedStartDate, window.selectedEndDate);
+}; 
