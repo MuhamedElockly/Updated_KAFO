@@ -27,7 +27,7 @@
 
         <!-- Statistics Cards -->
         <div class="row g-3 mb-4">
-            <div class="col-lg-3 col-md-6">
+            <div class="col-lg-4 col-md-6">
                 <div class="stats-card">
                     <div class="stats-badge bg-primary text-white">
                         <i class="fas fa-users me-2"></i>
@@ -36,25 +36,16 @@
                     <h3 class="stats-value text-primary">@Model.Count()</h3>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="stats-card">
-                    <div class="stats-badge bg-success text-white">
-                        <i class="fas fa-money-bill-wave me-2"></i>
-                        إجمالي المدفوع
-                    </div>
-                    <h3 class="stats-value text-success">@Model.Sum(c => c.TotalPaid).ToString("C")</h3>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
+            <div class="col-lg-4 col-md-6">
                 <div class="stats-card">
                     <div class="stats-badge bg-warning text-white">
                         <i class="fas fa-credit-card me-2"></i>
                         إجمالي المستحق
                     </div>
-                    <h3 class="stats-value text-warning">@Model.Sum(c => c.TotalOwed).ToString("C")</h3>
+                    <h3 class="stats-value text-warning">@Model.Sum(c => Math.Max(0, c.TotalOwed)).ToString("C")</h3>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6">
+            <div class="col-lg-4 col-md-6">
                 <div class="stats-card">
                     <div class="stats-badge bg-info text-white">
                         <i class="fas fa-balance-scale me-2"></i>
@@ -86,10 +77,7 @@
                                             <i class="fas fa-phone me-2"></i>
                                             رقم الهاتف
                                         </th>
-                                        <th class="text-center">
-                                            <i class="fas fa-money-bill-wave me-2"></i>
-                                            إجمالي المدفوع
-                                        </th>
+
                                         <th class="text-center">
                                             <i class="fas fa-credit-card me-2"></i>
                                             إجمالي المستحق
@@ -127,23 +115,18 @@
                                                     <span class="text-muted">غير محدد</span>
                                                 }
                                             </td>
-                                            <td class="text-center">
-                                                <span class="badge badge-amount positive">
-                                                    <i class="fas fa-plus me-1"></i>
-                                                    @item.TotalPaid.ToString("C")
-                                                </span>
-                                            </td>
+
                                             <td class="text-center">
                                                 <span class="badge badge-amount negative">
                                                     <i class="fas fa-minus me-1"></i>
-                                                    @item.TotalOwed.ToString("C")
+                                                    @Math.Max(0, item.TotalOwed).ToString("C")
                                                 </span>
                                             </td>
                                             <td class="text-center">
                                                 @{
                                                     var balance = item.Balance;
-                                                    var balanceClass = balance >= 0 ? "positive" : "negative";
-                                                    var balanceIcon = balance >= 0 ? "fa-plus" : "fa-minus";
+                                                    var balanceClass = "positive";
+                                                    var balanceIcon = "fa-plus";
                                                 }
                                                 <span class="badge badge-amount @balanceClass">
                                                     <i class="fas @balanceIcon me-1"></i>
@@ -157,7 +140,7 @@
                                                         data-bs-target="#settleAccountModal" 
                                                         data-customer-id="@item.Id"
                                                         data-customer-name="@item.CustomerName"
-                                                        data-customer-balance="@item.Balance"
+                                                        data-customer-balance="@item.ActualBalance"
                                                         title="تصفية الحساب">
                                                     <i class="fas fa-money-bill-wave me-2"></i>
                                                     تصفية الحساب
@@ -238,7 +221,7 @@
                                 </div>
                                 <div class="amount-help-text">
                                     <i class="fas fa-info-circle me-1"></i>
-                                    سيتم إضافة هذا المبلغ إلى رصيد العميل الحالي
+                                    إذا كان للعميل دين، سيتم تسويته أولاً ثم إضافة الباقي كرصيد
                                 </div>
                             </div>
                         </div>
@@ -296,7 +279,15 @@
                 
                 var modal = $(this);
                 modal.find('#modalCustomerName').text(customerName);
-                modal.find('#modalCustomerBalance').text('الرصيد الحالي: ' + customerBalance.toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }));
+                
+                // Show amount owed if there's debt, otherwise show current balance
+                if (customerBalance < 0) {
+                    var amountOwed = Math.abs(customerBalance);
+                    modal.find('#modalCustomerBalance').text('المبلغ المستحق: ' + amountOwed.toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }));
+                } else {
+                    modal.find('#modalCustomerBalance').text('الرصيد الحالي: ' + customerBalance.toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }));
+                }
+                
                 modal.find('#customerId').val(customerId);
                 modal.find('#settlementAmount').val('');
             });

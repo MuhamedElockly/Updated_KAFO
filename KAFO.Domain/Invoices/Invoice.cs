@@ -132,7 +132,32 @@ namespace KAFO.Domain.Invoices
                 // Decrease The StockQuantity 
                 item.Product.DecreaseStockQuantity(item.Quantity);
             }
-            CustomerAccount!.TotalOwed += TotalInvoice;
+
+            if (TotalInvoice <= 0)
+                CalculateTotalInvoice();
+
+            // Use available balance to pay off invoice
+            if (CustomerAccount!.TotalPaid > 0)
+            {
+                if (CustomerAccount.TotalPaid >= TotalInvoice)
+                {
+                    // All paid from balance
+                    CustomerAccount.TotalPaid -= TotalInvoice;
+                    // No debt added
+                }
+                else
+                {
+                    // Partially paid from balance, rest is debt
+                    var remaining = TotalInvoice - CustomerAccount.TotalPaid;
+                    CustomerAccount.TotalPaid = 0;
+                    CustomerAccount.AddDebt(remaining);
+                }
+            }
+            else
+            {
+                // No balance, all is debt
+                CustomerAccount.AddDebt(TotalInvoice);
+            }
         }
 
         private void CashInvoiceCompleteInvoice()

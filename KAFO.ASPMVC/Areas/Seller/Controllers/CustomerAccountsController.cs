@@ -161,7 +161,7 @@ namespace KAFO.ASPMVC.Controllers
         // POST: CustomerAccounts/SettleAccount
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SettleAccount(int customerId, decimal amount, string? notes)
+        public async Task<IActionResult> SettleAccount(int customerId, decimal amount)
         {
             try
             {
@@ -187,6 +187,41 @@ namespace KAFO.ASPMVC.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
+                // Check if customer has debt to settle
+                if (customer.TotalOwed > 0)
+                {
+                    var currentDebt = customer.TotalOwed; // Store current debt amount
+                    
+                    // If amount is greater than debt, settle debt first, then add remaining as credit
+                    if (amount >= currentDebt)
+                    {
+                        var remainingAmount = amount - currentDebt;
+                        
+                        // Settle all debt
+                        customer.SettleDebt(currentDebt);
+                        
+                        // Add remaining as credit (TotalPaid)
+                        if (remainingAmount > 0)
+                        {
+                            customer.AddPayment(remainingAmount);
+                        }
+                        
+                        TempData["Success"] = $"تم تسوية دين العميل {customer.CustomerName} بالكامل ({currentDebt:C}) وإضافة رصيد إضافي ({remainingAmount:C})";
+                    }
+                    else
+                    {
+                        // Settle partial debt
+                        customer.SettleDebt(amount);
+                        TempData["Success"] = $"تم تسوية جزء من دين العميل {customer.CustomerName} بمبلغ {amount:C}";
+                    }
+                }
+                else
+                {
+                    // No debt, add as credit
+                    customer.AddPayment(amount);
+                    TempData["Success"] = $"تم إضافة رصيد للعميل {customer.CustomerName} بمبلغ {amount:C}";
+                }
+
                 // Create credit terminate invoice
                 var creditTerminateInvoice = new KAFO.Domain.Invoices.CreditTerminateInvoice
                 {
@@ -198,16 +233,13 @@ namespace KAFO.ASPMVC.Controllers
 
                 _context.CreditTerminateInvoices.Add(creditTerminateInvoice);
 
-                // Update customer balance
-                customer.TotalPaid += amount;
-
                 await _context.SaveChangesAsync();
 
-                TempData["Success"] = $"تم تصفية حساب العميل {customer.CustomerName} بمبلغ {amount:C} بنجاح";
-                if (!string.IsNullOrEmpty(notes))
-                {
-                    TempData["Info"] = $"ملاحظات: {notes}";
-                }
+                return RedirectToAction(nameof(Index));
+            }
+            catch (ArgumentException ex)
+            {
+                TempData["Error"] = ex.Message;
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
