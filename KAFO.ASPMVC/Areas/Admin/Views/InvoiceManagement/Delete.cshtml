@@ -1,0 +1,13 @@
+@model KAFO.Domain.Invoices.Invoice
+@{
+    ViewData["Title"] = "حذف الفاتورة";
+}
+<div class="container">
+    <h2>حذف الفاتورة</h2>
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+        <p>هل أنت متأكد أنك تريد حذف الفاتورة رقم <strong>@Model.Id</strong>؟</p>
+        <button type="submit" class="btn btn-danger">حذف</button>
+        <a href="@Url.Action("Index", "InvoiceManagement", new { area = "Admin" })" class="btn btn-secondary">إلغاء</a>
+    </form>
+</div> 

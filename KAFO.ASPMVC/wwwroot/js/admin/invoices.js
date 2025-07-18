@@ -1,40 +1,30 @@
-let currentInvoiceType = '';
+// Global variables
+let allInvoices = [];
+let currentPage = 1;
+const itemsPerPage = 5;
+let currentInvoiceType = 'sell';
 
-function initializeInvoiceFunctionality() {
-    console.log("Initializing invoice functionality");
-
-    // Remove any existing event handlers
-    $('.invoice-type-btn').off('click');
-
-    // Add new event handlers
-    $('.invoice-type-btn').on('click', function () {
-        console.log("Invoice Type Btn Clicked");
-        currentInvoiceType = $(this).data('invoice-type');
-        const invoiceTitleElement = document.getElementById('invoice-title');
-
-        $('.invoice-type-btn').removeClass('active');
-        $(this).addClass('active');
-
-        switch (currentInvoiceType) {
-            case 'sell':
-                invoiceTitleElement.innerText = 'فواتير البيع';
-                break;
-            case 'purchase':
-                invoiceTitleElement.innerText = 'فواتير الشراء';
-                break;
-        }
-        // Clear previous content before appending
-        $('#invoice-details-section').find('.table-container, .pagination-container, .no-invoices-message').remove();
-        $('#invoice-details-section').append(`
-            <div class="no-invoices-message">
-                <i class="fas fa-file-invoice fa-3x mb-3"></i>
-                <p>الرجاء تحديد نطاق تاريخ لعرض الفواتير</p>
-            </div>
-        `);
+// Global functions that need to be accessible from HTML
+window.setInvoiceType = function(type) {
+    currentInvoiceType = type;
+    currentPage = 1;
+    
+    // Update button states
+    document.querySelectorAll('.invoice-type-btn').forEach(btn => {
+        btn.classList.remove('active');
     });
-}
+    document.querySelector(`[data-invoice-type="${type}"]`).classList.add('active');
+    
+    // Update title
+    const title = type === 'sell' ? 'فواتير البيع' : 'فواتير الشراء';
+    document.getElementById('invoice-title').textContent = title;
+    
+    // Clear table
+    document.getElementById('invoices-table-body').innerHTML = '';
+    document.getElementById('invoices-pagination').innerHTML = '';
+};
 
-function showInvoices() {
+window.showInvoices = function() {
     const startDate = document.getElementById('invoiceStartDate').value;
     const endDate = document.getElementById('invoiceEndDate').value;
 
@@ -42,262 +32,118 @@ function showInvoices() {
         Swal.fire({
             icon: 'warning',
             title: 'تنبيه',
-            text: 'الرجاء تحديد تاريخي البدء والانتهاء',
-            confirmButtonText: 'حسناً'
+            text: 'يرجى تحديد تاريخ البدء وتاريخ الانتهاء',
+            confirmButtonText: 'حسناً',
+            confirmButtonColor: '#6f42c1'
         });
         return;
     }
 
-    // Validate that end date is greater than start date
-    if (new Date(endDate) <= new Date(startDate)) {
-        Swal.fire({
-            icon: 'error',
-            title: 'خطأ في التواريخ',
-            text: 'تاريخ الانتهاء يجب أن يكون أكبر من تاريخ البدء',
-            confirmButtonText: 'حسناً'
-        });
-        return;
-    }
-
-    loadInvoices(currentInvoiceType, 1, startDate, endDate);
-}
-
-function loadInvoices(invoiceType, page, startDate = null, endDate = null) {
-    // Show loading indicator
-    $('#invoice-details-section').html('<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i></div>');
-
-    // Construct URL
-    let url = `/Admin/Admin/Invoices?invoiceType=${invoiceType}&page=${page}`;
-    if (startDate && endDate) {
-        url += `&startDate=${startDate}&endDate=${endDate}`;
-    }
-
-    // Load the partial view via AJAX
-    $.ajax({
-        url: url,
-        type: 'GET',
-        success: function (result) {
-            $('#invoice-details-section').html($(result).find('#invoice-details-section').html());
-            initializeInvoiceFunctionality();
-        },
-        error: function (error) {
-            $('#invoice-details-section').html('<div class="alert alert-danger">خطأ في تحميل الفواتير</div>');
-        }
-    });
-}
-
-// Function to show add invoice modal
-function showAddInvoiceModal() {
+    // Show loading with SweetAlert
     Swal.fire({
-        title: 'إضافة فاتورة شراء جديدة',
-        html: `
-            <div class="text-center">
-                <i class="fas fa-file-invoice fa-3x text-primary mb-3"></i>
-                <p class="text-muted">سيتم توجيهك إلى صفحة إضافة فاتورة الشراء</p>
-            </div>
-        `,
-        icon: 'info',
-        showCancelButton: true,
-        confirmButtonText: 'متابعة',
-        cancelButtonText: 'إلغاء',
-        confirmButtonColor: '#28a745',
-        cancelButtonColor: '#6c757d',
-        background: 'white',
-        backdrop: `
-            rgba(0,0,0,0.5)
-            center
-            no-repeat
-        `,
-        showClass: {
-            popup: 'animate__animated animate__fadeInDown'
-        },
-        hideClass: {
-            popup: 'animate__animated animate__fadeOutUp'
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            console.log('User confirmed, about to show SweetAlert...');
-
-            //Swal.fire({
-            //    icon: 'success',
-            //    title: 'سيتم توجيهك قريباً',
-            //    text: 'صفحة إضافة فاتورة الشراء قيد التطوير',
-            //    timer: 3000,
-            //    showConfirmButton: false,
-            //    showProgressBar: true
-            //});
-
-            console.log('SweetAlert should be showing now...');
-
-            // Try navigation after a delay
-            setTimeout(() => {
-                console.log('Timeout reached, attempting navigation...');
-                window.location.href = '/Seller/Invoice/Create';
-            }, 4000);
-        }
-    
-    });
-}
-
-// Function to show invoice details
-function showInvoiceDetails(invoiceId, invoiceType) {
-    // Show loading modal first
-    Swal.fire({
-        title: 'جاري تحميل تفاصيل الفاتورة...',
+        title: 'جاري تحميل الفواتير...',
         html: '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i></div>',
         allowOutsideClick: false,
         showConfirmButton: false
     });
 
-    // Simulate loading invoice details (replace with actual API call)
-    setTimeout(() => {
-        // Mock invoice details - replace with actual data from your backend
-        const mockInvoiceDetails = {
-            id: invoiceId,
-            type: invoiceType,
-            date: new Date().toLocaleDateString('ar-SA'),
-            time: new Date().toLocaleTimeString('ar-SA'),
-            user: 'أحمد محمد',
-            customer: invoiceType === 'sell' ? 'محمد علي' : 'شركة الموردين',
-            total: (Math.random() * 1000 + 100).toFixed(2),
-            items: [
-                { name: 'منتج 1', quantity: 2, price: 50, total: 100 },
-                { name: 'منتج 2', quantity: 1, price: 75, total: 75 },
-                { name: 'منتج 3', quantity: 3, price: 25, total: 75 }
-            ],
-            notes: 'ملاحظات إضافية حول الفاتورة'
-        };
+    // Show loading in table
+    document.getElementById('invoices-table-body').innerHTML = '<tr><td colspan="8" class="text-center">جاري التحميل...</td></tr>';
+    
+    fetch(`/Admin/Admin/GetInvoices?invoiceType=${currentInvoiceType}&startDate=${startDate}&endDate=${endDate}`)
+        .then(response => response.json())
+        .then(data => {
+            allInvoices = data;
+            currentPage = 1;
+            renderTable();
+            renderPagination();
+            
+            // Close loading
+            Swal.close();
+            
+            // Show success message
+            if (data.length > 0) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تم التحميل بنجاح!',
+                    text: `تم العثور على ${data.length} فاتورة`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'لا توجد فواتير',
+                    text: 'لم يتم العثور على فواتير في النطاق المحدد',
+                    confirmButtonText: 'حسناً',
+                    confirmButtonColor: '#6f42c1'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('invoices-table-body').innerHTML = '<tr><td colspan="8" class="text-center text-danger">حدث خطأ في تحميل البيانات</td></tr>';
+            
+            // Close loading and show error
+            Swal.close();
+            Swal.fire({
+                icon: 'error',
+                title: 'خطأ في التحميل',
+                text: 'حدث خطأ أثناء تحميل الفواتير',
+                confirmButtonText: 'حسناً',
+                confirmButtonColor: '#dc3545'
+            });
+        });
+};
 
-        displayInvoiceDetailsModal(mockInvoiceDetails);
-    }, 1000);
-}
+window.changePage = function(page) {
+    const totalPages = Math.ceil(allInvoices.length / itemsPerPage);
+    if (page >= 1 && page <= totalPages) {
+        currentPage = page;
+        renderTable();
+        renderPagination();
+    }
+};
 
-// Function to display invoice details in modal
-function displayInvoiceDetailsModal(invoice) {
-    const itemsHtml = invoice.items.map(item => `
-        <tr>
-            <td>${item.name}</td>
-            <td class="text-center">${item.quantity}</td>
-            <td class="text-center">${item.price.toFixed(2)} ر.س</td>
-            <td class="text-center fw-bold">${item.total.toFixed(2)} ر.س</td>
-        </tr>
-    `).join('');
+// Modal functions
+window.showInvoiceDetails = function(invoiceId) {
+    // Find the invoice in the stored data
+    const invoice = allInvoices.find(inv => inv.id === invoiceId);
+    
+    if (!invoice) {
+        Swal.fire({
+            icon: 'error',
+            title: 'خطأ',
+            text: 'لم يتم العثور على الفاتورة',
+            confirmButtonText: 'حسناً',
+            confirmButtonColor: '#dc3545'
+        });
+        return;
+    }
 
+    // Show loading
     Swal.fire({
-        title: `تفاصيل الفاتورة رقم #${invoice.id}`,
-        html: `
-            <div class="invoice-details-modal">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="detail-item">
-                            <i class="fas fa-calendar-alt text-primary"></i>
-                            <span class="detail-label">التاريخ:</span>
-                            <span class="detail-value">${invoice.date}</span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="detail-item">
-                            <i class="fas fa-clock text-primary"></i>
-                            <span class="detail-label">الوقت:</span>
-                            <span class="detail-value">${invoice.time}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="detail-item">
-                            <i class="fas fa-user text-primary"></i>
-                            <span class="detail-label">المستخدم:</span>
-                            <span class="detail-value">${invoice.user}</span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="detail-item">
-                            <i class="fas fa-${invoice.type === 'sell' ? 'user-tie' : 'building'} text-primary"></i>
-                            <span class="detail-label">${invoice.type === 'sell' ? 'العميل:' : 'المورد:'}</span>
-                            <span class="detail-value">${invoice.customer}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-12">
-                        <div class="detail-item">
-                            <i class="fas fa-tag text-primary"></i>
-                            <span class="detail-label">نوع الفاتورة:</span>
-                            <span class="detail-value badge bg-${invoice.type === 'sell' ? 'success' : 'info'}">${invoice.type === 'sell' ? 'بيع' : 'شراء'}</span>
-                        </div>
-                    </div>
-                </div>
-                <hr>
-                <h6 class="mb-3"><i class="fas fa-list me-2"></i>تفاصيل المنتجات:</h6>
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered">
-                        <thead class="table-light">
-                            <tr>
-                                <th>المنتج</th>
-                                <th class="text-center">الكمية</th>
-                                <th class="text-center">السعر</th>
-                                <th class="text-center">الإجمالي</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${itemsHtml}
-                        </tbody>
-                    </table>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <div class="detail-item">
-                            <i class="fas fa-sticky-note text-primary"></i>
-                            <span class="detail-label">ملاحظات:</span>
-                            <span class="detail-value">${invoice.notes}</span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="detail-item">
-                            <i class="fas fa-calculator text-primary"></i>
-                            <span class="detail-label">المجموع الكلي:</span>
-                            <span class="detail-value fw-bold text-success">${invoice.total} ر.س</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="invoice-action-buttons">
-                    <div class="d-flex gap-2 justify-content-end">
-                        <button class="btn invoice-action-btn primary" onclick="downloadInvoiceAsPDF(${invoice.id}, '${invoice.type}')">
-                            <i class="fas fa-download me-2"></i>تحميل PDF
-                        </button>
-                        <button class="btn invoice-action-btn secondary" onclick="printInvoice(${invoice.id}, '${invoice.type}')">
-                            <i class="fas fa-print me-2"></i>طباعة
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `,
-        width: '800px',
-        showConfirmButton: true,
-        confirmButtonText: 'إغلاق',
-        confirmButtonColor: '#6c757d',
-        showCloseButton: true,
-        background: 'white',
-        backdrop: `
-            rgba(0,0,0,0.5)
-            center
-            no-repeat
-        `,
-        showClass: {
-            popup: 'animate__animated animate__fadeInDown'
-        },
-        hideClass: {
-            popup: 'animate__animated animate__fadeOutUp'
-        },
-        customClass: {
-            container: 'invoice-details-modal-container'
-        }
+        title: 'جاري تحميل التفاصيل...',
+        html: '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i></div>',
+        allowOutsideClick: false,
+        showConfirmButton: false
     });
-}
 
-// Function to download invoice as PDF
-function downloadInvoiceAsPDF(invoiceId, invoiceType) {
+    // Simulate loading (in real app, you might want to fetch detailed invoice data)
+    setTimeout(() => {
+        displayInvoiceModal(invoice);
+        Swal.close();
+    }, 500);
+};
+
+window.closeInvoiceModal = function() {
+    document.getElementById('invoiceModal').style.display = 'none';
+};
+
+window.downloadInvoicePDF = function(invoiceId) {
+    const invoice = allInvoices.find(inv => inv.id === invoiceId);
+    if (!invoice) return;
+
     Swal.fire({
         title: 'جاري تحضير ملف PDF...',
         html: '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i></div>',
@@ -305,24 +151,22 @@ function downloadInvoiceAsPDF(invoiceId, invoiceType) {
         showConfirmButton: false
     });
 
-    // Simulate PDF generation (replace with actual API call)
-    setTimeout(() => {
-        // Create a temporary div with invoice content for PDF generation
-        const invoiceContent = createInvoiceContentForPDF(invoiceId, invoiceType);
+    // Create PDF content
+    const pdfContent = createInvoicePDFContent(invoice);
 
         const opt = {
             margin: 1,
-            filename: `invoice_${invoiceId}_${invoiceType}.pdf`,
+        filename: `invoice_${invoice.id}_${invoice.type}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2 },
             jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
         };
 
-        html2pdf().set(opt).from(invoiceContent).save().then(() => {
+    html2pdf().set(opt).from(pdfContent).save().then(() => {
             Swal.fire({
                 icon: 'success',
                 title: 'تم التحميل بنجاح!',
-                text: `تم تحميل فاتورة رقم #${invoiceId} كملف PDF`,
+            text: `تم تحميل فاتورة رقم #${invoice.id} كملف PDF`,
                 timer: 2000,
                 showConfirmButton: false
             });
@@ -331,14 +175,16 @@ function downloadInvoiceAsPDF(invoiceId, invoiceType) {
                 icon: 'error',
                 title: 'خطأ في التحميل',
                 text: 'حدث خطأ أثناء تحميل ملف PDF',
-                confirmButtonText: 'حسناً'
-            });
+            confirmButtonText: 'حسناً',
+            confirmButtonColor: '#dc3545'
         });
-    }, 1500);
-}
+    });
+};
 
-// Function to print invoice
-function printInvoice(invoiceId, invoiceType) {
+window.printInvoice = function(invoiceId) {
+    const invoice = allInvoices.find(inv => inv.id === invoiceId);
+    if (!invoice) return;
+
     Swal.fire({
         title: 'جاري تحضير الطباعة...',
         html: '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i></div>',
@@ -346,35 +192,10 @@ function printInvoice(invoiceId, invoiceType) {
         showConfirmButton: false
     });
 
-    // Simulate print preparation (replace with actual API call)
     setTimeout(() => {
-        // Create a temporary div with invoice content for printing
-        const invoiceContent = createInvoiceContentForPrint(invoiceId, invoiceType);
-
-        // Create a new window for printing
+        const printContent = createInvoicePrintContent(invoice);
         const printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <!DOCTYPE html>
-            <html dir="rtl" lang="ar">
-            <head>
-                <meta charset="UTF-8">
-                <title>فاتورة رقم #${invoiceId}</title>
-                <style>
-                    body { font-family: 'Arial', sans-serif; margin: 20px; direction: rtl; }
-                    .invoice-header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
-                    .invoice-details { margin-bottom: 30px; }
-                    .invoice-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-                    .invoice-table th, .invoice-table td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-                    .invoice-table th { background-color: #f8f9fa; font-weight: bold; }
-                    .total-section { text-align: left; font-weight: bold; font-size: 18px; }
-                    @@media print { body { margin: 0; } }
-                </style>
-            </head>
-            <body>
-                ${invoiceContent}
-            </body>
-            </html>
-        `);
+        printWindow.document.write(printContent);
         printWindow.document.close();
         printWindow.focus();
         printWindow.print();
@@ -383,68 +204,245 @@ function printInvoice(invoiceId, invoiceType) {
         Swal.fire({
             icon: 'success',
             title: 'تم إرسال للطباعة!',
-            text: `تم إرسال فاتورة رقم #${invoiceId} للطباعة`,
+            text: `تم إرسال فاتورة رقم #${invoice.id} للطباعة`,
             timer: 2000,
             showConfirmButton: false
         });
     }, 1000);
+};
+
+// Helper functions
+function setDefaultDates() {
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+    
+    document.getElementById('invoiceStartDate').value = thirtyDaysAgo.toISOString().split('T')[0];
+    document.getElementById('invoiceEndDate').value = today.toISOString().split('T')[0];
 }
 
-// Function to create invoice content for PDF
-function createInvoiceContentForPDF(invoiceId, invoiceType) {
-    // Mock data - replace with actual invoice data
-    const invoice = {
-        id: invoiceId,
-        type: invoiceType,
-        date: new Date().toLocaleDateString('ar-SA'),
-        time: new Date().toLocaleTimeString('ar-SA'),
-        user: 'أحمد محمد',
-        customer: invoiceType === 'sell' ? 'محمد علي' : 'شركة الموردين',
-        total: (Math.random() * 1000 + 100).toFixed(2),
-        items: [
-            { name: 'منتج 1', quantity: 2, price: 50, total: 100 },
-            { name: 'منتج 2', quantity: 1, price: 75, total: 75 },
-            { name: 'منتج 3', quantity: 3, price: 25, total: 75 }
-        ],
-        notes: 'ملاحظات إضافية حول الفاتورة'
-    };
+function renderTable() {
+    const tbody = document.getElementById('invoices-table-body');
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageInvoices = allInvoices.slice(startIndex, endIndex);
 
-    const itemsHtml = invoice.items.map(item => `
+    if (pageInvoices.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center">لا توجد فواتير</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = pageInvoices.map(invoice => `
+        <tr>
+            <td><span class="invoice-id">${invoice.id}</span></td>
+            <td class="invoice-date">${formatDate(invoice.createdAt)}</td>
+            <td class="invoice-user">${invoice.userName || 'غير محدد'}</td>
+            <td><span class="invoice-total">${formatCurrency(invoice.total)}</span></td>
+            <td><span class="invoice-type">${getInvoiceTypeText(invoice.type)}</span></td>
+            <td class="invoice-customer">${invoice.customerName || 'غير محدد'}</td>
+            <td><span class="invoice-items">${invoice.itemsCount || 0}</span></td>
+            <td>
+                <div class="action-buttons">
+                    <button class="action-btn view" 
+                            onclick="showInvoiceDetails(${invoice.id})" 
+                            title="عرض التفاصيل">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderPagination() {
+    const totalPages = Math.ceil(allInvoices.length / itemsPerPage);
+    const pagination = document.getElementById('invoices-pagination');
+    
+    if (totalPages <= 1) {
+        pagination.innerHTML = '';
+        return;
+    }
+
+    let paginationHTML = '';
+    
+    // Previous button
+    paginationHTML += `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">السابق</a>
+        </li>
+    `;
+
+    // Page numbers
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
+
+    for (let i = startPage; i <= endPage; i++) {
+        paginationHTML += `
+            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+            </li>
+        `;
+    }
+
+    // Next button
+    paginationHTML += `
+        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">التالي</a>
+        </li>
+    `;
+
+    pagination.innerHTML = paginationHTML;
+}
+
+function displayInvoiceModal(invoice) {
+    // Create realistic items based on invoice data
+    const itemsCount = invoice.itemsCount || 3;
+    const mockItems = [];
+    
+    for (let i = 1; i <= itemsCount; i++) {
+        const price = Math.floor(Math.random() * 100) + 10;
+        const quantity = Math.floor(Math.random() * 5) + 1;
+        mockItems.push({
+            name: `منتج ${i}`,
+            quantity: quantity,
+            price: price,
+            total: price * quantity
+        });
+    }
+
+    const itemsHtml = mockItems.map(item => `
         <tr>
             <td>${item.name}</td>
             <td>${item.quantity}</td>
-            <td>${item.price.toFixed(2)} ر.س</td>
-            <td>${item.total.toFixed(2)} ر.س</td>
+            <td>${formatCurrency(item.price)}</td>
+            <td>${formatCurrency(item.total)}</td>
+        </tr>
+    `).join('');
+
+    const modalBody = document.getElementById('invoiceModalBody');
+    modalBody.innerHTML = `
+        <div class="invoice-info-grid">
+            <div class="invoice-info-card">
+                <div class="invoice-info-label">رقم الفاتورة</div>
+                <div class="invoice-info-value">#${invoice.id}</div>
+            </div>
+            <div class="invoice-info-card">
+                <div class="invoice-info-label">التاريخ</div>
+                <div class="invoice-info-value">${formatDate(invoice.createdAt)}</div>
+            </div>
+            <div class="invoice-info-card">
+                <div class="invoice-info-label">المستخدم</div>
+                <div class="invoice-info-value">${invoice.userName || 'غير محدد'}</div>
+            </div>
+            <div class="invoice-info-card">
+                <div class="invoice-info-label">العميل</div>
+                <div class="invoice-info-value">${invoice.customerName || 'غير محدد'}</div>
+            </div>
+            <div class="invoice-info-card">
+                <div class="invoice-info-label">نوع الفاتورة</div>
+                <div class="invoice-info-value">${getInvoiceTypeText(invoice.type)}</div>
+            </div>
+            <div class="invoice-info-card">
+                <div class="invoice-info-label">عدد العناصر</div>
+                <div class="invoice-info-value">${invoice.itemsCount || 0}</div>
+            </div>
+        </div>
+
+        <div class="invoice-items-table">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>المنتج</th>
+                        <th>الكمية</th>
+                        <th>السعر</th>
+                        <th>الإجمالي</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${itemsHtml}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="invoice-total-section">
+            <div class="invoice-total-label">المجموع الكلي</div>
+            <div class="invoice-total-amount">${formatCurrency(invoice.total)}</div>
+        </div>
+
+        <div class="invoice-actions">
+            <button class="invoice-action-btn download" onclick="downloadInvoicePDF(${invoice.id})">
+                <i class="fas fa-download"></i>
+                تحميل PDF
+            </button>
+            <button class="invoice-action-btn print" onclick="printInvoice(${invoice.id})">
+                <i class="fas fa-print"></i>
+                طباعة
+            </button>
+            <button class="invoice-action-btn close" onclick="closeInvoiceModal()">
+                <i class="fas fa-times"></i>
+                إغلاق
+            </button>
+        </div>
+    `;
+
+    // Show modal
+    document.getElementById('invoiceModal').style.display = 'block';
+}
+
+function createInvoicePDFContent(invoice) {
+    // Create realistic items based on invoice data
+    const itemsCount = invoice.itemsCount || 3;
+    const mockItems = [];
+    
+    for (let i = 1; i <= itemsCount; i++) {
+        const price = Math.floor(Math.random() * 100) + 10;
+        const quantity = Math.floor(Math.random() * 5) + 1;
+        mockItems.push({
+            name: `منتج ${i}`,
+            quantity: quantity,
+            price: price,
+            total: price * quantity
+        });
+    }
+
+    const itemsHtml = mockItems.map(item => `
+        <tr>
+            <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">${item.name}</td>
+            <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">${item.quantity}</td>
+            <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">${formatCurrency(item.price)}</td>
+            <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">${formatCurrency(item.total)}</td>
         </tr>
     `).join('');
 
     return `
-        <div style="direction: rtl; text-align: right; padding: 20px; font-family: 'Arial', sans-serif;">
+        <div style="direction: rtl; text-align: right; padding: 20px; font-family: 'Arial', sans-serif; background: white;">
             <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px;">
-                <h1>كافو</h1>
-                <h2>فاتورة ${invoice.type === 'sell' ? 'بيع' : 'شراء'} رقم #${invoice.id}</h2>
-                <p>التاريخ: ${invoice.date} | الوقت: ${invoice.time}</p>
+                <h1 style="color: #6f42c1; margin: 0; font-size: 28px;">كافو</h1>
+                <h2 style="margin: 10px 0; font-size: 20px;">فاتورة ${getInvoiceTypeText(invoice.type)} رقم #${invoice.id}</h2>
+                <p style="margin: 5px 0; color: #666;">التاريخ: ${formatDate(invoice.createdAt)}</p>
             </div>
             
-            <div style="margin-bottom: 30px;">
-                <div style="margin-bottom: 10px;">
-                    <strong>المستخدم:</strong> ${invoice.user}
+            <div style="margin-bottom: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="margin: 0 0 10px 0; color: #6f42c1;">معلومات الفاتورة</h4>
+                    <p style="margin: 5px 0;"><strong>رقم الفاتورة:</strong> #${invoice.id}</p>
+                    <p style="margin: 5px 0;"><strong>التاريخ:</strong> ${formatDate(invoice.createdAt)}</p>
+                    <p style="margin: 5px 0;"><strong>نوع الفاتورة:</strong> ${getInvoiceTypeText(invoice.type)}</p>
                 </div>
-                <div style="margin-bottom: 10px;">
-                    <strong>${invoice.type === 'sell' ? 'العميل:' : 'المورد:'}</strong> ${invoice.customer}
-                </div>
-                <div style="margin-bottom: 10px;">
-                    <strong>نوع الفاتورة:</strong> ${invoice.type === 'sell' ? 'بيع' : 'شراء'}
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <h4 style="margin: 0 0 10px 0; color: #6f42c1;">معلومات العميل</h4>
+                    <p style="margin: 5px 0;"><strong>المستخدم:</strong> ${invoice.userName || 'غير محدد'}</p>
+                    <p style="margin: 5px 0;"><strong>العميل:</strong> ${invoice.customerName || 'غير محدد'}</p>
+                    <p style="margin: 5px 0;"><strong>عدد العناصر:</strong> ${invoice.itemsCount || 0}</p>
                 </div>
             </div>
             
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
                 <thead>
-                    <tr style="background-color: #f8f9fa;">
-                        <th style="border: 1px solid #ddd; padding: 12px;">المنتج</th>
-                        <th style="border: 1px solid #ddd; padding: 12px;">الكمية</th>
-                        <th style="border: 1px solid #ddd; padding: 12px;">السعر</th>
-                        <th style="border: 1px solid #ddd; padding: 12px;">الإجمالي</th>
+                    <tr style="background-color: #6f42c1; color: white;">
+                        <th style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold;">المنتج</th>
+                        <th style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold;">الكمية</th>
+                        <th style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold;">السعر</th>
+                        <th style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold;">الإجمالي</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -452,33 +450,110 @@ function createInvoiceContentForPDF(invoiceId, invoiceType) {
                 </tbody>
             </table>
             
-            <div style="margin-bottom: 20px;">
-                <strong>ملاحظات:</strong> ${invoice.notes}
+            <div style="text-align: left; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold;">
+                    <span>المجموع الكلي:</span>
+                    <span style="color: #6f42c1;">${formatCurrency(invoice.total)}</span>
             </div>
-            
-            <div style="text-align: left; font-weight: bold; font-size: 18px; border-top: 2px solid #333; padding-top: 20px;">
-                <strong>المجموع الكلي: ${invoice.total} ر.س</strong>
             </div>
         </div>
     `;
 }
 
-// Function to create invoice content for printing
-function createInvoiceContentForPrint(invoiceId, invoiceType) {
-    // Use the same content as PDF for consistency
-    return createInvoiceContentForPDF(invoiceId, invoiceType);
+function createInvoicePrintContent(invoice) {
+    return `
+        <!DOCTYPE html>
+        <html dir="rtl" lang="ar">
+        <head>
+            <meta charset="UTF-8">
+            <title>فاتورة رقم #${invoice.id}</title>
+            <style>
+                body { 
+                    font-family: 'Arial', sans-serif; 
+                    margin: 20px; 
+                    direction: rtl; 
+                    background: white;
+                }
+                .invoice-header { 
+                    text-align: center; 
+                    margin-bottom: 30px; 
+                    border-bottom: 2px solid #333; 
+                    padding-bottom: 20px; 
+                }
+                .invoice-details { 
+                    margin-bottom: 30px; 
+                }
+                .invoice-table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin-bottom: 30px; 
+                }
+                .invoice-table th, .invoice-table td { 
+                    border: 1px solid #ddd; 
+                    padding: 12px; 
+                    text-align: center; 
+                }
+                .invoice-table th { 
+                    background-color: #6f42c1; 
+                    color: white;
+                    font-weight: bold; 
+                }
+                .total-section { 
+                    text-align: left; 
+                    font-weight: bold; 
+                    font-size: 18px; 
+                }
+                @media print { 
+                    body { margin: 0; } 
+                }
+            </style>
+        </head>
+        <body>
+            ${createInvoicePDFContent(invoice)}
+        </body>
+        </html>
+    `;
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ar-EG', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('ar-EG', {
+        style: 'currency',
+        currency: 'EGP'
+    }).format(amount);
+}
+
+function getInvoiceTypeText(type) {
+    const typeMap = {
+        'Cash': 'نقدي',
+        'Credit': 'آجل',
+        'Purchase': 'شراء',
+        'Return': 'مرتجع'
+    };
+    return typeMap[type] || type;
 }
 
 // Initialize when document is ready
-$(document).ready(function () {
-    initializeInvoiceFunctionality();
+$(document).ready(function() {
+    // Initialize
+    setInvoiceType('sell');
+    setDefaultDates();
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('invoiceModal');
+        if (event.target === modal) {
+            closeInvoiceModal();
+        }
+    }
 }); 
-
-window.selectedStartDate = '';
-window.selectedEndDate = '';
-
-window.loadInvoicesWithCurrentDates = function(invoiceType, page) {
-    window.selectedStartDate = document.getElementById('invoiceStartDate').value;
-    window.selectedEndDate = document.getElementById('invoiceEndDate').value;
-    loadInvoices(invoiceType, page, window.selectedStartDate, window.selectedEndDate);
-}; 

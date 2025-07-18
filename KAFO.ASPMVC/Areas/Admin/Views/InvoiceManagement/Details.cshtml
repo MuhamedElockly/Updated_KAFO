@@ -1,0 +1,22 @@
+@model KAFO.Domain.Invoices.Invoice
+@{
+    ViewData["Title"] = "تفاصيل الفاتورة";
+}
+<div class="container">
+    <h2>تفاصيل الفاتورة</h2>
+    <dl class="row">
+        <dt class="col-sm-3">رقم الفاتورة</dt>
+        <dd class="col-sm-9">@Model.Id</dd>
+        <dt class="col-sm-3">تاريخ الإنشاء</dt>
+        <dd class="col-sm-9">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</dd>
+        <dt class="col-sm-3">المستخدم</dt>
+        <dd class="col-sm-9">@Model.User?.Name</dd>
+        <dt class="col-sm-3">الإجمالي</dt>
+        <dd class="col-sm-9">@Model.TotalInvoice</dd>
+        <dt class="col-sm-3">النوع</dt>
+        <dd class="col-sm-9">@Model.Type</dd>
+        <dt class="col-sm-3">عدد الأصناف</dt>
+        <dd class="col-sm-9">@Model.Items?.Count ?? 0</dd>
+    </dl>
+    <a href="@Url.Action("Index", "InvoiceManagement", new { area = "Admin" })" class="btn btn-secondary">رجوع</a>
+</div> 

@@ -22,8 +22,9 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 		private readonly UserManager _userManager;
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly CreditCustomerManager _creditCustomerManager;
+		private readonly InvoiceManager _invoiceManager;
 		const int pageSize = 5;
-		public AdminController(CategoryManager categoryManager, ReportManager invoiceManager, InventoryManager inventoryManager, ProductManager productManager, UserManager userManager, IUnitOfWork unitOfWork, CreditCustomerManager creditCustomerManager)
+		public AdminController(CategoryManager categoryManager, ReportManager invoiceManager, InventoryManager inventoryManager, ProductManager productManager, UserManager userManager, IUnitOfWork unitOfWork, CreditCustomerManager creditCustomerManager, InvoiceManager invoiceManager2)
 		{
 			_categoryManager = categoryManager;
 			_reportManager = invoiceManager;
@@ -32,6 +33,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 			_unitOfWork = unitOfWork;
 			_inventoryManager = inventoryManager;
 			_creditCustomerManager = creditCustomerManager;
+			_invoiceManager = invoiceManager2;
 		}
 
 		public IActionResult Index(int sellerPage = 1, int categoryPage = 1, int productPage = 1, int adminPage = 1)
@@ -274,6 +276,15 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 			};
 
 			return PartialView("_InvoicesManagement", invoicesTableVM);
+		}
+
+		public IActionResult GetInvoices(string invoiceType = "sell", DateTime? startDate = null, DateTime? endDate = null)
+		{
+			// Use the new InvoiceManager to get invoices
+			var invoices = _invoiceManager.GetInvoicesForAdmin(invoiceType, startDate, endDate);
+			
+			// Return JSON result
+			return Json(invoices);
 		}
 
 		public IActionResult DailyInventory()

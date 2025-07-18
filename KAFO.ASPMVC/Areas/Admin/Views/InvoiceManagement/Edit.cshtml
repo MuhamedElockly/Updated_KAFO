@@ -1,0 +1,31 @@
+@model KAFO.Domain.Invoices.Invoice
+@{
+    ViewData["Title"] = "تعديل الفاتورة";
+}
+<div class="container">
+    <h2>تعديل الفاتورة</h2>
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="Id" />
+        <div class="mb-3">
+            <label asp-for="CreatedAt" class="form-label"></label>
+            <input asp-for="CreatedAt" class="form-control" />
+            <span asp-validation-for="CreatedAt" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="TotalInvoice" class="form-label"></label>
+            <input asp-for="TotalInvoice" class="form-control" />
+            <span asp-validation-for="TotalInvoice" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Type" class="form-label"></label>
+            <input asp-for="Type" class="form-control" />
+            <span asp-validation-for="Type" class="text-danger"></span>
+        </div>
+        <!-- Add more fields as needed -->
+        <button type="submit" class="btn btn-primary">حفظ</button>
+        <a href="@Url.Action("Index", "InvoiceManagement", new { area = "Admin" })" class="btn btn-secondary">إلغاء</a>
+    </form>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 
