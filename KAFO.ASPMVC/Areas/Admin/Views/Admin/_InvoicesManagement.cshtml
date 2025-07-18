@@ -456,6 +456,27 @@
                 color: white;
             }
 
+    .new-invoice-btn {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .new-invoice-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+        color: white;
+    }
+
     /* Print styles */
     @@media print {
         .invoice-modal {
@@ -485,6 +506,10 @@
     <div class="card-header invoices-table-header">
         <div class="d-flex justify-content-between align-items-center">
             <h4><i class="fas fa-file-invoice me-2"></i>إدارة الفواتير</h4>
+            <button class="new-invoice-btn" onclick="createNewInvoice()">
+                <i class="fas fa-plus"></i>
+                انشاء فاتورة شراء جديدة
+            </button>
         </div>
     </div>
     <div class="card-body p-0">

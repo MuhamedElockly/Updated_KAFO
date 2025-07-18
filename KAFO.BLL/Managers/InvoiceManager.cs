@@ -87,7 +87,14 @@ namespace KAFO.BLL.Managers
                             total = invoice.TotalInvoice,
                             type = "Cash",
                             customerName = "-",
-                            itemsCount = invoice.Items?.Count ?? 0
+                            itemsCount = invoice.Items?.Count ?? 0,
+                            items = invoice.Items?.Select(item => new
+                            {
+                                productName = item.Product?.Name ?? "غير محدد",
+                                quantity = item.Quantity,
+                                unitPrice = item.UnitSellingPrice,
+                                totalPrice = item.UnitSellingPrice * item.Quantity
+                            }).Cast<object>().ToList() ?? new List<object>()
                         });
                     }
 
@@ -101,7 +108,14 @@ namespace KAFO.BLL.Managers
                             total = invoice.TotalInvoice,
                             type = "Credit",
                             customerName = invoice.CustomerAccount?.CustomerName ?? "غير محدد",
-                            itemsCount = invoice.Items?.Count ?? 0
+                            itemsCount = invoice.Items?.Count ?? 0,
+                            items = invoice.Items?.Select(item => new
+                            {
+                                productName = item.Product?.Name ?? "غير محدد",
+                                quantity = item.Quantity,
+                                unitPrice = item.UnitSellingPrice,
+                                totalPrice = item.UnitSellingPrice * item.Quantity
+                            }).Cast<object>().ToList() ?? new List<object>()
                         });
                     }
                 }
@@ -123,7 +137,14 @@ namespace KAFO.BLL.Managers
                             total = invoice.TotalInvoice,
                             type = "Purchase",
                             customerName = "-",
-                            itemsCount = invoice.Items?.Count ?? 0
+                            itemsCount = invoice.Items?.Count ?? 0,
+                            items = invoice.Items?.Select(item => new
+                            {
+                                productName = item.Product?.Name ?? "غير محدد",
+                                quantity = item.Quantity,
+                                unitPrice = item.UnitSellingPrice,
+                                totalPrice = item.UnitSellingPrice * item.Quantity
+                            }).Cast<object>().ToList() ?? new List<object>()
                         });
                     }
                 }
@@ -133,6 +154,22 @@ namespace KAFO.BLL.Managers
                 {
                     for (int i = 1; i <= 7; i++)
                     {
+                        var mockItems = new List<object>();
+                        var itemsCount = 2 + (i % 3);
+                        
+                        for (int j = 1; j <= itemsCount; j++)
+                        {
+                            var price = 10 + (j * 5) + (i * 2);
+                            var quantity = 1 + (j % 3);
+                            mockItems.Add(new
+                            {
+                                productName = $"منتج {j}",
+                                quantity = quantity,
+                                unitPrice = price,
+                                totalPrice = price * quantity
+                            });
+                        }
+                        
                         invoices.Add(new
                         {
                             id = 1000 + i,
@@ -141,7 +178,8 @@ namespace KAFO.BLL.Managers
                             total = 100 * i + (invoiceType == "purchase" ? 50 : 0),
                             type = invoiceType == "sell" ? (i % 2 == 0 ? "Cash" : "Credit") : "Purchase",
                             customerName = invoiceType == "sell" ? (i % 2 == 0 ? "-" : $"عميل {i}") : "-",
-                            itemsCount = 2 + (i % 3)
+                            itemsCount = itemsCount,
+                            items = mockItems
                         });
                     }
                 }

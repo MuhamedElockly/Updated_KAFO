@@ -5,6 +5,36 @@ const itemsPerPage = 5;
 let currentInvoiceType = 'sell';
 
 // Global functions that need to be accessible from HTML
+window.createNewInvoice = function() {
+    Swal.fire({
+        title: 'إنشاء فاتورة شراء جديدة',
+        text: 'سيتم توجيهك إلى صفحة إنشاء فاتورة الشراء',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'متابعة',
+        cancelButtonText: 'إلغاء',
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#6c757d',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Show loading
+            Swal.fire({
+                title: 'جاري التوجيه...',
+                html: '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i></div>',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                timer: 1500
+            });
+            
+            // Navigate to the invoice creation page
+            setTimeout(() => {
+                window.location.href = '/seller/Invoice/Create';
+            }, 1500);
+        }
+    });
+};
+
 window.setInvoiceType = function(type) {
     currentInvoiceType = type;
     currentPage = 1;
@@ -294,22 +324,33 @@ function renderPagination() {
 }
 
 function displayInvoiceModal(invoice) {
-    // Create realistic items based on invoice data
-    const itemsCount = invoice.itemsCount || 3;
-    const mockItems = [];
+    // Use real items data from InvoiceManager if available, otherwise fallback to mock data
+    let items = [];
     
-    for (let i = 1; i <= itemsCount; i++) {
-        const price = Math.floor(Math.random() * 100) + 10;
-        const quantity = Math.floor(Math.random() * 5) + 1;
-        mockItems.push({
-            name: `منتج ${i}`,
-            quantity: quantity,
-            price: price,
-            total: price * quantity
-        });
+    if (invoice.items && Array.isArray(invoice.items) && invoice.items.length > 0) {
+        // Use real product data from InvoiceManager
+        items = invoice.items.map(item => ({
+            name: item.productName || 'غير محدد',
+            quantity: item.quantity || 0,
+            price: item.unitPrice || 0,
+            total: item.totalPrice || 0
+        }));
+    } else {
+        // Fallback to mock data if no real items
+        const itemsCount = invoice.itemsCount || 3;
+        for (let i = 1; i <= itemsCount; i++) {
+            const price = Math.floor(Math.random() * 100) + 10;
+            const quantity = Math.floor(Math.random() * 5) + 1;
+            items.push({
+                name: `منتج ${i}`,
+                quantity: quantity,
+                price: price,
+                total: price * quantity
+            });
+        }
     }
 
-    const itemsHtml = mockItems.map(item => `
+    const itemsHtml = items.map(item => `
         <tr>
             <td>${item.name}</td>
             <td>${item.quantity}</td>
@@ -389,22 +430,33 @@ function displayInvoiceModal(invoice) {
 }
 
 function createInvoicePDFContent(invoice) {
-    // Create realistic items based on invoice data
-    const itemsCount = invoice.itemsCount || 3;
-    const mockItems = [];
+    // Use real items data from InvoiceManager if available, otherwise fallback to mock data
+    let items = [];
     
-    for (let i = 1; i <= itemsCount; i++) {
-        const price = Math.floor(Math.random() * 100) + 10;
-        const quantity = Math.floor(Math.random() * 5) + 1;
-        mockItems.push({
-            name: `منتج ${i}`,
-            quantity: quantity,
-            price: price,
-            total: price * quantity
-        });
+    if (invoice.items && Array.isArray(invoice.items) && invoice.items.length > 0) {
+        // Use real product data from InvoiceManager
+        items = invoice.items.map(item => ({
+            name: item.productName || 'غير محدد',
+            quantity: item.quantity || 0,
+            price: item.unitPrice || 0,
+            total: item.totalPrice || 0
+        }));
+    } else {
+        // Fallback to mock data if no real items
+        const itemsCount = invoice.itemsCount || 3;
+        for (let i = 1; i <= itemsCount; i++) {
+            const price = Math.floor(Math.random() * 100) + 10;
+            const quantity = Math.floor(Math.random() * 5) + 1;
+            items.push({
+                name: `منتج ${i}`,
+                quantity: quantity,
+                price: price,
+                total: price * quantity
+            });
+        }
     }
 
-    const itemsHtml = mockItems.map(item => `
+    const itemsHtml = items.map(item => `
         <tr>
             <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">${item.name}</td>
             <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">${item.quantity}</td>
