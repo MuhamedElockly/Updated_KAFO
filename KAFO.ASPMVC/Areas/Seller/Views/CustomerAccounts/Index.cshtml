@@ -666,4 +666,17 @@
     * {
         transition: all 0.2s ease;
     }
+
+    /* Improved mobile responsiveness for customer accounts table */
+    @@media (max-width: 767.98px) {
+        .customer-accounts-table th,
+        .customer-accounts-table td {
+            font-size: 0.85rem;
+            padding: 0.5rem 0.25rem;
+            white-space: nowrap;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+    }
 </style>
