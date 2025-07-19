@@ -11,26 +11,48 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 	public class InvoiceController : Controller
 	{
 		private readonly IUnitOfWork _unitOfWork;
+		private readonly InvoiceManager _invoiceManager;
 		private readonly InvoicesManager _invoicesManager;
 
-		public InvoiceController(IUnitOfWork unitOfWork, InvoicesManager invoicesManager)
+		public InvoiceController(IUnitOfWork unitOfWork, InvoiceManager invoiceManager, InvoicesManager invoicesManager)
 		{
 			_unitOfWork = unitOfWork;
+			_invoiceManager = invoiceManager;
 			_invoicesManager = invoicesManager;
 		}
+		
 		// GET: InvoiceController
 		public IActionResult Index()
 		{
-			var invoices = _invoicesManager.GetCompleteAll();
+			// Get current user ID from claims
+			var userIdClaim = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+			{
+				TempData["Error"] = "لم يتم العثور على معرف المستخدم الحالي";
+				return RedirectToAction("Index", "Home");
+			}
+
+			// Get invoices for the current seller only
+			var invoices = _invoiceManager.GetInvoicesByUser(userId);
 			return View(invoices);
 		}
 
 		// GET: InvoiceController/Details/5
 		public IActionResult Details(int id)
 		{
+			// Get current user ID from claims
+			var userIdClaim = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+			{
+				TempData["Error"] = "لم يتم العثور على معرف المستخدم الحالي";
+				return RedirectToAction("Index", "Home");
+			}
+
 			var invoice = _invoicesManager.GetComplete(id);
-			if (invoice == null)
+			if (invoice == null || invoice.User.Id != userId)
+			{
 				return NotFound();
+			}
 			return View(invoice);
 		}
 
@@ -91,25 +113,43 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 		// GET: InvoiceController/Edit/5
 		public IActionResult Edit(int id)
 		{
-			var DBInvoice = _invoicesManager.GetComplete(id);
-			return View(DBInvoice);
-		}
+			// Get current user ID from claims
+			var userIdClaim = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+			{
+				TempData["Error"] = "لم يتم العثور على معرف المستخدم الحالي";
+				return RedirectToAction("Index", "Home");
+			}
 
+			var invoice = _invoicesManager.GetComplete(id);
+			if (invoice == null || invoice.User.Id != userId)
+			{
+				return NotFound();
+			}
+			return View(invoice);
+		}
 
 		// POST: InvoiceController/Edit/5
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public IActionResult Edit(int id, Invoice invoice)
 		{
-			Invoice DBInvoice = _unitOfWork.Invoices.FindById(id);
+			// Get current user ID from claims
+			var userIdClaim = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+			{
+				TempData["Error"] = "لم يتم العثور على معرف المستخدم الحالي";
+				return RedirectToAction("Index", "Home");
+			}
+
+			var DBInvoice = _invoicesManager.GetComplete(id);
+			if (DBInvoice == null || DBInvoice.User.Id != userId)
+			{
+				return NotFound();
+			}
+
 			try
 			{
-				if (DBInvoice == null)
-				{
-					ModelState.AddModelError("", "الفاتورة غير موجودة.");
-					return View(invoice);
-				}
-
 				int checkResult = CheckInvoice(invoice);
 				if (checkResult < 0)
 				{
@@ -139,23 +179,43 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 		// GET: InvoiceController/Delete/5
 		public IActionResult Delete(int id)
 		{
+			// Get current user ID from claims
+			var userIdClaim = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+			{
+				TempData["Error"] = "لم يتم العثور على معرف المستخدم الحالي";
+				return RedirectToAction("Index", "Home");
+			}
+
 			var invoice = _invoicesManager.GetComplete(id);
+			if (invoice == null || invoice.User.Id != userId)
+			{
+				return NotFound();
+			}
 			return View(invoice);
 		}
 
 		// POST: InvoiceController/Delete/5
-		[HttpPost]
+		[HttpPost, ActionName("Delete")]
 		[ValidateAntiForgeryToken]
 		public IActionResult DeleteConfirmed(int id)
 		{
-			var DBInvoice = _unitOfWork.Invoices.FindById(id);
+			// Get current user ID from claims
+			var userIdClaim = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+			{
+				TempData["Error"] = "لم يتم العثور على معرف المستخدم الحالي";
+				return RedirectToAction("Index", "Home");
+			}
+
+			var DBInvoice = _invoicesManager.GetComplete(id);
+			if (DBInvoice == null || DBInvoice.User.Id != userId)
+			{
+				return NotFound();
+			}
+
 			try
 			{
-				if (DBInvoice == null)
-				{
-					ModelState.AddModelError("", "الفاتورة غير موجودة.");
-					return View(DBInvoice);
-				}
 				_invoicesManager.DeleteInvoice(DBInvoice);
 				return RedirectToAction(nameof(Index));
 			}
@@ -180,7 +240,9 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 				ModelState.AddModelError("", "لم يتم العثور على معرف المستخدم. يرجى تسجيل الدخول مرة أخرى.");
 			else
 			{
-				invoice.User = _unitOfWork.Users.Get(u => u.Id == int.Parse(nameIdentifierClaim.Value));
+				var userId = int.Parse(nameIdentifierClaim.Value);
+				invoice.User = _unitOfWork.Users.Get(u => u.Id == userId);
+				invoice.UserId = userId;
 				if (false && invoice.User.Role.ToLower().Trim() == "seller" && !(invoice.Type == InvoiceType.Cash || invoice.Type == InvoiceType.Credit))
 				{
 					ModelState.AddModelError("", "ليس لديك صلاحية.");

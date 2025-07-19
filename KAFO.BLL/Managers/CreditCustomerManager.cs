@@ -1,9 +1,11 @@
 
 using KAFO.Domain.Users;
+using KAFO.Domain.Invoices;
 using Kafo.DAL.Repository;
 using System.Collections.Generic;
 using System.Linq;
 using KAFO.BLL.Managers;
+using System;
 
 namespace KAFO.BLL.Managers
 {
@@ -117,17 +119,132 @@ namespace KAFO.BLL.Managers
                         DepositMoney = i.TotalInvoice
                     }).ToList()
                 : new List<CreditCustomerTransactionData>();
-            return new CreditCustomerAccountData
+                            return new CreditCustomerAccountData
+                {
+                    Id = customer.Id,
+                    Name = customer.CustomerName,
+                    Phone = customer.PhoneNumber ?? "",
+                    Email = customer.Email,
+                    Gender = customer.Gender ?? "",
+                    Balance = customer.Balance,
+                    Credit = customer.TotalOwed,
+                    Transactions = transactions
+                };
+            }
+
+            public SettlementResult SettleAccount(int customerId, decimal amount, int userId)
             {
-                Id = customer.Id,
-                Name = customer.CustomerName,
-                Phone = customer.PhoneNumber ?? "",
-                Email = customer.Email,
-                Gender = customer.Gender ?? "",
-                Balance = customer.Balance,
-                Credit = customer.TotalOwed,
-                Transactions = transactions
-            };
+                try
+                {
+                    if (amount <= 0)
+                    {
+                        return new SettlementResult
+                        {
+                            Success = false,
+                            Message = "يجب أن يكون المبلغ أكبر من صفر"
+                        };
+                    }
+
+                    var customer = _unitOfWork.CustomerAccounts.FindById(customerId);
+                    if (customer == null)
+                    {
+                        return new SettlementResult
+                        {
+                            Success = false,
+                            Message = "العميل غير موجود"
+                        };
+                    }
+
+                                    var currentUser = _unitOfWork.Users.FindById(userId);
+                if (currentUser == null)
+                {
+                    return new SettlementResult
+                    {
+                        Success = false,
+                        Message = "لم يتم العثور على المستخدم الحالي"
+                    };
+                }
+
+                    var oldTotalOwed = customer.TotalOwed;
+                    var oldTotalPaid = customer.TotalPaid;
+                    var message = "";
+
+                    // Check if customer has debt to settle
+                    if (customer.TotalOwed > 0)
+                    {
+                        var currentDebt = customer.TotalOwed; 
+                        
+                        // If amount is greater than debt, settle debt first, then add remaining as credit
+                        if (amount >= currentDebt)
+                        {
+                            var remainingAmount = amount - currentDebt;
+                            
+                            // Settle all debt
+                            customer.SettleDebt(currentDebt);
+                            
+                            // Add remaining as credit (TotalPaid)
+                            if (remainingAmount > 0)
+                            {
+                                customer.AddPayment(remainingAmount);
+                            }
+                            
+                            message = $"تم تسوية دين العميل {customer.CustomerName} بالكامل ({currentDebt:C}) وإضافة رصيد إضافي ({remainingAmount:C})";
+                        }
+                        else
+                        {
+                            // Settle partial debt
+                            customer.SettleDebt(amount);
+                            message = $"تم تسوية جزء من دين العميل {customer.CustomerName} بمبلغ {amount:C}";
+                        }
+                    }
+                    else
+                    {
+                        // No debt, add as credit
+                        customer.AddPayment(amount);
+                        message = $"تم إضافة رصيد للعميل {customer.CustomerName} بمبلغ {amount:C}";
+                    }
+
+                    // Create credit terminate invoice
+                    var creditTerminateInvoice = new CreditTerminateInvoice
+                    {
+                        CreatedAt = DateTime.Now,
+                        User = currentUser,
+                        CustomerAccount = customer,
+                        TotalInvoice = amount
+                    };
+
+                    _unitOfWork.CreditTerminateInvoice.Add(creditTerminateInvoice);
+                    _unitOfWork.Save();
+
+                    return new SettlementResult
+                    {
+                        Success = true,
+                        Message = message,
+                        CustomerId = customer.Id,
+                        NewTotalOwed = customer.TotalOwed,
+                        NewTotalPaid = customer.TotalPaid,
+                        OldTotalOwed = oldTotalOwed,
+                        OldTotalPaid = oldTotalPaid,
+                        CustomerName = customer.CustomerName,
+                        AmountPaid = amount
+                    };
+                }
+                catch (ArgumentException ex)
+                {
+                    return new SettlementResult
+                    {
+                        Success = false,
+                        Message = ex.Message
+                    };
+                }
+                catch (Exception ex)
+                {
+                    return new SettlementResult
+                    {
+                        Success = false,
+                        Message = "حدث خطأ أثناء تصفية الحساب: " + ex.Message
+                    };
+                }
+            }
         }
-    }
 } 

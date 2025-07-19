@@ -40,6 +40,7 @@ namespace KAFO.ASPMVC.Areas.Identity.Controllers
 					Claim info0 = new Claim(ClaimTypes.NameIdentifier, user.Id.ToString());
 					Claim info1 = new Claim(ClaimTypes.Name, user.Name.Trim());
 					Claim info2 = new Claim(ClaimTypes.Role, user.Role.ToLower().Trim());
+					Claim info3 = new Claim(ClaimTypes.MobilePhone, user.PhoneNumber.Trim());
 					ClaimsIdentity card = new ClaimsIdentity(new[] { info0, info1, info2 }, "CustomIdentity");
 					ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(card);
 					await HttpContext.SignInAsync("CustomIdentity", claimsPrincipal, new AuthenticationProperties

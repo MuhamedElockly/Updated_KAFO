@@ -1,8 +1,5 @@
-﻿using Kafo.DAL.Data;
-using KAFO.Domain.Users;
-using KAFO.Domain.Invoices;
+﻿using KAFO.BLL.Managers;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace KAFO.ASPMVC.Controllers
@@ -10,242 +7,65 @@ namespace KAFO.ASPMVC.Controllers
     [Area("Seller")]
     public class CustomerAccountsController : Controller
     {
-        // change to CustomerAccounts Manager
-        private readonly AppDBContext _context;
+        private readonly CreditCustomerManager _creditCustomerManager;
 
-        public CustomerAccountsController(AppDBContext context)
+        public CustomerAccountsController(CreditCustomerManager creditCustomerManager)
         {
-            _context = context;
+            _creditCustomerManager = creditCustomerManager;
         }
 
         // GET: CustomerAccounts
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var customers = await _context.CustomerAccounts
+            var customers = _creditCustomerManager.GetAll()
                 .Where(c => !c.IsDeleted)
                 .OrderByDescending(c => c.Id)
-                .ToListAsync();
+                .ToList();
             
             return View(customers);
         }
 
         // GET: CustomerAccounts/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var customerAccount = await _context.CustomerAccounts
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (customerAccount == null)
-            {
-                return NotFound();
-            }
+            var customerAccount = _creditCustomerManager.Get(id.Value);
+            if (customerAccount == null) return NotFound();
 
             return View(customerAccount);
         }
 
-        // GET: CustomerAccounts/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+       
 
-        // POST: CustomerAccounts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // AJAX: CustomerAccounts/SettleAccountAjax
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CustomerName,TotalPaid,TotalOwed")] CustomerAccount customerAccount)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(customerAccount);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(customerAccount);
-        }
-
-        // GET: CustomerAccounts/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var customerAccount = await _context.CustomerAccounts.FindAsync(id);
-            if (customerAccount == null)
-            {
-                return NotFound();
-            }
-            return View(customerAccount);
-        }
-
-        // POST: CustomerAccounts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CustomerName,TotalPaid,TotalOwed")] CustomerAccount customerAccount)
-        {
-            if (id != customerAccount.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(customerAccount);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CustomerAccountExists(customerAccount.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(customerAccount);
-        }
-
-        // GET: CustomerAccounts/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var customerAccount = await _context.CustomerAccounts
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (customerAccount == null)
-            {
-                return NotFound();
-            }
-
-            return View(customerAccount);
-        }
-
-        // POST: CustomerAccounts/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var customerAccount = await _context.CustomerAccounts.FindAsync(id);
-            if (customerAccount != null)
-            {
-                _context.CustomerAccounts.Remove(customerAccount);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool CustomerAccountExists(int id)
-        {
-            return _context.CustomerAccounts.Any(e => e.Id == id);
-        }
-
-        // POST: CustomerAccounts/SettleAccount
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SettleAccount(int customerId, decimal amount)
+        public IActionResult SettleAccountAjax(int customerId, decimal amount)
         {
             try
             {
-                if (amount <= 0)
+                var userIdClaim = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
                 {
-                    TempData["Error"] = "يجب أن يكون المبلغ أكبر من صفر";
-                    return RedirectToAction(nameof(Index));
+                    return Json(new { success = false, message = "لم يتم العثور على معرف المستخدم الحالي" });
                 }
 
-                var customer = await _context.CustomerAccounts.FindAsync(customerId);
-                if (customer == null)
-                {
-                    TempData["Error"] = "العميل غير موجود";
-                    return RedirectToAction(nameof(Index));
-                }
+                var result = _creditCustomerManager.SettleAccount(customerId, amount, userId);
 
-                // Get current user
-                var userName = User?.FindFirst(ClaimTypes.Name)?.Value;
-                var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Name == userName);
-                if (currentUser == null)
-                {
-                    TempData["Error"] = "لم يتم العثور على المستخدم الحالي";
-                    return RedirectToAction(nameof(Index));
-                }
-
-                // Check if customer has debt to settle
-                if (customer.TotalOwed > 0)
-                {
-                    var currentDebt = customer.TotalOwed; // Store current debt amount
-                    
-                    // If amount is greater than debt, settle debt first, then add remaining as credit
-                    if (amount >= currentDebt)
-                    {
-                        var remainingAmount = amount - currentDebt;
-                        
-                        // Settle all debt
-                        customer.SettleDebt(currentDebt);
-                        
-                        // Add remaining as credit (TotalPaid)
-                        if (remainingAmount > 0)
-                        {
-                            customer.AddPayment(remainingAmount);
-                        }
-                        
-                        TempData["Success"] = $"تم تسوية دين العميل {customer.CustomerName} بالكامل ({currentDebt:C}) وإضافة رصيد إضافي ({remainingAmount:C})";
-                    }
-                    else
-                    {
-                        // Settle partial debt
-                        customer.SettleDebt(amount);
-                        TempData["Success"] = $"تم تسوية جزء من دين العميل {customer.CustomerName} بمبلغ {amount:C}";
-                    }
-                }
-                else
-                {
-                    // No debt, add as credit
-                    customer.AddPayment(amount);
-                    TempData["Success"] = $"تم إضافة رصيد للعميل {customer.CustomerName} بمبلغ {amount:C}";
-                }
-
-                // Create credit terminate invoice
-                var creditTerminateInvoice = new KAFO.Domain.Invoices.CreditTerminateInvoice
-                {
-                    CreatedAt = DateTime.Now,
-                    User = currentUser,
-                    CustomerAccount = customer,
-                    TotalInvoice = amount
-                };
-
-                _context.CreditTerminateInvoices.Add(creditTerminateInvoice);
-
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch (ArgumentException ex)
-            {
-                TempData["Error"] = ex.Message;
-                return RedirectToAction(nameof(Index));
+                return Json(new { 
+                    success = result.Success, 
+                    message = result.Message,
+                    customerId = result.CustomerId,
+                    newTotalOwed = result.NewTotalOwed,
+                    newTotalPaid = result.NewTotalPaid,
+                    oldTotalOwed = result.OldTotalOwed,
+                    oldTotalPaid = result.OldTotalPaid
+                });
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "حدث خطأ أثناء تصفية الحساب: " + ex.Message;
-                return RedirectToAction(nameof(Index));
+                return Json(new { success = false, message = "حدث خطأ أثناء تصفية الحساب: " + ex.Message });
             }
         }
     }

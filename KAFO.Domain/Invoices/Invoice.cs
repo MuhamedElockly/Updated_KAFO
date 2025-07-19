@@ -12,7 +12,11 @@ namespace KAFO.Domain.Invoices
         public InvoiceType Type { get; set; }
         [Required]
         public ICollection<InvoiceItem> Items { set; get; } = [];
+        
+        [ForeignKey(nameof(User))]
+        public int UserId { get; set; }
         public User User { set; get; }
+        
         public decimal TotalInvoice { set; get; }
         public bool IsDeleted { get; set; } = false;
 
@@ -32,6 +36,7 @@ namespace KAFO.Domain.Invoices
         {
             CreatedAt = createdAt;
             User = user;
+            UserId = user.Id;
             Type = type;
         }
         private InvoiceItem? GetInvoiceItemByProduct(Product product)

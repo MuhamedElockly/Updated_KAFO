@@ -183,15 +183,18 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg">
             <!-- Enhanced Header with Gradient -->
-            <div class="modal-header border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="modal-header border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative;">
                 <h5 class="modal-title text-white fw-bold" id="settleAccountModalLabel">
                     <i class="fas fa-money-bill-wave me-3"></i>
                     تصفية حساب العميل
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="modal-close-btn" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             
             <form id="settleAccountForm" asp-action="SettleAccount" method="post">
+                @Html.AntiForgeryToken()
                 <div class="modal-body p-4" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
                     <div class="row g-4">
                         <!-- Enhanced Customer Info Card -->
@@ -257,6 +260,9 @@
 </div>
 
 @section Scripts {
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script>
         // Add smooth animations and interactions
         $(document).ready(function() {
@@ -281,6 +287,26 @@
                 trigger: 'hover'
             });
 
+            // Enhanced modal close button functionality
+            $('.modal-close-btn').on('click', function() {
+                var modal = $(this).closest('.modal');
+                modal.modal('hide');
+            });
+
+            // Add keyboard support for modal close
+            $(document).on('keydown', function(e) {
+                if (e.key === 'Escape' && $('#settleAccountModal').hasClass('show')) {
+                    $('#settleAccountModal').modal('hide');
+                }
+            });
+
+            // Add click outside modal to close
+            $('#settleAccountModal').on('click', function(e) {
+                if (e.target === this) {
+                    $(this).modal('hide');
+                }
+            });
+
             // Settlement modal functionality
             $('#settleAccountModal').on('show.bs.modal', function (event) {
                 var button = $(event.relatedTarget);
@@ -303,19 +329,132 @@
                 modal.find('#settlementAmount').val('');
             });
 
-            // Form submission with loading state
+            // AJAX Form submission with SweetAlert
             $('#settleAccountForm').on('submit', function(e) {
-                var submitBtn = $(this).find('.btn-settle-submit');
-                var originalText = submitBtn.html();
+                e.preventDefault();
                 
-                submitBtn.html('<i class="fas fa-spinner fa-spin me-2"></i>جاري التصفية...');
-                submitBtn.prop('disabled', true);
+                var form = $(this);
+                var customerId = form.find('#customerId').val();
+                var amount = form.find('#settlementAmount').val();
+                var customerName = form.find('#modalCustomerName').text();
                 
-                // Re-enable after 3 seconds if no response
-                setTimeout(function() {
-                    submitBtn.html(originalText);
-                    submitBtn.prop('disabled', false);
-                }, 3000);
+                // Validate amount
+                if (!amount || parseFloat(amount) <= 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ في الإدخال',
+                        text: 'يرجى إدخال مبلغ صحيح أكبر من صفر',
+                        confirmButtonColor: '#667eea',
+                        background: '#fff',
+                        color: '#222',
+                        showClass: { popup: 'animate__animated animate__fadeInDown' },
+                        hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+                    });
+                    return;
+                }
+
+                // Show loading SweetAlert
+                Swal.fire({
+                    title: 'جاري تصفية الحساب...',
+                    html: `
+                        <div class="text-center">
+                            <div class="spinner-border text-primary mb-3" role="status">
+                                <span class="visually-hidden">جاري التحميل...</span>
+                            </div>
+                            <p class="text-muted">يرجى الانتظار بينما يتم معالجة طلبك</p>
+                        </div>
+                    `,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    background: '#fff',
+                    color: '#222',
+                    showClass: { popup: 'animate__animated animate__fadeInDown' },
+                    hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+                });
+
+                // Prepare form data
+                var formData = new FormData();
+                formData.append('customerId', customerId);
+                formData.append('amount', amount);
+                formData.append('__RequestVerificationToken', $('input[name="__RequestVerificationToken"]').val());
+
+                // Make AJAX request
+                $.ajax({
+                    url: '/Seller/CustomerAccounts/SettleAccountAjax',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        Swal.close();
+                        
+                        if (response.success) {
+                            // Success SweetAlert
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'تم التصفية بنجاح!',
+                                html: `
+                                    <div class="text-center">
+                                        <div class="success-icon mb-3">
+                                            <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                                        </div>
+                                        <p class="text-success fw-bold mb-2">${response.message}</p>
+                                        <div class="settlement-details mt-3">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <small class="text-muted">المبلغ المدفوع:</small>
+                                                    <div class="fw-bold text-primary">${parseFloat(amount).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' })}</div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <small class="text-muted">العميل:</small>
+                                                    <div class="fw-bold">${customerName}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `,
+                                confirmButtonText: 'تم',
+                                confirmButtonColor: '#10b981',
+                                background: '#fff',
+                                color: '#222',
+                                showClass: { popup: 'animate__animated animate__fadeInDown' },
+                                hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+                            }).then((result) => {
+                                // Close modal and refresh page
+                                $('#settleAccountModal').modal('hide');
+                                location.reload();
+                            });
+                        } else {
+                            // Error SweetAlert
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'فشل في التصفية',
+                                text: response.message || 'حدث خطأ أثناء تصفية الحساب',
+                                confirmButtonColor: '#ef4444',
+                                background: '#fff',
+                                color: '#222',
+                                showClass: { popup: 'animate__animated animate__fadeInDown' },
+                                hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.close();
+                        
+                        // Error SweetAlert
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'خطأ في الاتصال',
+                            text: 'حدث خطأ أثناء الاتصال بالخادم. يرجى المحاولة مرة أخرى.',
+                            confirmButtonColor: '#ef4444',
+                            background: '#fff',
+                            color: '#222',
+                            showClass: { popup: 'animate__animated animate__fadeInDown' },
+                            hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+                        });
+                    }
+                });
             });
 
             // Add loading animation for links
@@ -415,6 +554,43 @@
         border-radius: 1.5rem;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         overflow: hidden;
+    }
+
+    /* Custom Modal Close Button */
+    .modal-close-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .modal-close-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+        color: white;
+    }
+
+    .modal-close-btn:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+    }
+
+    .modal-close-btn:active {
+        transform: scale(0.95);
     }
 
     .modal-header {
@@ -624,6 +800,14 @@
     @@media (max-width: 768px) {
         .modal-dialog {
             margin: 1rem;
+        }
+        
+        .modal-close-btn {
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 35px;
+            height: 35px;
+            font-size: 1rem;
         }
         
         .customer-info-header-enhanced {

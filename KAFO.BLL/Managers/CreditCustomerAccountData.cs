@@ -21,4 +21,17 @@ namespace KAFO.BLL.Managers
         public DateTime Time { get; set; }
         public decimal DepositMoney { get; set; }
     }
+
+    public class SettlementResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
+        public int CustomerId { get; set; }
+        public decimal NewTotalOwed { get; set; }
+        public decimal NewTotalPaid { get; set; }
+        public decimal OldTotalOwed { get; set; }
+        public decimal OldTotalPaid { get; set; }
+        public string CustomerName { get; set; }
+        public decimal AmountPaid { get; set; }
+    }
 } 
