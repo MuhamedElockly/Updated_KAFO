@@ -90,6 +90,10 @@
                                             <i class="fas fa-money-bill-wave me-2"></i>
                                             تصفية الحساب
                                         </th>
+                                        <th class="text-center">
+                                            <i class="fas fa-cogs me-2"></i>
+                                            الإجراءات
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -145,6 +149,13 @@
                                                     <i class="fas fa-money-bill-wave me-2"></i>
                                                     تصفية الحساب
                                                 </button>
+                                            </td>
+                                            <td class="text-center">
+                                                <a asp-area="Admin" asp-controller="CreditCustomerManagement" asp-action="ViewAccount" asp-route-id="@item.Id" 
+                                                   class="btn btn-view-account" title="عرض تفاصيل الحساب">
+                                                    <i class="fas fa-eye me-2"></i>
+                                                    عرض الحساب
+                                                </a>
                                             </td>
                                         </tr>
                                     }
