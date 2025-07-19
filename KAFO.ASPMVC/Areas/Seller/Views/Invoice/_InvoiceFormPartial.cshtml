@@ -5,6 +5,7 @@
         <h6 class="m-0 font-weight-bold">ج.م الفاتورة</h6>
     </div>
     <div class="card-body">
+        <input type="hidden" asp-for="ImageUrl" />
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
@@ -20,6 +21,24 @@
                         <option value="2">شراء</option>
                     </select>
                     <span asp-validation-for="Type" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <!-- Invoice Image Upload -->
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="invoiceImageInput" class="form-label">صورة الفاتورة الورقية (اختياري)</label>
+                    <div class="image-upload-container" id="invoiceImageUploadContainer" style="border: 2px dashed #d1d3e2; border-radius: 0.5rem; padding: 1.5rem; text-align: center; cursor: pointer;">
+                        <div id="invoiceUploadIcon">
+                            <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                            <p class="mb-0">اضغط لرفع صورة الفاتورة الورقية</p>
+                            <small class="text-muted">(JPEG, PNG, Max 2MB)</small>
+                        </div>
+                        <img src="@(Model?.ImageUrl??"")" id="invoiceImagePreview" class="image-preview img-thumbnail" alt="Preview" style="max-width: 200px; max-height: 200px; display: @(Model?.ImageUrl==null?"none":"block")">
+                        <input type="file" id="invoiceImageInput" name="invoiceImageFile" accept="image/*" style="display: none;" />
+                    </div>
+                    <span asp-validation-for="ImageUrl" class="text-danger small"></span>
                 </div>
             </div>
         </div>

@@ -359,8 +359,28 @@ function displayInvoiceModal(invoice) {
         </tr>
     `).join('');
 
+    // --- Invoice Image Section ---
+    let imageSection = '';
+    if (invoice.imageUrl && invoice.imageUrl !== "") {
+        imageSection = `
+            <div class="card shadow-sm p-4 text-center mb-4" style="border-radius: 1rem; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+                <h5 class="mb-3" style="color: #6f42c1; font-weight: 600;"><i class="fas fa-paperclip me-2"></i>مرفق صورة الفاتورة الورقية</h5>
+                <a href="${invoice.imageUrl}" target="_blank" class="btn btn-lg btn-primary" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); border: none; border-radius: 0.5rem; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <i class="fas fa-image me-2"></i>عرض الصورة في تبويب جديد
+                </a>
+            </div>
+        `;
+    } else {
+        imageSection = `
+            <div class="alert alert-warning d-flex align-items-center justify-content-center mb-4" style="border-radius: 0.5rem; font-size: 1.1rem;">
+                <i class="fas fa-exclamation-circle me-2"></i>لا يوجد ملف مرفق لهذه الفاتورة
+            </div>
+        `;
+    }
+
     const modalBody = document.getElementById('invoiceModalBody');
     modalBody.innerHTML = `
+        ${imageSection}
         <div class="invoice-info-grid">
             <div class="invoice-info-card">
                 <div class="invoice-info-label">رقم الفاتورة</div>

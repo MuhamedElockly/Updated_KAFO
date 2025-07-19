@@ -39,18 +39,31 @@ namespace KAFO.BLL.Managers
                 }
             }
 
+            // Filter out invalid items (no product selected or invalid product)
+            var validItems = new List<InvoiceItem>();
             foreach (var item in invoice.Items)
             {
-                if (item == null || item.ProductId == null || item.UnitSellingPrice == null || item.UnitPurchasingPrice == null)
+                if (item == null || item.ProductId == 0)
                 {
-                    dic.Add("", $"حدث خطا في معالجة الاصناف");
-                    continue;
+                    continue; // skip invalid
                 }
-
+                var product = Products.FirstOrDefault(p => p.Id == item.ProductId);
+                if (product == null)
+                {
+                    continue; // skip invalid
+                }
                 item.Invoice = invoice;
-                item.Product = Products.FirstOrDefault(p => p.Id == item.ProductId);
-                item.UnitSellingPrice = item.Product.SellingPrice;
-                item.UnitPurchasingPrice = item.Product.AveragePurchasePrice;
+                item.Product = product;
+                item.UnitSellingPrice = product.SellingPrice;
+                item.UnitPurchasingPrice = product.AveragePurchasePrice;
+                validItems.Add(item);
+            }
+            invoice.Items = validItems;
+
+            if (invoice.Items == null || invoice.Items.Count == 0)
+            {
+                dic.Add("", "يجب إضافة صنف واحد على الأقل للفاتورة.");
+                return dic;
             }
 
             if (dic.Count == 0)

@@ -20,6 +20,9 @@ namespace KAFO.Domain.Invoices
         public decimal TotalInvoice { set; get; }
         public bool IsDeleted { get; set; } = false;
 
+        // Image of the paper invoice
+        public string? ImageUrl { get; set; }
+
         // credit invoice 
 
         [ForeignKey(nameof(CustomerAccount))]

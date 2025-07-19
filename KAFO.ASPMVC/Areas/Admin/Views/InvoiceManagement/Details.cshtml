@@ -18,5 +18,24 @@
         <dt class="col-sm-3">عدد الأصناف</dt>
         <dd class="col-sm-9">@Model.Items?.Count ?? 0</dd>
     </dl>
+    <div class="row mb-4">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-sm p-4 text-center" style="border-radius: 1rem; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+                <h5 class="mb-3" style="color: #6f42c1; font-weight: 600;"><i class="fas fa-paperclip me-2"></i>مرفق صورة الفاتورة الورقية</h5>
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <a href="@Model.ImageUrl" target="_blank" class="btn btn-lg btn-primary" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); border: none; border-radius: 0.5rem; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        <i class="fas fa-image me-2"></i>عرض الصورة في تبويب جديد
+                    </a>
+                }
+                else
+                {
+                    <div class="alert alert-warning d-flex align-items-center justify-content-center mb-0" style="border-radius: 0.5rem; font-size: 1.1rem;">
+                        <i class="fas fa-exclamation-circle me-2"></i>لا يوجد ملف مرفق لهذه الفاتورة
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
     <a href="@Url.Action("Index", "InvoiceManagement", new { area = "Admin" })" class="btn btn-secondary">رجوع</a>
 </div> 

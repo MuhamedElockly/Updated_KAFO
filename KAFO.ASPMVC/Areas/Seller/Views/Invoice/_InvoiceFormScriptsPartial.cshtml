@@ -211,5 +211,23 @@
                 }, 500);
             }
         });
+
+        // Invoice image upload preview
+        document.getElementById("invoiceImageUploadContainer").addEventListener("click", function () {
+            document.getElementById("invoiceImageInput").click();
+        });
+
+        document.getElementById("invoiceImageInput").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const imgPreview = document.getElementById("invoiceImagePreview");
+                    imgPreview.src = e.target.result;
+                    imgPreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
     });
 </script>

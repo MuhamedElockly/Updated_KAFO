@@ -12,5 +12,6 @@ namespace KAFO.ASPMVC.Areas.Admin.ViewModels
         public string InvoiceType { get; set; }
         public string CustomerName { get; set; }
         public int ItemsCount { get; set; }
+        public string? ImageUrl { get; set; }
     }
 } 

@@ -57,7 +57,7 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 		}
 
 		// GET: InvoiceController/Create
-		public IActionResult Create()
+		public async Task<IActionResult> Create()
 		{
 			ViewBag.Products = _unitOfWork.Products.GetAll("Category", p => p.IsActive);
 			return View();
@@ -66,10 +66,23 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 		// POST: InvoiceController/Create
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public IActionResult Create(Invoice invoice, string dist = "", string redirectTo = "")
+		public async Task<IActionResult> Create(Invoice invoice, IFormFile? invoiceImageFile, string dist = "", string redirectTo = "")
 		{
            
             invoice.CreatedAt = DateTime.Now;
+			// Handle invoice image upload
+			if (invoiceImageFile != null && invoiceImageFile.Length > 0)
+			{
+				var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/Upload/invoices");
+				Directory.CreateDirectory(uploadsFolder);
+				var fileName = $"[Invoice] - {DateTime.Now:dd-MM-yyyy-HH-mm-ss}{Path.GetExtension(invoiceImageFile.FileName)}";
+				var filePath = Path.Combine(uploadsFolder, fileName);
+				using (var stream = new FileStream(filePath, FileMode.Create))
+				{
+					await invoiceImageFile.CopyToAsync(stream);
+				}
+				invoice.ImageUrl = $"/images/Upload/invoices/{fileName}";
+			}
 			int checkResult = CheckInvoice(invoice);
 			if (checkResult < 0)
 			{

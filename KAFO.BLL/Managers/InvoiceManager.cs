@@ -138,6 +138,7 @@ namespace KAFO.BLL.Managers
                             type = "Purchase",
                             customerName = "-",
                             itemsCount = invoice.Items?.Count ?? 0,
+                            imageUrl = invoice.ImageUrl,
                             items = invoice.Items?.Select(item => new
                             {
                                 productName = item.Product?.Name ?? "غير محدد",

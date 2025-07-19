@@ -198,7 +198,8 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 							TotalInvoice = invoice.TotalInvoice,
 							InvoiceType = "نقدي",
 							CustomerName = "-",
-							ItemsCount = invoice.Items?.Count ?? 0
+							ItemsCount = invoice.Items?.Count ?? 0,
+							ImageUrl = invoice.ImageUrl
 						});
 					}
 
@@ -212,7 +213,8 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 							TotalInvoice = invoice.TotalInvoice,
 							InvoiceType = "آجل",
 							CustomerName = invoice.CustomerAccount?.CustomerName ?? "غير محدد",
-							ItemsCount = invoice.Items?.Count ?? 0
+							ItemsCount = invoice.Items?.Count ?? 0,
+							ImageUrl = invoice.ImageUrl
 						});
 					}
 				}
@@ -234,7 +236,8 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 							TotalInvoice = invoice.TotalInvoice,
 							InvoiceType = "شراء",
 							CustomerName = "-",
-							ItemsCount = invoice.Items?.Count ?? 0
+							ItemsCount = invoice.Items?.Count ?? 0,
+							ImageUrl = invoice.ImageUrl
 						});
 					}
 				}
@@ -252,7 +255,8 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 							TotalInvoice = 100 * i + (invoiceType == "purchase" ? 50 : 0),
 							InvoiceType = invoiceType == "sell" ? (i % 2 == 0 ? "نقدي" : "آجل") : "شراء",
 							CustomerName = invoiceType == "sell" ? (i % 2 == 0 ? "-" : $"عميل {i}") : "-",
-							ItemsCount = 2 + (i % 3)
+							ItemsCount = 2 + (i % 3),
+							ImageUrl = null
 						});
 					}
 				}
