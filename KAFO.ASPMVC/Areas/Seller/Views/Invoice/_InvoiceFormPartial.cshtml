@@ -71,14 +71,15 @@
             <table class="table table-bordered" id="invoiceItemsTable">
                 <thead class="bg-light">
                     <tr>
-                        <th width="20%">المنتج</th>
-                        <th width="10%">الكمية بالقطعة</th>
-                        <th width="10%">الكمية بالكرتونة</th>
-                        <th width="10%">سعة الكرتونة</th>
-                        <th width="10%">سعر الشراء للقطعة</th>
-                        <th width="10%">سعر الشراء للكرتونة</th>
-                        <th width="10%">المجموع</th>
-                        <th width="10%">إجراءات</th>
+                        <th width="18%">المنتج</th>
+                        <th width="9%">الكمية بالقطعة</th>
+                        <th width="9%">الكمية بالكرتونة</th>
+                        <th width="9%">سعة الكرتونة</th>
+                        <th width="9%">سعر الشراء للقطعة</th>
+                        <th width="9%">سعر الشراء للكرتونة</th>
+                        <th width="9%">سعر البيع للقطعة</th>
+                        <th width="9%">المجموع</th>
+                        <th width="9%">إجراءات</th>
                     </tr>
                 </thead>
                 <tbody id="itemsContainer">
@@ -129,6 +130,10 @@
                                            value="@item.Product?.BoxPurchasePrice" readonly />
                                 </td>
                                 <td>
+                                    <input type="number" min="0" step="0.01" class="form-control selling-price"
+                                           value="@item.Product?.SellingPrice" readonly />
+                                </td>
+                                <td>
                                     <input type="number" class="form-control item-total"
                                            value="@((item.Quantity * item.UnitPurchasingPrice).ToString("N2"))" readonly />
                                 </td>
@@ -143,7 +148,7 @@
                 </tbody>
                 <tfoot>
                     <tr class="font-weight-bold">
-                        <td colspan="6" class="text-left">الإجمالي</td>
+                        <td colspan="7" class="text-left">الإجمالي</td>
                         <td id="totalInvoiceAmount">@Model?.TotalInvoice.ToString("N2")</td>
                         <td></td>
                     </tr>

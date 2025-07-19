@@ -1,7 +1,7 @@
 ﻿@model Invoice
 
 @{
-    ViewData["Title"] = "إنشاء فاتورة";
+    ViewData["Title"] = " إنشاء فاتورة";
     Layout = null;
 }
 
@@ -123,10 +123,10 @@
                             <partial name="_InvoiceFormPartial" model="Model" />
                             <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mt-4">
                                 <button type="submit" class="btn btn-lg btn-primary px-5" style="font-weight:600;">
-                                    <i class="fas fa-save me-2"></i>حفظ الفاتورة
+                                    <i class="fas fa-save me-2"></i> حفظ الفاتورة
                                 </button>
                                 <a href="/Admin/Admin/Index" class="btn btn-lg btn-outline-secondary px-5" style="font-weight:600;">
-                                    <i class="fas fa-arrow-left me-2"></i>رجوع
+                                    <i class="fas fa-arrow-left me-2"></i> رجوع
                                 </a>
                             </div>
                         </form>
@@ -196,7 +196,8 @@
                                                         data-price="@product.AveragePurchasePrice"
                                                         data-boxprice="@product.BoxPurchasePrice"
                                                         data-boxquantity="@product.BoxQuantity"
-                                                        data-image="@product.ImageUrl">
+                                                        data-image="@product.ImageUrl"
+                                                        data-sellingprice="@product.SellingPrice">
                                                     <i class="fas fa-check"></i> اختيار
                                                 </button>
                                             </td>
@@ -231,6 +232,41 @@
         $('#invoiceForm').off('submit').on('submit', function (e) {
             e.preventDefault();
             var form = this;
+            // Client-side validation for at least one valid item and valid quantity
+            var hasValidItems = false;
+            var invalidQuantity = false;
+            $('#itemsContainer tr').each(function () {
+                var productId = $(this).find('.product-id').val();
+                var pieceQty = parseFloat($(this).find('.piece-quantity').val()) || 0;
+                var boxQty = parseFloat($(this).find('.box-quantity').val()) || 0;
+                var totalQty = pieceQty + boxQty;
+                if (productId && productId !== "0" && productId !== "") {
+                    hasValidItems = true;
+                    if (totalQty <= 0) {
+                        invalidQuantity = true;
+                    }
+                }
+            });
+            if (!hasValidItems) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'خطأ',
+                    text: 'يجب إضافة صنف واحد على الأقل للفاتورة.',
+                    confirmButtonText: 'حسناً',
+                    confirmButtonColor: '#dc3545'
+                });
+                return;
+            }
+            if (invalidQuantity) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'خطأ',
+                    text: 'يجب أن تكون الكمية لكل منتج أكبر من صفر.',
+                    confirmButtonText: 'حسناً',
+                    confirmButtonColor: '#dc3545'
+                });
+                return;
+            }
             var formData = new FormData(form);
             Swal.fire({
                 title: 'جاري الحفظ ...',
