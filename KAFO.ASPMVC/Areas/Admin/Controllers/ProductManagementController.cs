@@ -2,11 +2,13 @@
 using KAFO.ASPMVC.Areas.Admin.ViewModels;
 using KAFO.BLL.Managers;
 using KAFO.Domain.Products;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KAFO.ASPMVC.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "admin")]
     public class ProductManagementController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

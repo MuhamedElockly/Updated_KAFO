@@ -5,11 +5,13 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using KAFO.BLL.Managers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KAFO.ASPMVC.Areas.Admin.Controllers
 {
 	[Area("Admin")]
-	public class ReportController : Controller
+    [Authorize(Roles = "admin")]
+    public class ReportController : Controller
 	{
 		private readonly ReportManager _reportManager;
 		public ReportController(ReportManager invoiceManager)

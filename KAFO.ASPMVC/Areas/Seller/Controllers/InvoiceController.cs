@@ -1,6 +1,7 @@
 ﻿using Kafo.DAL.Repository;
 using KAFO.BLL.Managers;
 using KAFO.Domain.Invoices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -8,7 +9,8 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace KAFO.ASPMVC.Areas.Seller.Controllers
 {
 	[Area("seller")]
-	public class InvoiceController : Controller
+   
+    public class InvoiceController : Controller
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly InvoiceManager _invoiceManager;
@@ -20,9 +22,10 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 			_invoiceManager = invoiceManager;
 			_invoicesManager = invoicesManager;
 		}
-		
-		// GET: InvoiceController
-		public IActionResult Index()
+
+        // GET: InvoiceController
+        [Authorize(Roles = "seller")]
+        public IActionResult Index()
 		{
 			// Get current user ID from claims
 			var userIdClaim = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -37,8 +40,9 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 			return View(invoices);
 		}
 
-		// GET: InvoiceController/Details/5
-		public IActionResult Details(int id)
+        // GET: InvoiceController/Details/5
+        [Authorize(Roles = "seller")]
+        public IActionResult Details(int id)
 		{
 			// Get current user ID from claims
 			var userIdClaim = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -56,8 +60,9 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 			return View(invoice);
 		}
 
-		// GET: InvoiceController/Create
-		public async Task<IActionResult> Create()
+        // GET: InvoiceController/Create
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> Create()
 		{
 			ViewBag.Products = _unitOfWork.Products.GetAll("Category", p => p.IsActive);
 			return View();
@@ -66,8 +71,31 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 		// POST: InvoiceController/Create
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Create(Invoice invoice, IFormFile? invoiceImageFile, string dist = "", string redirectTo = "")
+        [Authorize(Roles = "admin,seller")]
+        public async Task<IActionResult> Create(Invoice invoice, IFormFile? invoiceImageFile, string dist = "", string redirectTo = "")
 		{
+            // Role-based authorization for invoice types
+            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+            
+            if (userRole == "seller" && invoice.Type == InvoiceType.Purchasing)
+            {
+                ModelState.AddModelError("", "ليس لديك صلاحية لإنشاء فواتير الشراء");
+                if (dist.Trim().ToLower() == "pos" || Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = false, message = "ليس لديك صلاحية لإنشاء فواتير الشراء" });
+                }
+                return View(invoice);
+            }
+            
+            if (userRole == "admin" && (invoice.Type == InvoiceType.Cash || invoice.Type == InvoiceType.Credit))
+            {
+                ModelState.AddModelError("", "ليس لديك صلاحية لإنشاء فواتير البيع");
+                if (dist.Trim().ToLower() == "pos" || Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = false, message = "ليس لديك صلاحية لإنشاء فواتير البيع" });
+                }
+                return View(invoice);
+            }
            
             invoice.CreatedAt = DateTime.Now;
 			// Handle invoice image upload
@@ -131,8 +159,9 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 			return RedirectToAction(nameof(Index));
 		}
 
-		// GET: InvoiceController/Edit/5
-		public IActionResult Edit(int id)
+        // GET: InvoiceController/Edit/5
+        [Authorize(Roles = "seller")]
+        public IActionResult Edit(int id)
 		{
 			// Get current user ID from claims
 			var userIdClaim = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -153,7 +182,8 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 		// POST: InvoiceController/Edit/5
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public IActionResult Edit(int id, Invoice invoice)
+        [Authorize(Roles = "seller")]
+        public IActionResult Edit(int id, Invoice invoice)
 		{
 			// Get current user ID from claims
 			var userIdClaim = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -197,56 +227,9 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 			}
 		}
 
-		// GET: InvoiceController/Delete/5
-		public IActionResult Delete(int id)
-		{
-			// Get current user ID from claims
-			var userIdClaim = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-			if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
-			{
-				TempData["Error"] = "لم يتم العثور على معرف المستخدم الحالي";
-				return RedirectToAction("Index", "Home");
-			}
 
-			var invoice = _invoicesManager.GetComplete(id);
-			if (invoice == null || invoice.User.Id != userId)
-			{
-				return NotFound();
-			}
-			return View(invoice);
-		}
-
-		// POST: InvoiceController/Delete/5
-		[HttpPost, ActionName("Delete")]
-		[ValidateAntiForgeryToken]
-		public IActionResult DeleteConfirmed(int id)
-		{
-			// Get current user ID from claims
-			var userIdClaim = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-			if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
-			{
-				TempData["Error"] = "لم يتم العثور على معرف المستخدم الحالي";
-				return RedirectToAction("Index", "Home");
-			}
-
-			var DBInvoice = _invoicesManager.GetComplete(id);
-			if (DBInvoice == null || DBInvoice.User.Id != userId)
-			{
-				return NotFound();
-			}
-
-			try
-			{
-				_invoicesManager.DeleteInvoice(DBInvoice);
-				return RedirectToAction(nameof(Index));
-			}
-			catch
-			{
-				return View(DBInvoice);
-			}
-		}
-
-		public int CheckInvoice(Invoice invoice)
+        [Authorize(Roles = "seller")]
+        public int CheckInvoice(Invoice invoice)
 		{
 			if (invoice == null || invoice.Items == null || !invoice.Items.Any())
 			{

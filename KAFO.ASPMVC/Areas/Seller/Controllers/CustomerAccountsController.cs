@@ -1,10 +1,12 @@
 ﻿using KAFO.BLL.Managers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace KAFO.ASPMVC.Controllers
 {
     [Area("Seller")]
+    [Authorize(Roles = "seller")]
     public class CustomerAccountsController : Controller
     {
         private readonly CreditCustomerManager _creditCustomerManager;

@@ -1,12 +1,14 @@
 using KAFO.ASPMVC.Areas.Admin.ViewModels;
 using KAFO.BLL.Managers;
 using KAFO.Domain.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
 namespace Kafo.ASPMVC.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    
     public class CreditCustomerManagementController : Controller
     {
         private readonly CreditCustomerManager _creditCustomerManager;
@@ -16,7 +18,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
         {
             _creditCustomerManager = creditCustomerManager;
         }
-
+        [Authorize(Roles = "admin")]
         public IActionResult CreditCustomerManagement(int? page)
         {
             int pageSize = 5;
@@ -43,7 +45,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 
             return PartialView("_CreditCustomersManagement", vm);
         }
-
+        [Authorize(Roles = "admin")]
         public IActionResult Create()
         {
             try
@@ -58,6 +60,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public IActionResult Create(KAFO.ASPMVC.Areas.Admin.ViewModels.CreditCustomerAddVM model)
         {
             try
@@ -90,7 +93,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
                 return View(model);
             }
         }
-
+        [Authorize(Roles = "admin")]
         public IActionResult Details(int id)
         {
             try
@@ -121,7 +124,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
                 return Json(new { success = false, message = "حدث خطأ غير متوقع: " + ex.Message });
             }
         }
-
+        [Authorize(Roles = "admin,seller")]
         public IActionResult ViewAccount(int id)
         {
             try
@@ -202,6 +205,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
         //}
 
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public IActionResult Delete(int id)
         {
             try
@@ -223,6 +227,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "admin")]
         public IActionResult Edit(int id)
         {
             var customer = _creditCustomerManager.Get(id);
@@ -244,6 +249,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public IActionResult Edit(CreditCustomerAddVM model)
         {
             try

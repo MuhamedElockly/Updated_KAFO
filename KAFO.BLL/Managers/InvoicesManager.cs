@@ -129,6 +129,7 @@ namespace KAFO.BLL.Managers
                 item.UnitSellingPrice = item.UnitSellingPrice > 0 ? item.UnitSellingPrice : product.SellingPrice;
                 // Update product prices and stock for purchase invoices
                 product.ChangePurchasingPriceAndQuantity(item.UnitPurchasingPrice, item.UnitSellingPrice, item.Quantity);
+                invoice.TotalInvoice += item.UnitPurchasingPrice * item.Quantity;
                 // Update BoxPurchasePrice with the latest value from the invoice item
                 if (item.Product.BoxPurchasePrice > 0)
                 {
@@ -136,6 +137,7 @@ namespace KAFO.BLL.Managers
                     _unitOfWork.Products.Update(product);
                 }
                 validItems.Add(item);
+
             }
             invoice.Items = validItems;
             if (invoice.Items == null || invoice.Items.Count == 0)
@@ -151,6 +153,7 @@ namespace KAFO.BLL.Managers
                 //{
                 //    item.Product = null;
                 //}
+                
                 _unitOfWork.Invoices.Add(invoice);
                 _unitOfWork.Save();
             }

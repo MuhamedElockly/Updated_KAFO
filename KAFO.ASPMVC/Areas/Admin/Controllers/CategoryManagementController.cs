@@ -4,10 +4,12 @@ using Kafo.DAL.Repository;
 using KAFO.BLL.Managers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Kafo.ASPMVC.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "admin")]
     public class CategoryManagementController : Controller
     {
         private readonly CategoryManager _categoryManager;

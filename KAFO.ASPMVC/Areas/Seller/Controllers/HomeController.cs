@@ -1,10 +1,12 @@
 using KAFO.ASPMVC.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 namespace KAFO.ASPMVC.Controllers
 {
     [Area("Seller")]
+    [Authorize(Roles = "seller")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

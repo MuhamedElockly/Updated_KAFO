@@ -1,6 +1,7 @@
 @model ProfileVM
 
 <link rel="stylesheet" href="~/css/reports.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 
 <div class="reports-container" id="profile-management">
@@ -20,71 +21,81 @@
         </div>
         
         <div class="report-details-section">
-            <form id="profileForm" class="view-mode">
+            <form id="profileForm" asp-action="UpdateProfile" asp-controller="Profile" method="post">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="Role" />
+                
                 <div class="profile-section">
                     <h5 class="report-title"><i class="fas fa-user-tag"></i> المعلومات الشخصية</h5>
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label"><i class="fas fa-user me-2"></i>الاسم <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" asp-for="Name" disabled required />
+                            <input type="text" class="form-control profile-field" asp-for="Name" disabled required />
                             <span class="error-message" asp-validation-for="Name"></span>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label"><i class="fas fa-envelope me-2"></i>البريد الإلكتروني</label>
-                            <input type="email" class="form-control" asp-for="Email" disabled />
+                            <input type="email" class="form-control profile-field" asp-for="Email" disabled />
+                            <span class="error-message" asp-validation-for="Email"></span>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label"><i class="fas fa-phone me-2"></i>رقم الهاتف <span class="text-danger">*</span></label>
-                            <input type="tel" class="form-control" asp-for="Phone" disabled required />
+                            <input type="tel" class="form-control profile-field" asp-for="Phone" disabled required />
                             <span class="error-message" asp-validation-for="Phone"></span>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label"><i class="fas fa-venus-mars me-2"></i>النوع</label>
-                            <input type="text" class="form-control" asp-for="Gender" disabled />
+                            <select class="form-control profile-field" asp-for="Gender" disabled readonly>
+                                <option value="">اختر النوع</option>
+                                <option value="Male" selected="@(Model.Gender == "Male")">ذكر</option>
+                                <option value="Female" selected="@(Model.Gender == "Female")">أنثى</option>
+                            </select>
+                            <span class="error-message" asp-validation-for="Gender"></span>
                         </div>
                     </div>
                 </div>
                 
-                <div class="profile-section">
-                    <div class="password-toggle-section">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="changePasswordToggle" role="switch">
-                            <label class="form-check-label" for="changePasswordToggle">
-                                <i class="fas fa-lock me-2"></i>تغيير كلمة المرور
-                            </label>
-                        </div>
+                <div class="password-toggle-section">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="changePasswordToggle">
+                        <label class="form-check-label" for="changePasswordToggle">
+                            <i class="fas fa-key me-2"></i>تغيير كلمة المرور
+                        </label>
                     </div>
-                    
-                    <div class="password-section" id="passwordSection">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label"><i class="fas fa-key me-2"></i>كلمة المرور الجديدة <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input type="password" class="form-control" asp-for="NewPassword" minlength="6" disabled />
-                                    <button type="button" class="btn password-toggle">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </div>
-                                <span class="error-message" asp-validation-for="NewPassword"></span>
+                </div>
+                
+                <div class="password-section" id="passwordSection" style="display: none;">
+                    <h5 class="report-title"><i class="fas fa-lock"></i> تغيير كلمة المرور</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-key me-2"></i>كلمة المرور الجديدة <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="password" class="form-control password-field" asp-for="NewPassword" disabled />
+                                <button type="button" class="btn password-toggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label"><i class="fas fa-key me-2"></i>تأكيد كلمة المرور <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input type="password" class="form-control" asp-for="ConfirmPassword" disabled />
-                                    <button type="button" class="btn password-toggle">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </div>
-                                <span class="error-message" asp-validation-for="ConfirmPassword"></span>
+                            <span class="error-message" asp-validation-for="NewPassword"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-key me-2"></i>تأكيد كلمة المرور <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="password" class="form-control password-field" asp-for="ConfirmPassword" disabled />
+                                <button type="button" class="btn password-toggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
                             </div>
+                            <span class="error-message" asp-validation-for="ConfirmPassword"></span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="report-actions">
                     <div class="d-flex gap-2 justify-content-end">
-                        <button type="button" class="btn btn-delete-account" id="deleteAccountBtn">
+                        <button type="button" class="btn btn-delete-account" id="deleteAccountBtn" 
+                                data-delete-url="@Url.Action("DeleteAccount", "Profile")" 
+                                data-logout-url="/Identity/Identity/Logout">
                             <i class="fas fa-trash-alt me-2"></i>حذف الحساب
                         </button>
                         <button type="button" class="btn action-btn secondary" id="cancelEditBtn" style="display: none;">
@@ -103,418 +114,256 @@
     </div>
 </div>
 
-@section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        $(document).ready(function() {
-            // Initialize password section as hidden
-            $('#passwordSection').hide();
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(function() {
+        let isEditMode = false;
+        let originalData = {};
+        
+        // Store original data when page loads
+        $('.profile-field').each(function() {
+            originalData[$(this).attr('id')] = $(this).val();
+        });
+        
+        // Ensure gender field is readonly on page load
+        $('#Gender').prop('disabled', true).prop('readonly', true);
+        
+        // Edit button click
+        $('#editProfileBtn').click(function() {
+            isEditMode = true;
+            enableEditMode();
+        });
+        
+        // Cancel button click
+        $('#cancelEditBtn').click(function() {
+            isEditMode = false;
+            disableEditMode();
+            restoreOriginalData();
+        });
+        
+        // Password toggle
+        $('#changePasswordToggle').change(function() {
+            if ($(this).is(':checked')) {
+                $('#passwordSection').slideDown();
+                $('.password-field').prop('disabled', false);
+            } else {
+                $('#passwordSection').slideUp();
+                $('.password-field').prop('disabled', true).val('');
+            }
+        });
+        
+        // Password visibility toggle
+        $('.password-toggle').click(function() {
+            const input = $(this).siblings('input');
+            const icon = $(this).find('i');
             
-            // Toggle password visibility with animation
-            $('.password-toggle').click(function() {
-                const input = $(this).siblings('input');
-                const icon = $(this).find('i');
-                if (input.attr('type') === 'password') {
-                    input.attr('type', 'text');
-                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
-                } else {
-                    input.attr('type', 'password');
-                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
-                }
-            });
+            if (input.attr('type') === 'password') {
+                input.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                input.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+        
+        // Form submission
+        $('#profileForm').submit(function(e) {
+            e.preventDefault();
             
-            // Toggle password section with smooth animation
-            $('#changePasswordToggle').change(function() {
-                if ($(this).is(':checked')) {
-                    $('#passwordSection').slideDown(300, function() {
-                        $('#NewPassword, #ConfirmPassword').prop('disabled', false);
-                        $(this).addClass('active');
-                    });
-                } else {
-                    $('#passwordSection').slideUp(300, function() {
-                        $('#NewPassword, #ConfirmPassword').prop('disabled', true).val('');
-                        $('.error-message').hide();
-                        $(this).removeClass('active');
-                    });
-                }
-            });
+            if (!isEditMode) return;
             
-            // Edit mode toggle - enable editable fields
-            $('#editProfileBtn').click(function() {
-                Swal.fire({
-                    title: 'تعديل الملف الشخصي',
-                    text: 'يمكنك الآن تعديل معلوماتك الشخصية',
-                    icon: 'info',
-                    showConfirmButton: true,
-                    confirmButtonText: 'حسناً',
-                    timer: 3000,
-                    timerProgressBar: true,
-                    background: '#fff',
-                    backdrop: `
-                        rgba(0,0,123,0.4)
-                        url("/images/nyan-cat.gif")
-                        left top
-                        no-repeat
-                    `
-                }).then(() => {
-                    $('#profileForm').removeClass('view-mode').addClass('edit-mode');
-                    $('#Name, #Email, #Phone').prop('disabled', false);
-                    $(this).hide();
-                    $('#saveProfileBtn, #cancelEditBtn').show();
-                });
-            });
+            // Reset validation
+            $('.is-invalid').removeClass('is-invalid');
+            $('.error-message').hide();
             
-            // Form validation and submission
-            $('#profileForm').submit(function(e) {
-                e.preventDefault();
+            // Validate required fields
+            let isValid = true;
+            
+            if (!$('#Name').val().trim()) {
+                $('#Name').addClass('is-invalid');
+                isValid = false;
+            }
+            
+            if (!$('#Phone').val().trim()) {
+                $('#Phone').addClass('is-invalid');
+                isValid = false;
+            }
+            
+            // Validate password if change is requested
+            if ($('#changePasswordToggle').is(':checked')) {
+                const newPassword = $('#NewPassword').val();
+                const confirmPassword = $('#ConfirmPassword').val();
                 
-                // Reset validation
-                $('.is-invalid').removeClass('is-invalid');
-                $('.error-message').hide();
-                
-                // Validate required fields
-                let isValid = true;
-                
-                if (!$('#Name').val().trim()) {
-                    $('#Name').addClass('is-invalid');
+                if (!newPassword || newPassword.length < 6) {
+                    $('#NewPassword').addClass('is-invalid');
                     isValid = false;
                 }
                 
-                if (!$('#Phone').val().trim()) {
-                    $('#Phone').addClass('is-invalid');
-                    isValid = false;
-                }
-                
-                // Validate password if change is requested
-                if ($('#changePasswordToggle').is(':checked')) {
-                    const newPassword = $('#NewPassword').val();
-                    const confirmPassword = $('#ConfirmPassword').val();
-                    
-                    if (!newPassword || newPassword.length < 6) {
-                        $('#NewPassword').addClass('is-invalid');
-                        isValid = false;
-                    }
-                    
-                    if (newPassword !== confirmPassword) {
-                        $('#ConfirmPassword').addClass('is-invalid');
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'خطأ في كلمة المرور',
-                            text: 'كلمة المرور وتأكيدها غير متطابقين',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                        isValid = false;
-                    }
-                }
-                
-                if (!isValid) {
+                if (newPassword !== confirmPassword) {
+                    $('#ConfirmPassword').addClass('is-invalid');
                     Swal.fire({
                         icon: 'error',
-                        title: 'خطأ في الإدخال',
-                        text: 'الرجاء تعبئة الحقول المطلوبة بشكل صحيح',
+                        title: 'خطأ في كلمة المرور',
+                        text: 'كلمة المرور وتأكيدها غير متطابقين',
                         timer: 2000,
                         showConfirmButton: false
                     });
-                    return;
+                    isValid = false;
                 }
-                
-                // Show loading animation
-                const swalInstance = Swal.fire({
-                    title: 'جاري حفظ التغييرات...',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
+            }
+            
+            if (!isValid) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'خطأ في البيانات',
+                    text: 'يرجى تصحيح الأخطاء المذكورة أعلاه',
+                    timer: 2000,
+                    showConfirmButton: false
                 });
-                
-                // Simulate AJAX submission
-                setTimeout(() => {
-                    swalInstance.close();
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'تم التحديث!',
-                        text: 'تم حفظ معلوماتك بنجاح',
-                        timer: 1500,
-                        showConfirmButton: false
-                    }).then(() => {
-                        $('#profileForm').removeClass('edit-mode').addClass('view-mode');
-                        $('#profileForm input').prop('disabled', true);
-                        $('#changePasswordToggle').prop('checked', false).trigger('change');
-                        $('#cancelEditBtn').hide();
-                        $('#saveProfileBtn').hide();
-                        $('#editProfileBtn').show();
-                    });
-                }, 1500);
+                return;
+            }
+            
+            // Show loading
+            Swal.fire({
+                title: 'جاري الحفظ...',
+                html: '<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i></div>',
+                allowOutsideClick: false,
+                showConfirmButton: false
             });
             
-            // Modern delete account button with confirmation
-            $('#deleteAccountBtn').click(function() {
-                Swal.fire({
-                    title: '<strong style="color:#d33">حذف الحساب</strong>',
-                    html: `
-                        <div class="text-center py-3">
-                            <i class="fas fa-exclamation-circle text-danger" style="font-size:4rem"></i>
-                            <h5 class="mt-3">هل أنت متأكد من حذف حسابك؟</h5>
-                            <p class="text-muted">هذا الإجراء لا يمكن التراجع عنه وسيؤدي إلى حذف جميع بياناتك بشكل دائم</p>
-                        </div>
-                    `,
-                    showCancelButton: true,
-                    confirmButtonText: 'نعم، احذف الحساب',
-                    cancelButtonText: 'إلغاء',
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    customClass: {
-                        confirmButton: 'btn btn-lg btn-danger mx-2',
-                        cancelButton: 'btn btn-lg btn-secondary mx-2'
-                    },
-                    buttonsStyling: false,
-                    showLoaderOnConfirm: true,
-                    preConfirm: () => {
-                        return new Promise((resolve) => {
-                            setTimeout(() => {
-                                resolve();
-                            }, 2000);
-                        });
-                    },
-                    allowOutsideClick: () => !Swal.isLoading()
-                }).then((result) => {
-                    if (result.isConfirmed) {
+            // Prepare form data - exclude password fields if not changing password
+            let formData = $(this).serialize();
+            if (!$('#changePasswordToggle').is(':checked')) {
+                // Remove password fields from form data if not changing password
+                formData = formData.replace(/&NewPassword=[^&]*/g, '');
+                formData = formData.replace(/&ConfirmPassword=[^&]*/g, '');
+            }
+            
+            // Submit form via AJAX
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.success) {
                         Swal.fire({
-                            title: 'تم الحذف!',
-                            text: 'تم حذف حسابك بنجاح',
                             icon: 'success',
-                            willClose: () => {
-                                window.location.href = '/Identity/Identity/Logout';
-                            }
+                            title: 'تم الحفظ بنجاح',
+                            text: response.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            // Update original data
+                            $('.profile-field').each(function() {
+                                originalData[$(this).attr('id')] = $(this).val();
+                            });
+                            
+                            // Exit edit mode
+                            isEditMode = false;
+                            disableEditMode();
+                            
+                            // Update profile display
+                            $('.profile-name').text($('#Name').val());
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'خطأ',
+                            text: response.message,
+                            timer: 3000,
+                            showConfirmButton: false
                         });
                     }
-                });
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ في الاتصال',
+                        text: 'حدث خطأ أثناء حفظ البيانات',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                }
             });
         });
-    </script>
-    
-    <style>
-        /* Modern Profile Card */
-        .profile-card {
-            background: white;
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border: none;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
         
-        .profile-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-        }
-        
-        .profile-avatar-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 2.5rem;
-            text-align: center;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .profile-avatar-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            right: -50%;
-            bottom: -50%;
-            background: linear-gradient(
-                to bottom right,
-                rgba(255,255,255,0.1) 0%,
-                rgba(255,255,255,0) 60%
-            );
-            transform: rotate(30deg);
-        }
-        
-        .profile-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-size: 3.5rem;
-            color: white;
-            border: 4px solid white;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .profile-avatar:hover {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        .profile-name {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: relative;
-            z-index: 1;
-        }
-        
-        .profile-role {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            position: relative;
-            z-index: 1;
-        }
-        
-        /* Password Section */
-        .password-toggle-section {
-            background: #f8f9fa;
-            border-radius: 0.75rem;
-            padding: 1.25rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid #e9ecef;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-        }
-        
-        .password-toggle-section:hover {
-            background: #f1f3f5;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .password-section {
-            background: #f8f9fa;
-            border-radius: 0.75rem;
-            padding: 0;
-            margin-bottom: 1.5rem;
-            border: 1px solid #e9ecef;
-            overflow: hidden;
-            max-height: 0;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .password-section.active {
-            max-height: 250px;
-            padding: 1.5rem;
-            margin-top: 1rem;
-        }
-        
-        /* Modern Delete Button */
-        .btn-delete-account {
-            background: linear-gradient(135deg, #ff4d4d 0%, #cc0000 100%);
-            color: white;
-            border: none;
-            border-radius: 0.75rem;
-            padding: 1rem 2rem;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .btn-delete-account::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255, 255, 255, 0.4), 
-                transparent);
-            transition: 0.5s;
-        }
-        
-        .btn-delete-account:hover::before {
-            left: 100%;
-        }
-        
-        .btn-delete-account:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255, 77, 77, 0.4);
-        }
-        
-        .btn-delete-account:active {
-            transform: translateY(1px);
-        }
-        
-        /* Form Validation */
-        .is-invalid {
-            border-color: #ff4444 !important;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23ff4444'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23ff4444' stroke='none'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right calc(0.375em + 0.1875rem) center;
-            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-        }
-        
-        .error-message {
-            color: #ff4444;
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @@keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Switch Button Styling */
-        .form-switch .form-check-input {
-            width: 3.5rem;
-            height: 1.75rem;
-            margin-left: 0.75rem;
-            background-color: #adb5bd;
-            border-color: #adb5bd;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .form-switch .form-check-input:checked {
-            background-color: #764ba2;
-            border-color: #764ba2;
-            transform: scale(1.05);
-        }
-        
-        .form-switch .form-check-input:focus {
-            border-color: #764ba2;
-            box-shadow: 0 0 0 0.25rem rgba(118, 75, 162, 0.25);
-        }
-        
-        /* Responsive adjustments */
-        @@media (max-width: 768px) {
-            .profile-avatar {
-                width: 90px;
-                height: 90px;
-                font-size: 3rem;
-            }
+        // Delete account button
+        $('#deleteAccountBtn').click(function() {
+            const deleteUrl = $(this).data('delete-url');
+            const logoutUrl = $(this).data('logout-url');
             
-            .profile-name {
-                font-size: 1.75rem;
-            }
-            
-            .profile-role {
-                font-size: 1.1rem;
-            }
-            
-            .btn-delete-account {
-                padding: 0.85rem 1.5rem;
-                font-size: 0.95rem;
-            }
+            Swal.fire({
+                title: 'هل أنت متأكد؟',
+                text: 'لن تتمكن من استعادة هذا الحساب مرة أخرى!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'نعم، احذف الحساب',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: deleteUrl,
+                        type: 'POST',
+                        data: { id: $('#Id').val() },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'تم الحذف',
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.href = logoutUrl;
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'خطأ',
+                                    text: response.message,
+                                    timer: 3000,
+                                    showConfirmButton: false
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        });
+        
+        function enableEditMode() {
+            $('.profile-field').prop('disabled', false);
+            // Keep gender field readonly
+            $('#Gender').prop('disabled', true).prop('readonly', true);
+            $('#editProfileBtn').hide();
+            $('#saveProfileBtn').show();
+            $('#cancelEditBtn').show();
+            $('.profile-field').addClass('editing');
         }
-    </style>
-}
+        
+        function disableEditMode() {
+            $('.profile-field').prop('disabled', true);
+            $('.password-field').prop('disabled', true);
+            // Keep gender field readonly
+            $('#Gender').prop('disabled', true).prop('readonly', true);
+            $('#editProfileBtn').show();
+            $('#saveProfileBtn').hide();
+            $('#cancelEditBtn').hide();
+            $('.profile-field').removeClass('editing');
+            $('#changePasswordToggle').prop('checked', false);
+            $('#passwordSection').slideUp();
+        }
+        
+        function restoreOriginalData() {
+            $('.profile-field').each(function() {
+                const fieldId = $(this).attr('id');
+                if (originalData[fieldId] !== undefined) {
+                    $(this).val(originalData[fieldId]);
+                }
+            });
+            $('.password-field').val('');
+        }
+    });
+</script>

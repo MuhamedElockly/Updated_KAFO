@@ -3,12 +3,14 @@ using KAFO.BLL.Managers;
 using KAFO.Domain.Products;
 using KAFO.Domain.Users;
 using KAFO.Utility.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kafo.ASPMVC.Areas.Admin.Controllers
 {
 	[Area("Admin")]
-	public class UserManagementController : Controller
+    [Authorize(Roles = "admin")]
+    public class UserManagementController : Controller
 	{
 		UserManager _userManager;
 		public UserManagementController(UserManager userManager)
