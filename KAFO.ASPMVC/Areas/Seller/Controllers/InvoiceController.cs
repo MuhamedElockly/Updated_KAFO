@@ -95,7 +95,15 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 				return View(invoice);
 			}
 
-			Dictionary<string, string> dic = _invoicesManager.AddInvoice(invoice);
+			Dictionary<string, string> dic;
+            if (invoice.Type == KAFO.Domain.Invoices.InvoiceType.Purchasing)
+            {
+                dic = _invoicesManager.AddPurchaseInvoice(invoice);
+            }
+            else
+            {
+                dic = _invoicesManager.AddInvoice(invoice);
+            }
 
 			if (dic.Count > 0)
 			{

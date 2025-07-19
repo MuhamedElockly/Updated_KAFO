@@ -117,109 +117,109 @@
                     <div class="card-header d-flex align-items-center justify-content-between">
                         <h3 class="mb-0" style="font-weight: 700;"><i class="fas fa-file-invoice me-2"></i>@ViewData["Title"]</h3>
                         <span class="badge invoice-type-badge">فاتورة شراء</span>
-                    </div>
+        </div>
                     <div class="card-body p-4">
                         <form asp-controller="Invoice" asp-action="Create" method="post" enctype="multipart/form-data" id="invoiceForm">
-                            <partial name="_InvoiceFormPartial" model="Model" />
+        <partial name="_InvoiceFormPartial" model="Model" />
                             <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mt-4">
                                 <button type="submit" class="btn btn-lg btn-primary px-5" style="font-weight:600;">
                                     <i class="fas fa-save me-2"></i> حفظ الفاتورة
-                                </button>
+                    </button>
                                 <a href="/Admin/Admin/Index" class="btn btn-lg btn-outline-secondary px-5" style="font-weight:600;">
                                     <i class="fas fa-arrow-left me-2"></i> رجوع
-                                </a>
+                    </a>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+</div>
 
-    <!-- Product Search Modal -->
-    <div class="modal fade" id="productSearchModal" tabindex="-1" role="dialog" aria-labelledby="productSearchModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
+<!-- Product Search Modal -->
+<div class="modal fade" id="productSearchModal" tabindex="-1" role="dialog" aria-labelledby="productSearchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="productSearchModalLabel">بحث عن منتج</h5>
+                <h5 class="modal-title" id="productSearchModalLabel">بحث عن منتج</h5>
                     <button type="button" class="close" aria-label="Close" onclick="$('#productSearchModal').modal('hide');">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <div class="input-group mb-3">
-                            <input type="text" id="productSearchInput" class="form-control" placeholder="ابحث عن منتج بالاسم..." />
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-secondary" type="button" id="searchButton">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="input-group mb-3">
+                        <input type="text" id="productSearchInput" class="form-control" placeholder="ابحث عن منتج بالاسم..." />
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                                <i class="fas fa-search"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover" id="productsTable">
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="productsTable">
                             <thead>
-                                <tr>
-                                    <th width="15%">الصورة</th>
-                                    <th>الاسم</th>
-                                    <th width="15%">سعر القطعة</th>
-                                    <th width="15%">سعر الكرتونة</th>
-                                    <th width="15%">الكمية المتاحة</th>
-                                    <th width="15%">اختيار</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (ViewBag.Products != null && ViewBag.Products.Count > 0)
-                                {
-                                    @foreach (Product product in ViewBag.Products)
-                                    {
-                                        <tr>
-                                            <td class="text-center">
-                                                @if (product.ImageUrl == null)
-                                                {
-                                                    <i class="fas fa-box-open fa-2x text-secondary"></i>
-                                                }
-                                                else
-                                                {
-                                                    <img src="@product.ImageUrl" width="50" height="50" class="img-thumbnail" />
-                                                }
-                                            </td>
-                                            <td>@product.Name</td>
-                                            <td>@product.AveragePurchasePrice.ToString("N2")</td>
-                                            <td>@product.BoxPurchasePrice.ToString("N2")</td>
-                                            <td>@product.StockQuantity.ToString("N0")</td>
-                                            <td class="text-center">
-                                                <button class="btn btn-primary btn-sm select-product"
-                                                        data-id="@product.Id"
-                                                        data-name="@product.Name"
-                                                        data-price="@product.AveragePurchasePrice"
-                                                        data-boxprice="@product.BoxPurchasePrice"
-                                                        data-boxquantity="@product.BoxQuantity"
-                                                        data-image="@product.ImageUrl"
-                                                        data-sellingprice="@product.SellingPrice">
-                                                    <i class="fas fa-check"></i> اختيار
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                else
+                            <tr>
+                                <th width="15%">الصورة</th>
+                                <th>الاسم</th>
+                                <th width="15%">سعر القطعة</th>
+                                <th width="15%">سعر الكرتونة</th>
+                                <th width="15%">الكمية المتاحة</th>
+                                <th width="15%">اختيار</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.Products != null && ViewBag.Products.Count > 0)
+                            {
+                                @foreach (Product product in ViewBag.Products)
                                 {
                                     <tr>
-                                        <td colspan="6" class="text-center text-muted">لا توجد منتجات متاحة</td>
+                                        <td class="text-center">
+                                            @if (product.ImageUrl == null)
+                                            {
+                                                <i class="fas fa-box-open fa-2x text-secondary"></i>
+                                            }
+                                            else
+                                            {
+                                                <img src="@product.ImageUrl" width="50" height="50" class="img-thumbnail" />
+                                            }
+                                        </td>
+                                        <td>@product.Name</td>
+                                        <td>@product.AveragePurchasePrice.ToString("N2")</td>
+                                        <td>@product.BoxPurchasePrice.ToString("N2")</td>
+                                        <td>@product.StockQuantity.ToString("N0")</td>
+                                        <td class="text-center">
+                                            <button class="btn btn-primary btn-sm select-product"
+                                                    data-id="@product.Id"
+                                                    data-name="@product.Name"
+                                                    data-price="@product.AveragePurchasePrice"
+                                                    data-boxprice="@product.BoxPurchasePrice"
+                                                    data-boxquantity="@product.BoxQuantity"
+                                                        data-image="@product.ImageUrl"
+                                                        data-sellingprice="@product.SellingPrice">
+                                                <i class="fas fa-check"></i> اختيار
+                                            </button>
+                                        </td>
                                     </tr>
                                 }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="$('#productSearchModal').modal('hide');">إغلاق</button>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">لا توجد منتجات متاحة</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
+            <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="$('#productSearchModal').modal('hide');">إغلاق</button>
+                </div>
         </div>
     </div>
+</div>
 
     <script src="/lib/jquery/dist/jquery.min.js"></script>
     <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -239,7 +239,8 @@
                 var productId = $(this).find('.product-id').val();
                 var pieceQty = parseFloat($(this).find('.piece-quantity').val()) || 0;
                 var boxQty = parseFloat($(this).find('.box-quantity').val()) || 0;
-                var totalQty = pieceQty + boxQty;
+                var boxCapacity = parseFloat($(this).find('.box-capacity').val()) || 1;
+                var totalQty = pieceQty + (boxQty * boxCapacity);
                 if (productId && productId !== "0" && productId !== "") {
                     hasValidItems = true;
                     if (totalQty <= 0) {

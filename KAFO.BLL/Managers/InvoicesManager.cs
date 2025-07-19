@@ -54,8 +54,10 @@ namespace KAFO.BLL.Managers
                 }
                 item.Invoice = invoice;
                 item.Product = product;
-                item.UnitSellingPrice = product.SellingPrice;
-                item.UnitPurchasingPrice = product.AveragePurchasePrice;
+                // Use the values from the invoice item (editable by user)
+                item.UnitPurchasingPrice = item.UnitPurchasingPrice > 0 ? item.UnitPurchasingPrice : product.AveragePurchasePrice;
+                item.UnitSellingPrice = item.UnitSellingPrice > 0 ? item.UnitSellingPrice : product.SellingPrice;
+                // Only handle selling and credit invoices here
                 validItems.Add(item);
             }
             invoice.Items = validItems;
@@ -102,6 +104,57 @@ namespace KAFO.BLL.Managers
         public void DeleteInvoice(Invoice dBInvoice)
         {
             throw new NotImplementedException();
+        }
+
+        // New method to handle purchase invoices
+        public Dictionary<string, string> AddPurchaseInvoice(Invoice invoice)
+        {
+            var dic = new Dictionary<string, string>();
+            var Products = _unitOfWork.Products.GetAll(filter: p => p.IsActive);
+            var validItems = new List<InvoiceItem>();
+            foreach (var item in invoice.Items)
+            {
+                if (item == null || item.ProductId == 0)
+                {
+                    continue; // skip invalid
+                }
+                var product = Products.FirstOrDefault(p => p.Id == item.ProductId);
+                if (product == null)
+                {
+                    continue; // skip invalid
+                }
+                item.Invoice = invoice;
+                item.Product = product;
+                item.UnitPurchasingPrice = item.UnitPurchasingPrice > 0 ? item.UnitPurchasingPrice : product.AveragePurchasePrice;
+                item.UnitSellingPrice = item.UnitSellingPrice > 0 ? item.UnitSellingPrice : product.SellingPrice;
+                // Update product prices and stock for purchase invoices
+                product.ChangePurchasingPriceAndQuantity(item.UnitPurchasingPrice, item.UnitSellingPrice, item.Quantity);
+                // Update BoxPurchasePrice with the latest value from the invoice item
+                if (item.Product.BoxPurchasePrice > 0)
+                {
+                    product.BoxPurchasePrice = item.UnitPurchasingPrice*item.Product.BoxQuantity;
+                    _unitOfWork.Products.Update(product);
+                }
+                validItems.Add(item);
+            }
+            invoice.Items = validItems;
+            if (invoice.Items == null || invoice.Items.Count == 0)
+            {
+                dic.Add("", "يجب إضافة صنف واحد على الأقل للفاتورة.");
+                return dic;
+            }
+            if (dic.Count == 0)
+            {
+                //invoice.CompleteInvoice();
+                //// Detach product from items to avoid EF double update
+                //foreach (var item in invoice.Items)
+                //{
+                //    item.Product = null;
+                //}
+                _unitOfWork.Invoices.Add(invoice);
+                _unitOfWork.Save();
+            }
+            return dic;
         }
     }
 }
