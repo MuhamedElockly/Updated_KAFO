@@ -46,7 +46,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label"><i class="fas fa-venus-mars me-2"></i>النوع</label>
-                            <select class="form-control profile-field" asp-for="Gender" disabled readonly>
+                            <select class="form-control profile-field" asp-for="Gender" readonly>
                                 <option value="">اختر النوع</option>
                                 <option value="Male" selected="@(Model.Gender == "Male")">ذكر</option>
                                 <option value="Female" selected="@(Model.Gender == "Female")">أنثى</option>
@@ -57,37 +57,35 @@
                 </div>
                 
                 <div class="password-toggle-section">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="changePasswordToggle">
+                    <div class="form-check form-switch d-flex align-items-center gap-2" dir="rtl">
                         <label class="form-check-label" for="changePasswordToggle">
                             <i class="fas fa-key me-2"></i>تغيير كلمة المرور
                         </label>
+                        <input class="form-check-input" type="checkbox" id="changePasswordToggle" role="switch"
+                               style="width: 3rem; height: 1.5rem;">
                     </div>
                 </div>
                 
-                <div class="password-section" id="passwordSection" style="display: none;">
-                    <h5 class="report-title"><i class="fas fa-lock"></i> تغيير كلمة المرور</h5>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label"><i class="fas fa-key me-2"></i>كلمة المرور الجديدة <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="password" class="form-control password-field" asp-for="NewPassword" disabled />
-                                <button type="button" class="btn password-toggle">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                            <span class="error-message" asp-validation-for="NewPassword"></span>
+                <div class="row password-section" id="passwordSection" style="display: none; max-height: none !important; padding: 1.25rem !important; overflow: visible !important;">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-key me-2"></i>كلمة المرور الجديدة <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="password" class="form-control password-field" asp-for="NewPassword" disabled />
+                            <button type="button" class="btn btn-outline-secondary toggle-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label"><i class="fas fa-key me-2"></i>تأكيد كلمة المرور <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="password" class="form-control password-field" asp-for="ConfirmPassword" disabled />
-                                <button type="button" class="btn password-toggle">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                            <span class="error-message" asp-validation-for="ConfirmPassword"></span>
+                        <span class="error-message" asp-validation-for="NewPassword"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><i class="fas fa-key me-2"></i>تأكيد كلمة المرور <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="password" class="form-control password-field" asp-for="ConfirmPassword" disabled />
+                            <button type="button" class="btn btn-outline-secondary toggle-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </div>
+                        <span class="error-message" asp-validation-for="ConfirmPassword"></span>
                     </div>
                 </div>
                 
@@ -117,6 +115,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
+        console.log('Document ready, jQuery version:', $.fn.jquery);
         let isEditMode = false;
         let originalData = {};
         
@@ -126,7 +125,7 @@
         });
         
         // Ensure gender field is readonly on page load
-        $('#Gender').prop('disabled', true).prop('readonly', true);
+        $('#Gender').prop('readonly', true);
         
         // Edit button click
         $('#editProfileBtn').click(function() {
@@ -143,27 +142,43 @@
         
         // Password toggle
         $('#changePasswordToggle').change(function() {
-            if ($(this).is(':checked')) {
-                $('#passwordSection').slideDown();
+            const isChecked = $(this).is(':checked');
+            const passwordSection = $('#passwordSection');
+            console.log('Toggle changed, checked:', isChecked);
+            console.log('Password section found:', passwordSection.length);
+            console.log('Current display:', passwordSection.css('display'));
+
+            if (isChecked) {
+                console.log('Showing password section');
+                passwordSection.show();
+                passwordSection.css({
+                    'display': 'flex',
+                    'max-height': 'none',
+                    'padding': '1.25rem',
+                    'overflow': 'visible'
+                });
                 $('.password-field').prop('disabled', false);
+                console.log('After show - display:', passwordSection.css('display'));
             } else {
-                $('#passwordSection').slideUp();
+                console.log('Hiding password section');
+                passwordSection.hide();
                 $('.password-field').prop('disabled', true).val('');
             }
         });
         
         // Password visibility toggle
-        $('.password-toggle').click(function() {
-            const input = $(this).siblings('input');
-            const icon = $(this).find('i');
-            
-            if (input.attr('type') === 'password') {
-                input.attr('type', 'text');
-                icon.removeClass('fa-eye').addClass('fa-eye-slash');
-            } else {
-                input.attr('type', 'password');
-                icon.removeClass('fa-eye-slash').addClass('fa-eye');
-            }
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', function () {
+                const input = this.parentElement.querySelector('input');
+                const icon = this.querySelector('i');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.replace('fa-eye', 'fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.replace('fa-eye-slash', 'fa-eye');
+                }
+            });
         });
         
         // Form submission
@@ -231,40 +246,94 @@
                 showConfirmButton: false
             });
             
-            // Prepare form data - exclude password fields if not changing password
-            let formData = $(this).serialize();
-            if (!$('#changePasswordToggle').is(':checked')) {
-                // Remove password fields from form data if not changing password
-                formData = formData.replace(/&NewPassword=[^&]*/g, '');
-                formData = formData.replace(/&ConfirmPassword=[^&]*/g, '');
-            }
+            // Prepare form data for profile update (exclude password fields)
+            let profileFormData = $(this).serialize();
+            profileFormData = profileFormData.replace(/&NewPassword=[^&]*/g, '');
+            profileFormData = profileFormData.replace(/&ConfirmPassword=[^&]*/g, '');
             
-            // Submit form via AJAX
+            // Submit profile update first
             $.ajax({
                 url: $(this).attr('action'),
                 type: 'POST',
-                data: formData,
+                data: profileFormData,
                 success: function(response) {
                     if (response.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'تم الحفظ بنجاح',
-                            text: response.message,
-                            timer: 2000,
-                            showConfirmButton: false
-                        }).then(() => {
-                            // Update original data
-                            $('.profile-field').each(function() {
-                                originalData[$(this).attr('id')] = $(this).val();
+                        // If password change is requested, update password separately
+                        if ($('#changePasswordToggle').is(':checked')) {
+                            let passwordFormData = $('#profileForm').serialize();
+                            // Only include password fields
+                            passwordFormData = passwordFormData.replace(/&Name=[^&]*/g, '');
+                            passwordFormData = passwordFormData.replace(/&Email=[^&]*/g, '');
+                            passwordFormData = passwordFormData.replace(/&Phone=[^&]*/g, '');
+                            passwordFormData = passwordFormData.replace(/&Gender=[^&]*/g, '');
+                            passwordFormData = passwordFormData.replace(/&Role=[^&]*/g, '');
+                            
+                            $.ajax({
+                                url: $('#profileForm').attr('action').replace('UpdateProfile', 'UpdatePassword'),
+                                type: 'POST',
+                                data: passwordFormData,
+                                success: function(passwordResponse) {
+                                    if (passwordResponse.success) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'تم الحفظ بنجاح',
+                                            text: 'تم تحديث البيانات وكلمة المرور بنجاح',
+                                            timer: 2000,
+                                            showConfirmButton: false
+                                        }).then(() => {
+                                            // Update original data
+                                            $('.profile-field').each(function() {
+                                                originalData[$(this).attr('id')] = $(this).val();
+                                            });
+                                            
+                                            // Exit edit mode
+                                            isEditMode = false;
+                                            disableEditMode();
+                                            
+                                            // Update profile display
+                                            $('.profile-name').text($('#Name').val());
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'خطأ في كلمة المرور',
+                                            text: passwordResponse.message,
+                                            timer: 3000,
+                                            showConfirmButton: false
+                                        });
+                                    }
+                                },
+                                error: function() {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'خطأ في الاتصال',
+                                        text: 'حدث خطأ أثناء تحديث كلمة المرور',
+                                        timer: 3000,
+                                        showConfirmButton: false
+                                    });
+                                }
                             });
-                            
-                            // Exit edit mode
-                            isEditMode = false;
-                            disableEditMode();
-                            
-                            // Update profile display
-                            $('.profile-name').text($('#Name').val());
-                        });
+                        } else {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'تم الحفظ بنجاح',
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                // Update original data
+                                $('.profile-field').each(function() {
+                                    originalData[$(this).attr('id')] = $(this).val();
+                                });
+                                
+                                // Exit edit mode
+                                isEditMode = false;
+                                disableEditMode();
+                                
+                                // Update profile display
+                                $('.profile-name').text($('#Name').val());
+                            });
+                        }
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -336,7 +405,7 @@
         function enableEditMode() {
             $('.profile-field').prop('disabled', false);
             // Keep gender field readonly
-            $('#Gender').prop('disabled', true).prop('readonly', true);
+            $('#Gender').prop('readonly', true);
             $('#editProfileBtn').hide();
             $('#saveProfileBtn').show();
             $('#cancelEditBtn').show();
@@ -347,7 +416,7 @@
             $('.profile-field').prop('disabled', true);
             $('.password-field').prop('disabled', true);
             // Keep gender field readonly
-            $('#Gender').prop('disabled', true).prop('readonly', true);
+            $('#Gender').prop('readonly', true);
             $('#editProfileBtn').show();
             $('#saveProfileBtn').hide();
             $('#cancelEditBtn').hide();

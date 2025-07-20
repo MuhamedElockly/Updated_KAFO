@@ -81,6 +81,12 @@ namespace KAFO.ASPMVC.Areas.Admin.Controllers
 
             try
             {
+                // Ensure Gender is not null or empty
+                if (string.IsNullOrEmpty(model.Gender))
+                {
+                    return Json(new { success = false, message = "النوع مطلوب" });
+                }
+
                 user.Name = model.Name;
                 user.Email = model.Email;
                 user.PhoneNumber = model.Phone;

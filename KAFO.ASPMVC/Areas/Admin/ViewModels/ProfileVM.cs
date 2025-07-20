@@ -17,6 +17,7 @@ namespace KAFO.ASPMVC.Areas.Admin.ViewModels
         [Display(Name = "رقم الهاتف")]
         public string Phone { get; set; }
 
+        [Required(ErrorMessage = "النوع مطلوب")]
         [Display(Name = "النوع")]
         public string Gender { get; set; }
 
