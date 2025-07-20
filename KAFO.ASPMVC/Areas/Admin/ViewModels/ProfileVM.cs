@@ -11,7 +11,7 @@ namespace KAFO.ASPMVC.Areas.Admin.ViewModels
         public string Name { get; set; }
 
         [Display(Name = "البريد الإلكتروني")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [Required(ErrorMessage = "رقم الهاتف مطلوب")]
         [Display(Name = "رقم الهاتف")]
