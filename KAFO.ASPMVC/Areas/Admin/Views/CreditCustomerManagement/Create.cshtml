@@ -21,6 +21,10 @@
                         {
                             <input type="hidden" asp-for="Id" />
                         }
+                        @if (Context.Request.Query["from"] == "seller")
+                        {
+                            <input type="hidden" name="from" value="seller" />
+                        }
                         <style>
                             [dir="rtl"] input::placeholder,
                             [dir="rtl"] textarea::placeholder {

@@ -24,7 +24,7 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 		}
 
         // GET: InvoiceController
-        [Authorize(Roles = "seller")]
+    //    [Authorize(Roles = "seller")]
         public IActionResult Index()
 		{
 			// Get current user ID from claims
@@ -41,7 +41,7 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 		}
 
         // GET: InvoiceController/Details/5
-        [Authorize(Roles = "seller")]
+     //   [Authorize(Roles = "seller")]
         public IActionResult Details(int id)
 		{
 			// Get current user ID from claims
@@ -71,7 +71,7 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 		// POST: InvoiceController/Create
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-        [Authorize(Roles = "admin,seller")]
+    //    [Authorize(Roles = "admin,seller")]
         public async Task<IActionResult> Create(Invoice invoice, IFormFile? invoiceImageFile, string dist = "", string redirectTo = "")
 		{
             // Role-based authorization for invoice types
@@ -160,7 +160,7 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 		}
 
         // GET: InvoiceController/Edit/5
-        [Authorize(Roles = "seller")]
+   //     [Authorize(Roles = "seller")]
         public IActionResult Edit(int id)
 		{
 			// Get current user ID from claims
@@ -182,7 +182,7 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 		// POST: InvoiceController/Edit/5
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-        [Authorize(Roles = "seller")]
+   //     [Authorize(Roles = "seller")]
         public IActionResult Edit(int id, Invoice invoice)
 		{
 			// Get current user ID from claims
@@ -228,7 +228,7 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 		}
 
 
-        [Authorize(Roles = "seller")]
+    //    [Authorize(Roles = "seller")]
         public int CheckInvoice(Invoice invoice)
 		{
 			if (invoice == null || invoice.Items == null || !invoice.Items.Any())

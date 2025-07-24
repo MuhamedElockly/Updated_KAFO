@@ -6,7 +6,7 @@ using System.Security.Claims;
 namespace KAFO.ASPMVC.Controllers
 {
     [Area("Seller")]
-    [Authorize(Roles = "seller")]
+ //   [Authorize(Roles = "seller")]
     public class CustomerAccountsController : Controller
     {
         private readonly CreditCustomerManager _creditCustomerManager;

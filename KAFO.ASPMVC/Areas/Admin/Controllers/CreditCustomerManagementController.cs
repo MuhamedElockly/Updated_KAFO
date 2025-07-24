@@ -61,7 +61,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 
         [HttpPost]
         [Authorize(Roles = "admin")]
-        public IActionResult Create(KAFO.ASPMVC.Areas.Admin.ViewModels.CreditCustomerAddVM model)
+        public IActionResult Create(KAFO.ASPMVC.Areas.Admin.ViewModels.CreditCustomerAddVM model, string from = null)
         {
             try
             {
@@ -85,6 +85,10 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
                 };
                 _creditCustomerManager.Add(customer);
                 TempData["Success"] = "تم إضافة العميل بنجاح!";
+                if (!string.IsNullOrEmpty(from) && from.ToLower() == "seller")
+                {
+                    return RedirectToAction("Index", "CustomerAccounts", new { area = "Seller" });
+                }
                 return RedirectToAction("Index", "Admin", new { area = "Admin" });
             }
             catch (Exception ex)
