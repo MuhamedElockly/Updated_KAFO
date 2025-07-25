@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KAFO.DAL.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20250624155831_UpdateInvoices3")]
-    partial class UpdateInvoices3
+    [Migration("20250724213526_initDataBaseAtRemote")]
+    partial class initDataBaseAtRemote
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,38 @@ namespace KAFO.DAL.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("KAFO.Domain.Invoices.CreditTerminateInvoice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomerAccountId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("TotalInvoice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerAccountId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CreditTerminateInvoices");
+                });
 
             modelBuilder.Entity("KAFO.Domain.Invoices.Invoice", b =>
                 {
@@ -38,6 +70,9 @@ namespace KAFO.DAL.Migrations
 
                     b.Property<int?>("CustomerAccountId")
                         .HasColumnType("int");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -179,8 +214,19 @@ namespace KAFO.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalOwed")
                         .HasColumnType("decimal(18,2)");
@@ -229,6 +275,25 @@ namespace KAFO.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("KAFO.Domain.Invoices.CreditTerminateInvoice", b =>
+                {
+                    b.HasOne("KAFO.Domain.Users.CustomerAccount", "CustomerAccount")
+                        .WithMany("Deposits")
+                        .HasForeignKey("CustomerAccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KAFO.Domain.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CustomerAccount");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("KAFO.Domain.Invoices.Invoice", b =>
@@ -290,6 +355,8 @@ namespace KAFO.DAL.Migrations
 
             modelBuilder.Entity("KAFO.Domain.Users.CustomerAccount", b =>
                 {
+                    b.Navigation("Deposits");
+
                     b.Navigation("Invoices");
                 });
 #pragma warning restore 612, 618

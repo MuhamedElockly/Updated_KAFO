@@ -12,6 +12,7 @@ namespace KAFO.ASPMVC.Areas.Admin.ViewModels
         public decimal Balance { get; set; }
         public decimal Credit { get; set; }
         public List<CreditCustomerTransactionVM> Transactions { get; set; }=new List<CreditCustomerTransactionVM>() { };
+        public List<InvoiceVM> Invoices { get; set; } = new List<InvoiceVM>();
         public int CurrentPage { get; set; }
         public int TotalPages { get; set; }
     }

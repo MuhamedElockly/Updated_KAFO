@@ -76,6 +76,11 @@
                             <i class="fas fa-list-alt me-2"></i> سجل المعاملات
                         </button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices" type="button" role="tab" aria-controls="invoices" aria-selected="false">
+                            <i class="fas fa-file-invoice me-2"></i> فواتير العميل
+                        </button>
+                    </li>
                 </ul>
                 <div class="tab-content" id="customerTabContent">
                     <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
@@ -170,6 +175,64 @@
                                             <!-- JS will render pagination here -->
                                         </ul>
                                     </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="invoices" role="tabpanel" aria-labelledby="invoices-tab">
+                        <div class="transactions-section">
+                            <div class="transactions-header">
+                                <h3 class="transactions-title">
+                                    <i class="fas fa-file-invoice me-2"></i>
+                                    فواتير العميل
+                                </h3>
+                                <div class="transactions-stats">
+                                    <span class="stat-item">
+                                        <i class="fas fa-chart-line me-1"></i>
+                                        إجمالي الفواتير: <strong>@Model.Invoices.Count</strong>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="transactions-table-container">
+                                <div class="table-responsive">
+                                    <table class="table transactions-table">
+                                        <thead>
+                                            <tr>
+                                                <th>رقم الفاتورة</th>
+                                                <th>التاريخ</th>
+                                                <th>المستخدم</th>
+                                                <th>الإجمالي</th>
+                                                <th>النوع</th>
+                                                <th>عدد الأصناف</th>
+                                                <th>رابط الصورة</th>
+                                                <th>تفاصيل</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var invoice in Model.Invoices)
+                                            {
+                                                <tr>
+                                                    <td>@invoice.Id</td>
+                                                    <td>@invoice.CreatedAt.ToString("yyyy/MM/dd HH:mm")</td>
+                                                    <td>@invoice.UserName</td>
+                                                    <td>@invoice.TotalInvoice.ToString("N2") ج.م</td>
+                                                    <td>@invoice.InvoiceType</td>
+                                                    <td>@invoice.ItemsCount</td>
+                                                    <td>
+                                                        @if (!string.IsNullOrEmpty(invoice.ImageUrl))
+                                                        {
+                                                            <a href="@invoice.ImageUrl" target="_blank">عرض</a>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-info btn-sm show-invoice-details" data-invoice='@Newtonsoft.Json.JsonConvert.SerializeObject(invoice)' style="background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); color: #fff; border: none; border-radius: 8px; font-weight: 600;">
+                                                            <i class="fas fa-eye"></i> تفاصيل
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -296,6 +359,60 @@
             });
         } finally {
             Swal.close();
+        }
+    });
+</script>
+<!-- Invoice Details Modal (ensure only one instance and at the end of body) -->
+<div class="modal fade" id="invoiceDetailsModal" tabindex="-1" aria-labelledby="invoiceDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 18px; box-shadow: 0 8px 32px rgba(67, 97, 238, 0.15);">
+      <div class="modal-header" style="background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); color: #fff; border-top-left-radius: 18px; border-top-right-radius: 18px;">
+        <h5 class="modal-title" id="invoiceDetailsModalLabel"><i class="fas fa-file-invoice me-2"></i>تفاصيل الفاتورة</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1);"></button>
+      </div>
+      <div class="modal-body p-4">
+        <dl class="row mb-0">
+          <dt class="col-sm-4">رقم الفاتورة</dt>
+          <dd class="col-sm-8" id="modalInvoiceId"></dd>
+          <dt class="col-sm-4">التاريخ</dt>
+          <dd class="col-sm-8" id="modalInvoiceDate"></dd>
+          <dt class="col-sm-4">المستخدم</dt>
+          <dd class="col-sm-8" id="modalInvoiceUser"></dd>
+          <dt class="col-sm-4">الإجمالي</dt>
+          <dd class="col-sm-8" id="modalInvoiceTotal"></dd>
+          <dt class="col-sm-4">النوع</dt>
+          <dd class="col-sm-8" id="modalInvoiceType"></dd>
+          <dt class="col-sm-4">عدد الأصناف</dt>
+          <dd class="col-sm-8" id="modalInvoiceItems"></dd>
+          <dt class="col-sm-4">رابط الصورة</dt>
+          <dd class="col-sm-8" id="modalInvoiceImage"></dd>
+        </dl>
+      </div>
+      <div class="modal-footer" style="border-bottom-left-radius: 18px; border-bottom-right-radius: 18px;">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$(document).on('click', '.show-invoice-details', function () {
+    var invoice = $(this).data('invoice');
+    if (typeof invoice === 'string') invoice = JSON.parse(invoice);
+    $('#modalInvoiceId').text(invoice.Id);
+    $('#modalInvoiceDate').text(new Date(invoice.CreatedAt).toLocaleString('ar-EG'));
+    $('#modalInvoiceUser').text(invoice.UserName);
+    $('#modalInvoiceTotal').text(parseFloat(invoice.TotalInvoice).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + ' ج.م');
+    $('#modalInvoiceType').text(invoice.InvoiceType);
+    $('#modalInvoiceItems').text(invoice.ItemsCount);
+    if (invoice.ImageUrl) {
+        $('#modalInvoiceImage').html('<a href="' + invoice.ImageUrl + '" target="_blank">عرض الصورة</a>');
+    } else {
+        $('#modalInvoiceImage').text('-');
+    }
+    var modalEl = document.getElementById('invoiceDetailsModal');
+    if (modalEl) {
+        var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
         }
     });
 </script> 

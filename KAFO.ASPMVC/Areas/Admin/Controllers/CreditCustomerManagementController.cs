@@ -12,11 +12,13 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
     public class CreditCustomerManagementController : Controller
     {
         private readonly CreditCustomerManager _creditCustomerManager;
+        private readonly InvoiceManager _invoiceManager;
         private const int pageSize = 5;
 
-        public CreditCustomerManagementController(CreditCustomerManager creditCustomerManager)
+        public CreditCustomerManagementController(CreditCustomerManager creditCustomerManager, InvoiceManager invoiceManager)
         {
             _creditCustomerManager = creditCustomerManager;
+            _invoiceManager = invoiceManager;
         }
         [Authorize(Roles = "admin")]
         public IActionResult CreditCustomerManagement(int? page)
@@ -145,6 +147,22 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
                     Time = t.Time,
                     DepositMoney = t.DepositMoney
                 }).ToList() ?? new List<CreditCustomerTransactionVM>();
+
+                // Fetch invoices for this customer
+                var invoices = _invoiceManager.GetInvoicesByCustomer(customer.Id)
+                    .OrderByDescending(i => i.CreatedAt)
+                    .Select(invoice => new InvoiceVM
+                    {
+                        Id = invoice.Id,
+                        CreatedAt = invoice.CreatedAt,
+                        UserName = invoice.User?.Name ?? "غير محدد",
+                        TotalInvoice = invoice.TotalInvoice,
+                        InvoiceType = invoice.Type.ToString(),
+                        CustomerName = invoice.CustomerAccount?.CustomerName ?? "-",
+                        ItemsCount = invoice.Items?.Count ?? 0,
+                        ImageUrl = invoice.ImageUrl
+                    }).ToList();
+
                 var vm = new CreditCustomerAccountVM
                 {
                     Id = customer.Id,
@@ -155,6 +173,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
                     Balance = customer.Balance,
                     Credit = customer.Credit,
                     Transactions = transactions,
+                    Invoices = invoices,
                     CurrentPage = 1,
                     TotalPages = 1 // Client-side pagination
                 };

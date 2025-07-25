@@ -80,7 +80,8 @@ namespace KAFO.ASPMVC.Areas.Identity.Controllers
 			else
 			{
 				var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-				return Json(new { success = false, message = string.Join("\n", errors) });
+			//	return Json(new { success = false, message = string.Join("\n", errors) });
+				return Json(new { success = false, message = "gggggffff" });
 			}
 		}
 		public User VerifyUser(string userInput, string password)
