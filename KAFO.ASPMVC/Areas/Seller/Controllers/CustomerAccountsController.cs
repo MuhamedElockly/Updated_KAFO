@@ -43,7 +43,7 @@ namespace KAFO.ASPMVC.Controllers
         // AJAX: CustomerAccounts/SettleAccountAjax
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult SettleAccountAjax(int customerId, decimal amount)
+        public IActionResult SettleAccountAjax(int customerId, decimal amount ,bool? withdraw)
         {
             try
             {
@@ -53,7 +53,7 @@ namespace KAFO.ASPMVC.Controllers
                     return Json(new { success = false, message = "لم يتم العثور على معرف المستخدم الحالي" });
                 }
 
-                var result = _creditCustomerManager.SettleAccount(customerId, amount, userId);
+                var result = _creditCustomerManager.SettleAccount(customerId, amount, userId,withdraw);
 
                 return Json(new { 
                     success = result.Success, 

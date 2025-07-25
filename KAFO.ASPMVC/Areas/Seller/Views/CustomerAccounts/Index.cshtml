@@ -1,1030 +1,1120 @@
 ﻿@model IEnumerable<KAFO.Domain.Users.CustomerAccount>
 
 @{
-    ViewData["Title"] = "عملاء الآجل";
+	ViewData["Title"] = "عملاء الآجل";
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/customer-accounts.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/customer-accounts.css" asp-append-version="true" />
 }
 
 <div class="customer-accounts-bg">
-    <div class="container-fluid py-4">
-        <!-- Header Section -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="glass-card">
-                    <div class="customer-accounts-header d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center gap-3">
-                            <i class="fas fa-users fa-2x"></i>
-                            <div>
-                                <h4 class="mb-1">إدارة عملاء الآجل</h4>
-                                <p class="mb-0 opacity-75">عرض وإدارة حسابات العملاء على الآجل</p>
-                            </div>
-                        </div>
-                        <a href="/Admin/CreditCustomerManagement/Create?from=seller" class="btn btn-primary btn-add-customer d-flex align-items-center" style="background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%); border: none; border-radius: 0.75rem; padding: 0.75rem 1.5rem; font-weight: 600; color: white; box-shadow: 0 2px 8px rgba(67, 206, 162, 0.3); font-size: 0.9rem; transition: all 0.3s ease;">
-                            <i class="fas fa-user-plus ms-2"></i>
-                            إضافة عميل آجل جديد
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+	<div class="container-fluid py-4">
+		<!-- Header Section -->
+		<div class="row mb-4">
+			<div class="col-12">
+				<div class="glass-card">
+					<div class="customer-accounts-header d-flex justify-content-between align-items-center">
+						<div class="d-flex align-items-center gap-3">
+							<i class="fas fa-users fa-2x"></i>
+							<div>
+								<h4 class="mb-1">إدارة عملاء الآجل</h4>
+								<p class="mb-0 opacity-75">عرض وإدارة حسابات العملاء على الآجل</p>
+							</div>
+						</div>
+						<a href="/Admin/CreditCustomerManagement/Create?from=seller" class="btn btn-primary btn-add-customer d-flex align-items-center" style="background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%); border: none; border-radius: 0.75rem; padding: 0.75rem 1.5rem; font-weight: 600; color: white; box-shadow: 0 2px 8px rgba(67, 206, 162, 0.3); font-size: 0.9rem; transition: all 0.3s ease;">
+							<i class="fas fa-user-plus ms-2"></i>
+							إضافة عميل آجل جديد
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
 
-        <!-- Statistics Cards -->
-        <div class="row g-3 mb-4">
-            <div class="col-lg-4 col-md-6">
-                <div class="stats-card">
-                    <div class="stats-badge bg-primary text-white">
-                        <i class="fas fa-users me-2"></i>
-                        إجمالي العملاء
-                    </div>
-                    <h3 class="stats-value text-primary">@Model.Count()</h3>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="stats-card">
-                    <div class="stats-badge bg-warning text-white">
-                        <i class="fas fa-credit-card me-2"></i>
-                        إجمالي المستحق
-                    </div>
-                    <h3 class="stats-value text-warning">@Model.Sum(c => Math.Max(0, c.TotalOwed)).ToString("N2") ج.م</h3>
+		<!-- Statistics Cards -->
+		<div class="row g-3 mb-4">
+			<div class="col-lg-4 col-md-6">
+				<div class="stats-card">
+					<div class="stats-badge bg-primary text-white">
+						<i class="fas fa-users me-2"></i>
+						إجمالي العملاء
+					</div>
+					<h3 class="stats-value text-primary">@Model.Count()</h3>
+				</div>
+			</div>
+			<div class="col-lg-4 col-md-6">
+				<div class="stats-card">
+					<div class="stats-badge bg-warning text-white">
+						<i class="fas fa-credit-card me-2"></i>
+						إجمالي المستحق
+					</div>
+					<h3 class="stats-value text-warning">@Model.Sum(c => Math.Max(0, c.TotalOwed)).ToString("N2") ج.م</h3>
 
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="stats-card">
-                    <div class="stats-badge bg-info text-white">
-                        <i class="fas fa-balance-scale me-2"></i>
-                        الرصيد الإجمالي
-                    </div>
-                    <h3 class="stats-value text-info">@Model.Sum(c => c.Balance).ToString("N2") ج.م</h3>
-                </div>
-            </div>
-        </div>
+				</div>
+			</div>
+			<div class="col-lg-4 col-md-6">
+				<div class="stats-card">
+					<div class="stats-badge bg-info text-white">
+						<i class="fas fa-balance-scale me-2"></i>
+						الرصيد الإجمالي
+					</div>
+					<h3 class="stats-value text-info">@Model.Sum(c => c.Balance).ToString("N2") ج.م</h3>
+				</div>
+			</div>
+		</div>
 
-        <!-- Customers Table -->
-        <div class="row">
-            <div class="col-12">
-                <div class="glass-card">
-                    <div class="table-container">
-                        <div class="table-responsive">
-                            <table class="table customer-accounts-table">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center">
-                                            <i class="fas fa-hashtag me-2"></i>
-                                            رقم العميل
-                                        </th>
-                                        <th class="text-center">
-                                            <i class="fas fa-user me-2"></i>
-                                            اسم العميل
-                                        </th>
-                                        <th class="text-center">
-                                            <i class="fas fa-phone me-2"></i>
-                                            رقم الهاتف
-                                        </th>
+		<!-- Customers Table -->
+		<div class="row">
+			<div class="col-12">
+				<div class="glass-card">
+					<div class="table-container">
+						<div class="table-responsive">
+							<table class="table customer-accounts-table">
+								<thead>
+									<tr>
+										<th class="text-center">
+											<i class="fas fa-hashtag me-2"></i>
+											رقم العميل
+										</th>
+										<th class="text-center">
+											<i class="fas fa-user me-2"></i>
+											اسم العميل
+										</th>
+										<th class="text-center">
+											<i class="fas fa-phone me-2"></i>
+											رقم الهاتف
+										</th>
 
-                                        <th class="text-center">
-                                            <i class="fas fa-credit-card me-2"></i>
-                                            إجمالي المستحق
-                                        </th>
-                                        <th class="text-center">
-                                            <i class="fas fa-balance-scale me-2"></i>
-                                            الرصيد
-                                        </th>
-                                        <th class="text-center">
-                                            <i class="fas fa-money-bill-wave me-2"></i>
-                                            تصفية الحساب
-                                        </th>
-                                        <th class="text-center">
-                                            <i class="fas fa-cogs me-2"></i>
-                                            الإجراءات
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in Model)
-                                    {
-                                        <tr>
-                                            <td class="text-center">
-                                                <span class="customer-id">@item.Id</span>
-                                            </td>
-                                            <td class="text-center">
-                                                <span class="customer-name">@item.CustomerName</span>
-                                            </td>
-                                            <td class="text-center">
-                                                @if (!string.IsNullOrEmpty(item.PhoneNumber))
-                                                {
-                                                    <span class="badge badge-phone">
-                                                        <i class="fas fa-phone me-1"></i>
-                                                        @item.PhoneNumber
-                                                    </span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="text-muted">غير محدد</span>
-                                                }
-                                            </td>
+										<th class="text-center">
+											<i class="fas fa-credit-card me-2"></i>
+											إجمالي المستحق
+										</th>
+										<th class="text-center">
+											<i class="fas fa-balance-scale me-2"></i>
+											الرصيد
+										</th>
+										<th class="text-center">
+											<i class="fas fa-money-bill-wave me-2"></i>
+											تصفية الحساب
+										</th>
+										<th class="text-center">
+											<i class="fas fa-cogs me-2"></i>
+											الإجراءات
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									@foreach (var item in Model)
+									{
+										<tr>
+											<td class="text-center">
+												<span class="customer-id">@item.Id</span>
+											</td>
+											<td class="text-center">
+												<span class="customer-name">@item.CustomerName</span>
+											</td>
+											<td class="text-center">
+												@if (!string.IsNullOrEmpty(item.PhoneNumber))
+												{
+													<span class="badge badge-phone">
+														<i class="fas fa-phone me-1"></i>
+														@item.PhoneNumber
+													</span>
+												}
+												else
+												{
+													<span class="text-muted">غير محدد</span>
+												}
+											</td>
 
-                                            <td class="text-center">
-                                                <span class="badge badge-amount negative">
-                                                    <i class="fas fa-minus me-1"></i>
-                                                    @Math.Max(0, item.TotalOwed).ToString("N2") ج.م
-                                                </span>
-                                            </td>
-                                            <td class="text-center">
-                                                @{
-                                                    var balance = item.Balance;
-                                                    var balanceClass = "positive";
-                                                    var balanceIcon = "fa-plus";
-                                                }
-                                                <span class="badge badge-amount @balanceClass">
-                                                    <i class="fas @balanceIcon me-1"></i>
-                                                    @balance.ToString("N2") ج.م
-                                                </span>
-                                            </td>
-                                            <td class="text-center">
-                                                <button type="button" 
-                                                        class="btn btn-settle-account" 
-                                                        data-bs-toggle="modal" 
-                                                        data-bs-target="#settleAccountModal" 
-                                                        data-customer-id="@item.Id"
-                                                        data-customer-name="@item.CustomerName"
-                                                        data-customer-balance="@item.ActualBalance"
-                                                        title="تصفية الحساب">
-                                                    <i class="fas fa-money-bill-wave me-2"></i>
-                                                    تصفية الحساب
-                                                </button>
-                                            </td>
-                                            <td class="text-center">
-                                                <a asp-area="Admin" asp-controller="CreditCustomerManagement" asp-action="ViewAccount" asp-route-id="@item.Id" 
-                                                   class="btn btn-view-account" title="عرض تفاصيل الحساب">
-                                                    <i class="fas fa-eye me-2"></i>
-                                                    عرض الحساب
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+											<td class="text-center">
+												<span class="badge badge-amount negative">
+													<i class="fas fa-minus me-1"></i>
+													@Math.Max(0, item.TotalOwed).ToString("N2") ج.م
+												</span>
+											</td>
+											<td class="text-center">
+												@{
+													var balance = item.Balance;
+													var balanceClass = "positive";
+													var balanceIcon = "fa-plus";
+												}
+												<span class="badge badge-amount @balanceClass">
+													<i class="fas @balanceIcon me-1"></i>
+													@balance.ToString("N2") ج.م
+												</span>
+											</td>
+											<td class="text-center">
+												<button type="button"
+														class="btn btn-settle-account"
+														data-bs-toggle="modal"
+														data-bs-target="#settleAccountModal"
+														data-customer-id="@item.Id"
+														data-customer-name="@item.CustomerName"
+														data-customer-balance="@item.ActualBalance"
+														title="تصفية الحساب">
+													<i class="fas fa-money-bill-wave me-2"></i>
+													تصفية الحساب
+												</button>
+											</td>
+											<td class="text-center">
+												<a asp-area="Admin" asp-controller="CreditCustomerManagement" asp-action="ViewAccount" asp-route-id="@item.Id"
+												   class="btn btn-view-account" title="عرض تفاصيل الحساب">
+													<i class="fas fa-eye me-2"></i>
+													عرض الحساب
+												</a>
+											</td>
+										</tr>
+									}
+								</tbody>
+							</table>
+						</div>
+					</div>
 
-                    @if (!Model.Any())
-                    {
-                        <div class="empty-state">
-                            <i class="fas fa-users"></i>
-                            <h4>لا يوجد عملاء حالياً</h4>
-                            <p>لا توجد حسابات عملاء متاحة للعرض</p>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
+					@if (!Model.Any())
+					{
+						<div class="empty-state">
+							<i class="fas fa-users"></i>
+							<h4>لا يوجد عملاء حالياً</h4>
+							<p>لا توجد حسابات عملاء متاحة للعرض</p>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <!-- Settlement Account Modal -->
 <div class="modal fade" id="settleAccountModal" tabindex="-1" aria-labelledby="settleAccountModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg">
-            <!-- Enhanced Header with Gradient -->
-            <div class="modal-header border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative;">
-                <h5 class="modal-title text-white fw-bold" id="settleAccountModalLabel">
-                    <i class="fas fa-money-bill-wave me-3"></i>
-                    تصفية حساب العميل
-                </h5>
-                <button type="button" class="modal-close-btn" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <form id="settleAccountForm" asp-action="SettleAccount" method="post">
-                @Html.AntiForgeryToken()
-                <div class="modal-body p-4" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
-                    <div class="row g-4">
-                        <!-- Enhanced Customer Info Card -->
-                        <div class="col-12">
-                            <div class="customer-info-card-enhanced">
-                                <div class="customer-info-header-enhanced">
-                                    <div class="customer-avatar">
-                                        <i class="fas fa-user-circle"></i>
-                                    </div>
-                                    <div class="customer-details-enhanced">
-                                        <h4 class="customer-name-enhanced mb-2" id="modalCustomerName"></h4>
-                                        <div class="customer-balance-enhanced" id="modalCustomerBalance"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Enhanced Amount Input -->
-                        <div class="col-12">
-                            <div class="amount-input-section">
-                                <label for="settlementAmount" class="form-label-enhanced">
-                                    <i class="fas fa-coins me-2"></i>
-                                    مبلغ التصفية
-                                </label>
-                                <div class="amount-input-group">
-                                    <span class="amount-input-prefix">
-                                        <i class="fas fa-money-bill-wave"></i>
-                                    </span>
-                                    <input type="number" 
-                                           class="form-control amount-input" 
-                                           id="settlementAmount" 
-                                           name="amount" 
-                                           step="0.01" 
-                                           min="0.01" 
-                                           required 
-                                           placeholder="أدخل المبلغ المراد إضافته">
-                                    <span class="amount-input-suffix">ج.م</span>
-                                </div>
-                                <div class="amount-help-text">
-                                    <i class="fas fa-info-circle me-1"></i>
-                                    إذا كان للعميل دين، سيتم تسويته أولاً ثم إضافة الباقي كرصيد
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Enhanced Footer -->
-                <div class="modal-footer border-0" style="background: linear-gradient(to right, #f8fafc, #ffffff);">
-                    <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-2"></i>
-                        إلغاء
-                    </button>
-                    <button type="submit" class="btn btn-settle-confirm">
-                        <i class="fas fa-check me-2"></i>
-                        تأكيد التصفية
-                    </button>
-                </div>
-                <input type="hidden" id="customerId" name="customerId" />
-            </form>
-        </div>
-    </div>
+	<div class="modal-dialog modal-dialog-centered modal-lg">
+		<div class="modal-content border-0 shadow-lg">
+			<!-- Enhanced Header with Gradient -->
+			<div class="modal-header border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative;">
+				<h5 class="modal-title text-white fw-bold" id="settleAccountModalLabel">
+					<i class="fas fa-money-bill-wave me-3"></i>
+					تصفية حساب العميل
+				</h5>
+				<button type="button" class="modal-close-btn" data-bs-dismiss="modal" aria-label="Close">
+					<i class="fas fa-times"></i>
+				</button>
+			</div>
+
+			<form id="settleAccountForm" asp-action="SettleAccount" method="post">
+				@Html.AntiForgeryToken()
+				<div class="modal-body p-4" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
+					<div class="row g-4">
+						<!-- Enhanced Customer Info Card -->
+						<div class="col-12">
+							<div class="customer-info-card-enhanced">
+								<div class="customer-info-header-enhanced">
+									<div class="customer-avatar">
+										<i class="fas fa-user-circle"></i>
+									</div>
+									<div class="customer-details-enhanced">
+										<h4 class="customer-name-enhanced mb-2" id="modalCustomerName"></h4>
+										<div class="customer-balance-enhanced" id="modalCustomerBalance"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- check if balance greater than zero to make user can withdraw amount-->
+
+						<div class="col-12" id="withdrawAmouontSection" style="display:none;">
+							<div class="customer-info-card-enhanced">
+								<div class="form-check form-switch">
+									<input class="form-check-input" type="checkbox" id="withdrawAmountSwitch">
+									<label class="form-check-label" for="customerStatusSwitch">سحب مبلغ</label>
+								</div>
+							</div>
+						</div>
+
+
+						<!-- Enhanced Amount Input -->
+						<div class="col-12">
+							<div class="amount-input-section">
+								<label for="settlementAmount" class="form-label-enhanced">
+									<i class="fas fa-coins me-2"></i>
+									مبلغ التصفية
+								</label>
+								<div class="amount-input-group">
+									<span class="amount-input-prefix">
+										<i class="fas fa-money-bill-wave"></i>
+									</span>
+									<input type="number"
+										   class="form-control amount-input"
+										   id="settlementAmount"
+										   name="amount"
+										   step="0.01"
+										   min="0.01"
+										   required
+										   placeholder="أدخل المبلغ المراد إضافته">
+									<span class="amount-input-suffix">ج.م</span>
+								</div>
+								<div class="amount-help-text" id="descreptionInfo">
+									<i class="fas fa-info-circle me-1"></i>
+									إذا كان للعميل دين، سيتم تسويته أولاً ثم إضافة الباقي كرصيد
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Enhanced Footer -->
+				<div class="modal-footer border-0" style="background: linear-gradient(to right, #f8fafc, #ffffff);">
+					<button type="button" class="btn btn-cancel" data-bs-dismiss="modal">
+						<i class="fas fa-times me-2"></i>
+						إلغاء
+					</button>
+					<button type="submit" class="btn btn-settle-confirm">
+						<i class="fas fa-check me-2"></i>
+						تأكيد التصفية
+					</button>
+				</div>
+				<input type="hidden" id="customerId" name="customerId" />
+			</form>
+		</div>
+	</div>
 </div>
 
 @section Scripts {
-    <!-- SweetAlert2 CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <script>
-        // Add smooth animations and interactions
-        $(document).ready(function() {
-            // Animate statistics cards on load
-            $('.glass-card').each(function(index) {
-                $(this).css('animation-delay', (index * 0.1) + 's');
-            });
+	<!-- SweetAlert2 CDN -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-            // Add hover effects to settlement buttons
-            $('.btn-settle-account').hover(
-                function() {
-                    $(this).addClass('shadow-sm');
-                },
-                function() {
-                    $(this).removeClass('shadow-sm');
-                }
-            );
+	<script>
+		// Add smooth animations and interactions
+		$(document).ready(function () {
+			// Animate statistics cards on load
+			$('.glass-card').each(function (index) {
+				$(this).css('animation-delay', (index * 0.1) + 's');
+			});
 
-            // Add tooltip functionality
-            $('[title]').tooltip({
-                placement: 'top',
-                trigger: 'hover'
-            });
+			// Add hover effects to settlement buttons
+			$('.btn-settle-account').hover(
+				function () {
+					$(this).addClass('shadow-sm');
+				},
+				function () {
+					$(this).removeClass('shadow-sm');
+				}
+			);
 
-            // Enhanced modal close button functionality
-            $('.modal-close-btn').on('click', function() {
-                var modal = $(this).closest('.modal');
-                modal.modal('hide');
-            });
+			// Add tooltip functionality
+			$('[title]').tooltip({
+				placement: 'top',
+				trigger: 'hover'
+			});
 
-            // Add keyboard support for modal close
-            $(document).on('keydown', function(e) {
-                if (e.key === 'Escape' && $('#settleAccountModal').hasClass('show')) {
-                    $('#settleAccountModal').modal('hide');
-                }
-            });
+			// Enhanced modal close button functionality
+			$('.modal-close-btn').on('click', function () {
+				var modal = $(this).closest('.modal');
+				modal.modal('hide');
+			});
 
-            // Add click outside modal to close
-            $('#settleAccountModal').on('click', function(e) {
-                if (e.target === this) {
-                    $(this).modal('hide');
-                }
-            });
+			// Add keyboard support for modal close
+			$(document).on('keydown', function (e) {
+				if (e.key === 'Escape' && $('#settleAccountModal').hasClass('show')) {
+					$('#settleAccountModal').modal('hide');
+				}
+			});
 
-            // Settlement modal functionality
-            $('#settleAccountModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget);
-                var customerId = button.data('customer-id');
-                var customerName = button.data('customer-name');
-                var customerBalance = button.data('customer-balance');
-                
-                var modal = $(this);
-                modal.find('#modalCustomerName').text(customerName);
-                
-                // Show amount owed if there's debt, otherwise show current balance
-                if (customerBalance < 0) {
-                    var amountOwed = Math.abs(customerBalance);
-                    modal.find('#modalCustomerBalance').text('المبلغ المستحق: ' + amountOwed.toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }));
-                } else {
-                    modal.find('#modalCustomerBalance').text('الرصيد الحالي: ' + customerBalance.toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }));
-                }
-                
-                modal.find('#customerId').val(customerId);
-                modal.find('#settlementAmount').val('');
-            });
+			// Add click outside modal to close
+			$('#settleAccountModal').on('click', function (e) {
+				if (e.target === this) {
+					$(this).modal('hide');
+				}
+			});
 
-            // AJAX Form submission with SweetAlert
-            $('#settleAccountForm').on('submit', function(e) {
-                e.preventDefault();
-                
-                var form = $(this);
-                var customerId = form.find('#customerId').val();
-                var amount = form.find('#settlementAmount').val();
-                var customerName = form.find('#modalCustomerName').text();
-                
-                // Validate amount
-                if (!amount || parseFloat(amount) <= 0) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'خطأ في الإدخال',
-                        text: 'يرجى إدخال مبلغ صحيح أكبر من صفر',
-                        confirmButtonColor: '#667eea',
-                        background: '#fff',
-                        color: '#222',
-                        showClass: { popup: 'animate__animated animate__fadeInDown' },
-                        hideClass: { popup: 'animate__animated animate__fadeOutUp' }
-                    });
-                    return;
-                }
+			// Settlement modal functionality
+			$('#settleAccountModal').on('show.bs.modal', function (event) {
+				var button = $(event.relatedTarget);
+				var customerId = button.data('customer-id');
+				var customerName = button.data('customer-name');
+				var customerBalance = button.data('customer-balance');
 
-                // Show loading SweetAlert
-                Swal.fire({
-                    title: 'جاري تصفية الحساب...',
-                    html: `
-                        <div class="text-center">
-                            <div class="spinner-border text-primary mb-3" role="status">
-                                <span class="visually-hidden">جاري التحميل...</span>
-                            </div>
-                            <p class="text-muted">يرجى الانتظار بينما يتم معالجة طلبك</p>
-                        </div>
-                    `,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    showConfirmButton: false,
-                    background: '#fff',
-                    color: '#222',
-                    showClass: { popup: 'animate__animated animate__fadeInDown' },
-                    hideClass: { popup: 'animate__animated animate__fadeOutUp' }
-                });
+				var modal = $(this);
+				modal.find('#modalCustomerName').text(customerName);
 
-                // Prepare form data
-                var formData = new FormData();
-                formData.append('customerId', customerId);
-                formData.append('amount', amount);
-                formData.append('__RequestVerificationToken', $('input[name="__RequestVerificationToken"]').val());
+				// Show amount owed if there's debt, otherwise show current balance
+				if (customerBalance > 0) {
+					modal.find('#withdrawAmouontSection').show();
+				}
+				if (customerBalance < 0) {
+					var amountOwed = Math.abs(customerBalance);
+					modal.find('#modalCustomerBalance').text('المبلغ المستحق: ' + amountOwed.toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }));
+				} else {
+					modal.find('#modalCustomerBalance').text('الرصيد الحالي: ' + customerBalance.toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' }));
 
-                // Make AJAX request
-                $.ajax({
-                    url: '/Seller/CustomerAccounts/SettleAccountAjax',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        Swal.close();
-                        
-                        if (response.success) {
-                            // Success SweetAlert
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'تم التصفية بنجاح!',
-                                html: `
-                                    <div class="text-center">
-                                        <div class="success-icon mb-3">
-                                            <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
-                                        </div>
-                                        <p class="text-success fw-bold mb-2">${response.message}</p>
-                                        <div class="settlement-details mt-3">
-                                            <div class="row">
-                                                <div class="col-6">
-                                                    <small class="text-muted">المبلغ المدفوع:</small>
-                                                    <div class="fw-bold text-primary">${parseFloat(amount).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' })}</div>
-                                                </div>
-                                                <div class="col-6">
-                                                    <small class="text-muted">العميل:</small>
-                                                    <div class="fw-bold">${customerName}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                `,
-                                confirmButtonText: 'تم',
-                                confirmButtonColor: '#10b981',
-                                background: '#fff',
-                                color: '#222',
-                                showClass: { popup: 'animate__animated animate__fadeInDown' },
-                                hideClass: { popup: 'animate__animated animate__fadeOutUp' }
-                            }).then((result) => {
-                                // Close modal and refresh page
-                                $('#settleAccountModal').modal('hide');
-                                location.reload();
-                            });
-                        } else {
-                            // Error SweetAlert
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'فشل في التصفية',
-                                text: response.message || 'حدث خطأ أثناء تصفية الحساب',
-                                confirmButtonColor: '#ef4444',
-                                background: '#fff',
-                                color: '#222',
-                                showClass: { popup: 'animate__animated animate__fadeInDown' },
-                                hideClass: { popup: 'animate__animated animate__fadeOutUp' }
-                            });
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        Swal.close();
-                        
-                        // Error SweetAlert
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'خطأ في الاتصال',
-                            text: 'حدث خطأ أثناء الاتصال بالخادم. يرجى المحاولة مرة أخرى.',
-                            confirmButtonColor: '#ef4444',
-                            background: '#fff',
-                            color: '#222',
-                            showClass: { popup: 'animate__animated animate__fadeInDown' },
-                            hideClass: { popup: 'animate__animated animate__fadeOutUp' }
-                        });
-                    }
-                });
-            });
+				}
 
-            // Add loading animation for links
-            $('a').click(function() {
-                if (!$(this).hasClass('btn') && !$(this).hasClass('no-spinner')) {
-                    $('body').append('<div class="loading-overlay"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">جاري التحميل...</span></div></div>');
-                }
-            });
-        });
+				modal.find('#customerId').val(customerId);
+				modal.find('#settlementAmount').val('');
 
-        // --- PAGINATION LOGIC START ---
-        function paginateTable(tableSelector, rowsPerPage) {
-            var $table = $(tableSelector);
-            var $tbodies = $table.find('tbody');
-            var $rows = $tbodies.find('tr');
-            var totalRows = $rows.length;
-            var totalPages = Math.ceil(totalRows / rowsPerPage);
-            var currentPage = 1;
+				$(document).on('change', '#withdrawAmountSwitch', function () {
+					const isWithdraw = $(this).is(':checked');
+					const modal = $('#settleAccountModal');
+					const amountInput = modal.find('#settlementAmount');
+					const descreptionInfo = modal.find("#descreptionInfo");
 
-            // Store all rows' HTML
-            var allRowsHtml = $rows.map(function(){ return this.outerHTML; }).get();
+					if (isWithdraw) {
+						// Switch is ON - withdrawing money
+						amountInput.attr('placeholder', 'أدخل المبلغ المراد سحبه');
+						amountInput.attr('title', 'سيتم خصم هذا المبلغ من رصيد العميل');
 
-            if (totalRows === 0) {
-                // Fallback: show all rows if something is wrong
-                $rows.show();
-                return;
-            }
 
-            // Remove any old pagination controls
-            $table.closest('.table-container').find('.customer-pagination-nav').remove();
+						$(this).next('label').addClass('text-danger');
+						descreptionInfo.hide();
 
-            // Create pagination controls inside .table-container
-            var $pagination = $('<nav class="customer-pagination-nav" aria-label="صفحات العملاء"><ul class="pagination justify-content-center mt-3"></ul></nav>');
-            function renderPagination() {
-                var $ul = $pagination.find('ul');
-                $ul.empty();
-                // Prev button
-                var prevDisabled = currentPage === 1 ? 'disabled' : '';
-                $ul.append('<li class="page-item ' + prevDisabled + '"><a class="page-link no-spinner pagination-btn" href="#" data-page="prev" tabindex="-1"><i class="fas fa-angle-right"></i></a></li>');
-                // Page numbers
-                for (var i = 1; i <= totalPages; i++) {
-                    var active = i === currentPage ? 'active' : '';
-                    $ul.append('<li class="page-item ' + active + '"><a class="page-link no-spinner pagination-btn" href="#" data-page="' + i + '">' + i + '</a></li>');
-                }
-                // Next button
-                var nextDisabled = currentPage === totalPages ? 'disabled' : '';
-                $ul.append('<li class="page-item ' + nextDisabled + '"><a class="page-link no-spinner pagination-btn" href="#" data-page="next"><i class="fas fa-angle-left"></i></a></li>');
-            }
+					} else {
 
-            function showPage(page) {
-                if (page < 1 || page > totalPages) return;
-                currentPage = page;
-                var start = (currentPage - 1) * rowsPerPage;
-                var end = start + rowsPerPage;
-                var pageRows = allRowsHtml.slice(start, end).join('');
-                $tbodies.each(function(idx, tb) {
-                    tb.innerHTML = pageRows; // Removed test row
-                });
-                // Re-initialize Bootstrap tooltips if available
-                if ($.fn.tooltip) {
-                    $('[title]').tooltip({placement: 'top', trigger: 'hover'});
-                } else {
-                    console.warn('[Pagination] Bootstrap tooltip function not available. Make sure Bootstrap JS is loaded.');
-                }
-                renderPagination();
-            }
+						amountInput.attr('placeholder', 'أدخل المبلغ المراد إضافته');
+						amountInput.attr('title', 'سيتم إضافة هذا المبلغ إلى رصيد العميل');
+						descreptionInfo.show();
+						$(this).next('label').removeClass('text-danger');
+					}
 
-            // Initial render
-            $table.closest('.table-container').append($pagination);
-            showPage(1);
 
-            // Handle pagination click
-            $pagination.on('click', 'a.page-link', function(e) {
-                e.preventDefault();
-                var page = $(this).data('page');
-                if (page === 'prev' && currentPage > 1) {
-                    showPage(currentPage - 1);
-                } else if (page === 'next' && currentPage < totalPages) {
-                    showPage(currentPage + 1);
-                } else {
-                    var pageNum = parseInt(page);
-                    if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
-                        showPage(pageNum);
-                    }
-                }
-            });
-        }
-        // Only paginate if more than 5 rows
-        var rowCount = $('.customer-accounts-table tbody tr').length;
-        if (rowCount > 5) {
-            paginateTable('.customer-accounts-table', 5);
-        } else {
-            $('.customer-accounts-table tbody tr').show();
-        }
-        // --- PAGINATION LOGIC END ---
+					const statusMessage = isWithdraw ? 'تم تفعيل وضع سحب المبلغ' : 'تم إلغاء وضع سحب المبلغ';
+					Swal.fire({
+						position: 'center',
+						icon: 'info',
+						title: statusMessage,
+						showConfirmButton: false,
+						timer: 1500
+					});
+				});
+			});
 
-        // Handle window resize for responsive design
-        $(window).resize(function() {
-            if ($(window).width() < 768) {
-                $('.customer-accounts-table').addClass('table-sm');
-            } else {
-                $('.customer-accounts-table').removeClass('table-sm');
-            }
-        });
-    </script>
+			// AJAX Form submission with SweetAlert
+			$('#settleAccountForm').on('submit', function (e) {
+				e.preventDefault();
+
+				var form = $(this);
+				var customerId = form.find('#customerId').val();
+				var amount = form.find('#settlementAmount').val();
+				var customerName = form.find('#modalCustomerName').text();
+				let customerBalance = parseFloat($("#modalCustomerBalance").data('raw-balance')) || 0;
+
+				const isWithdraw = $('#withdrawAmountSwitch').is(':checked');
+				// Validate amount
+				if (!amount || parseFloat(amount) <= 0) {
+					Swal.fire({
+						icon: 'error',
+						title: 'خطأ في الإدخال',
+						text: 'يرجى إدخال مبلغ صحيح أكبر من صفر',
+						confirmButtonColor: '#667eea',
+						background: '#fff',
+						color: '#222',
+						showClass: { popup: 'animate__animated animate__fadeInDown' },
+						hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+					});
+					return;
+				}
+				// console.log("customer Balance " +customerBalance);
+				// console.log("amount " +amount);
+				// if (isWithdraw) {
+				// 	// Validate withdrawal amount doesn't exceed balance
+				// 	if (amount > customerBalance) {
+				// 		console.log(customerBalance);
+				// 		Swal.fire({
+				// 			icon: 'error',
+				// 			title: 'رصيد غير كافي',
+				// 			html: `
+				// 					<div class="text-start">
+				// 						<p>لا يمكن سحب هذا المبلغ لأن رصيد العميل الحالي هو:</p>
+				// 						<div class="alert alert-danger mt-2">
+				// 							${customerBalance.toLocaleString('ar-EG')} ج.م
+				// 						</div>
+				// 						<p class="mt-2">المبلغ المطلوب سحبه: ${amount.toLocaleString('ar-EG')} ج.م</p>
+				// 					</div>
+				// 				`,
+				// 			confirmButtonText: 'حسناً'
+				// 		});
+				// 		return;
+				// 	}
+				// }
+
+				// Show loading SweetAlert
+				Swal.fire({
+					title: 'جاري تصفية الحساب...',
+					html: `
+																<div class="text-center">
+																	<div class="spinner-border text-primary mb-3" role="status">
+																		<span class="visually-hidden">جاري التحميل...</span>
+																	</div>
+																	<p class="text-muted">يرجى الانتظار بينما يتم معالجة طلبك</p>
+																</div>
+															`,
+					allowOutsideClick: false,
+					allowEscapeKey: false,
+					showConfirmButton: false,
+					background: '#fff',
+					color: '#222',
+					showClass: { popup: 'animate__animated animate__fadeInDown' },
+					hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+				});
+
+				// Prepare form data
+				var formData = new FormData();
+				if (isWithdraw) {
+					formData.append('withdraw', true);
+
+				}
+				formData.append('customerId', customerId);
+				formData.append('amount', amount);
+				formData.append('__RequestVerificationToken', $('input[name="__RequestVerificationToken"]').val());
+
+				// Make AJAX request
+				$.ajax({
+					url: '/Seller/CustomerAccounts/SettleAccountAjax',
+					type: 'POST',
+					data: formData,
+					processData: false,
+					contentType: false,
+					success: function (response) {
+						Swal.close();
+
+						if (response.success) {
+							// Success SweetAlert
+							Swal.fire({
+								icon: 'success',
+								title: 'تم التصفية بنجاح!',
+								html: `
+																			<div class="text-center">
+																				<div class="success-icon mb-3">
+																					<i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+																				</div>
+																				<p class="text-success fw-bold mb-2">${response.message}</p>
+																				<div class="settlement-details mt-3">
+																					<div class="row">
+																						<div class="col-6">
+																							<small class="text-muted">المبلغ المدفوع:</small>
+																							<div class="fw-bold text-primary">${parseFloat(amount).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' })}</div>
+																						</div>
+																						<div class="col-6">
+																							<small class="text-muted">العميل:</small>
+																							<div class="fw-bold">${customerName}</div>
+																						</div>
+																					</div>
+																				</div>
+																			</div>
+																		`,
+								confirmButtonText: 'تم',
+								confirmButtonColor: '#10b981',
+								background: '#fff',
+								color: '#222',
+								showClass: { popup: 'animate__animated animate__fadeInDown' },
+								hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+							}).then((result) => {
+								// Close modal and refresh page
+								$('#settleAccountModal').modal('hide');
+								location.reload();
+							});
+						} else {
+							// Error SweetAlert
+							Swal.fire({
+								icon: 'error',
+								title: 'فشل في التصفية',
+								text: response.message || 'حدث خطأ أثناء تصفية الحساب',
+								confirmButtonColor: '#ef4444',
+								background: '#fff',
+								color: '#222',
+								showClass: { popup: 'animate__animated animate__fadeInDown' },
+								hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+							}).then((result) => {
+								$('#settleAccountModal').modal('hide');
+								location.reload();
+							});;
+						}
+					},
+					error: function (xhr, status, error) {
+						Swal.close();
+
+						// Error SweetAlert
+						Swal.fire({
+							icon: 'error',
+							title: 'خطأ في الاتصال',
+							text: 'حدث خطأ أثناء الاتصال بالخادم. يرجى المحاولة مرة أخرى.',
+							confirmButtonColor: '#ef4444',
+							background: '#fff',
+							color: '#222',
+							showClass: { popup: 'animate__animated animate__fadeInDown' },
+							hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+						});
+					}
+				});
+			});
+
+			// Add loading animation for links
+			$('a').click(function () {
+				if (!$(this).hasClass('btn') && !$(this).hasClass('no-spinner')) {
+					$('body').append('<div class="loading-overlay"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">جاري التحميل...</span></div></div>');
+				}
+			});
+		});
+
+		// --- PAGINATION LOGIC START ---
+		function paginateTable(tableSelector, rowsPerPage) {
+			var $table = $(tableSelector);
+			var $tbodies = $table.find('tbody');
+			var $rows = $tbodies.find('tr');
+			var totalRows = $rows.length;
+			var totalPages = Math.ceil(totalRows / rowsPerPage);
+			var currentPage = 1;
+
+			// Store all rows' HTML
+			var allRowsHtml = $rows.map(function () { return this.outerHTML; }).get();
+
+			if (totalRows === 0) {
+				// Fallback: show all rows if something is wrong
+				$rows.show();
+				return;
+			}
+
+			// Remove any old pagination controls
+			$table.closest('.table-container').find('.customer-pagination-nav').remove();
+
+			// Create pagination controls inside .table-container
+			var $pagination = $('<nav class="customer-pagination-nav" aria-label="صفحات العملاء"><ul class="pagination justify-content-center mt-3"></ul></nav>');
+			function renderPagination() {
+				var $ul = $pagination.find('ul');
+				$ul.empty();
+				// Prev button
+				var prevDisabled = currentPage === 1 ? 'disabled' : '';
+				$ul.append('<li class="page-item ' + prevDisabled + '"><a class="page-link no-spinner pagination-btn" href="#" data-page="prev" tabindex="-1"><i class="fas fa-angle-right"></i></a></li>');
+				// Page numbers
+				for (var i = 1; i <= totalPages; i++) {
+					var active = i === currentPage ? 'active' : '';
+					$ul.append('<li class="page-item ' + active + '"><a class="page-link no-spinner pagination-btn" href="#" data-page="' + i + '">' + i + '</a></li>');
+				}
+				// Next button
+				var nextDisabled = currentPage === totalPages ? 'disabled' : '';
+				$ul.append('<li class="page-item ' + nextDisabled + '"><a class="page-link no-spinner pagination-btn" href="#" data-page="next"><i class="fas fa-angle-left"></i></a></li>');
+			}
+
+			function showPage(page) {
+				if (page < 1 || page > totalPages) return;
+				currentPage = page;
+				var start = (currentPage - 1) * rowsPerPage;
+				var end = start + rowsPerPage;
+				var pageRows = allRowsHtml.slice(start, end).join('');
+				$tbodies.each(function (idx, tb) {
+					tb.innerHTML = pageRows; // Removed test row
+				});
+				// Re-initialize Bootstrap tooltips if available
+				if ($.fn.tooltip) {
+					$('[title]').tooltip({ placement: 'top', trigger: 'hover' });
+				} else {
+					console.warn('[Pagination] Bootstrap tooltip function not available. Make sure Bootstrap JS is loaded.');
+				}
+				renderPagination();
+			}
+
+			// Initial render
+			$table.closest('.table-container').append($pagination);
+			showPage(1);
+
+			// Handle pagination click
+			$pagination.on('click', 'a.page-link', function (e) {
+				e.preventDefault();
+				var page = $(this).data('page');
+				if (page === 'prev' && currentPage > 1) {
+					showPage(currentPage - 1);
+				} else if (page === 'next' && currentPage < totalPages) {
+					showPage(currentPage + 1);
+				} else {
+					var pageNum = parseInt(page);
+					if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
+						showPage(pageNum);
+					}
+				}
+			});
+		}
+		// Only paginate if more than 5 rows
+		var rowCount = $('.customer-accounts-table tbody tr').length;
+		if (rowCount > 5) {
+			paginateTable('.customer-accounts-table', 5);
+		} else {
+			$('.customer-accounts-table tbody tr').show();
+		}
+		// --- PAGINATION LOGIC END ---
+
+		// Handle window resize for responsive design
+		$(window).resize(function () {
+			if ($(window).width() < 768) {
+				$('.customer-accounts-table').addClass('table-sm');
+			} else {
+				$('.customer-accounts-table').removeClass('table-sm');
+			}
+		});
+	</script>
 }
 
 <style>
-    /* Additional responsive styles */
-    @@media (max-width: 767.98px) {
-        .customer-accounts-header {
-            flex-direction: column;
-            text-align: center;
-            gap: 1rem;
-        }
-        
-        .customer-accounts-header .ms-auto {
-            margin: 0 !important;
-        }
-        
-        .btn-settle-account {
-            padding: 0.5rem 1rem;
-            font-size: 0.8rem;
-        }
-        
-        .customer-accounts-table th,
-        .customer-accounts-table td {
-            font-size: 0.875rem;
-            padding: 0.5rem 0.25rem;
-        }
-        
-        .stats-badge {
-            font-size: 0.875rem;
-            padding: 0.5rem 1rem;
-        }
-        
-        .stats-value {
-            font-size: 1.5rem;
-        }
-    }
+	/* Additional responsive styles */
+	@@media (max-width: 767.98px) {
+		.customer-accounts-header {
+			flex-direction: column;
+			text-align: center;
+			gap: 1rem;
+		}
 
-    /* Loading overlay */
-    .loading-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-    }
+			.customer-accounts-header .ms-auto {
+				margin: 0 !important;
+			}
 
-    /* Settlement button styles */
-    .btn-settle-account {
-        background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
-        border: none;
-        border-radius: 0.75rem;
-        padding: 0.75rem 1.5rem;
-        font-weight: 600;
-        color: white;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(67, 206, 162, 0.3);
-        font-size: 0.9rem;
-    }
+		.btn-settle-account {
+			padding: 0.5rem 1rem;
+			font-size: 0.8rem;
+		}
 
-    .btn-settle-account:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(67, 206, 162, 0.4);
-        background: linear-gradient(135deg, #185a9d 0%, #43cea2 100%);
-        color: white;
-    }
+		.customer-accounts-table th,
+		.customer-accounts-table td {
+			font-size: 0.875rem;
+			padding: 0.5rem 0.25rem;
+		}
 
-    .btn-settle-account:focus {
-        box-shadow: 0 0 0 0.25rem rgba(67, 206, 162, 0.25);
-    }
+		.stats-badge {
+			font-size: 0.875rem;
+			padding: 0.5rem 1rem;
+		}
 
-    /* Enhanced Modal Styles */
-    .modal-content {
-        border: none;
-        border-radius: 1.5rem;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        overflow: hidden;
-    }
+		.stats-value {
+			font-size: 1.5rem;
+		}
+	}
 
-    /* Custom Modal Close Button */
-    .modal-close-btn {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        width: 40px;
-        height: 40px;
-        border: none;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        font-size: 1.2rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        z-index: 10;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-    }
+	/* Loading overlay */
+	.loading-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(255, 255, 255, 0.8);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		z-index: 9999;
+	}
 
-    .modal-close-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
-        transform: scale(1.1);
-        color: white;
-    }
+	/* Settlement button styles */
+	.btn-settle-account {
+		background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+		border: none;
+		border-radius: 0.75rem;
+		padding: 0.75rem 1.5rem;
+		font-weight: 600;
+		color: white;
+		transition: all 0.3s ease;
+		box-shadow: 0 2px 8px rgba(67, 206, 162, 0.3);
+		font-size: 0.9rem;
+	}
 
-    .modal-close-btn:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
-    }
+		.btn-settle-account:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 6px 16px rgba(67, 206, 162, 0.4);
+			background: linear-gradient(135deg, #185a9d 0%, #43cea2 100%);
+			color: white;
+		}
 
-    .modal-close-btn:active {
-        transform: scale(0.95);
-    }
+		.btn-settle-account:focus {
+			box-shadow: 0 0 0 0.25rem rgba(67, 206, 162, 0.25);
+		}
 
-    .modal-header {
-        border-radius: 1.5rem 1.5rem 0 0;
-        border: none;
-        padding: 1.5rem 2rem;
-    }
+	/* Enhanced Modal Styles */
+	.modal-content {
+		border: none;
+		border-radius: 1.5rem;
+		box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+		overflow: hidden;
+	}
 
-    .modal-body {
-        padding: 2rem;
-    }
+	/* Custom Modal Close Button */
+	.modal-close-btn {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		width: 40px;
+		height: 40px;
+		border: none;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.2);
+		color: white;
+		font-size: 1.2rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		z-index: 10;
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+	}
 
-    .modal-footer {
-        border-radius: 0 0 1.5rem 1.5rem;
-        padding: 1.5rem 2rem;
-    }
+		.modal-close-btn:hover {
+			background: rgba(255, 255, 255, 0.3);
+			transform: scale(1.1);
+			color: white;
+		}
 
-    /* Enhanced Customer Info Card */
-    .customer-info-card-enhanced {
-        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-        border-radius: 1rem;
-        padding: 2rem;
-        border: 2px solid #e2e8f0;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-    }
+		.modal-close-btn:focus {
+			outline: none;
+			box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+		}
 
-    .customer-info-card-enhanced:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
-    }
+		.modal-close-btn:active {
+			transform: scale(0.95);
+		}
 
-    .customer-info-header-enhanced {
-        display: flex;
-        align-items: center;
-        gap: 1.5rem;
-    }
+	.modal-header {
+		border-radius: 1.5rem 1.5rem 0 0;
+		border: none;
+		padding: 1.5rem 2rem;
+	}
 
-    .customer-avatar {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-    }
+	.modal-body {
+		padding: 2rem;
+	}
 
-    .customer-avatar i {
-        font-size: 2.5rem;
-        color: white;
-    }
+	.modal-footer {
+		border-radius: 0 0 1.5rem 1.5rem;
+		padding: 1.5rem 2rem;
+	}
 
-    .customer-details-enhanced {
-        flex: 1;
-    }
+	/* Enhanced Customer Info Card */
+	.customer-info-card-enhanced {
+		background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+		border-radius: 1rem;
+		padding: 2rem;
+		border: 2px solid #e2e8f0;
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+		transition: all 0.3s ease;
+	}
 
-    .customer-name-enhanced {
-        color: #1e293b;
-        font-weight: 700;
-        font-size: 1.5rem;
-        margin: 0;
-    }
+		.customer-info-card-enhanced:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+		}
 
-    .customer-balance-enhanced {
-        color: #64748b;
-        font-weight: 600;
-        font-size: 1.1rem;
-        padding: 0.5rem 1rem;
-        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-        border-radius: 0.75rem;
-        display: inline-block;
-        margin-top: 0.5rem;
-    }
+	.customer-info-header-enhanced {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+	}
 
-    /* Enhanced Amount Input Section */
-    .amount-input-section {
-        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-        border-radius: 1rem;
-        padding: 2rem;
-        border: 2px solid #e2e8f0;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    }
+	.customer-avatar {
+		width: 80px;
+		height: 80px;
+		border-radius: 50%;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+	}
 
-    .form-label-enhanced {
-        font-weight: 700;
-        color: #1e293b;
-        font-size: 1.1rem;
-        margin-bottom: 1rem;
-        display: block;
-    }
+		.customer-avatar i {
+			font-size: 2.5rem;
+			color: white;
+		}
 
-    .amount-input-group {
-        position: relative;
-        display: flex;
-        align-items: center;
-        background: white;
-        border: 2px solid #e2e8f0;
-        border-radius: 1rem;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    }
+	.customer-details-enhanced {
+		flex: 1;
+	}
 
-    .amount-input-group:focus-within {
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
+	.customer-name-enhanced {
+		color: #1e293b;
+		font-weight: 700;
+		font-size: 1.5rem;
+		margin: 0;
+	}
 
-    .amount-input-prefix {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 1rem 1.5rem;
-        font-size: 1.2rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 60px;
-    }
+	.customer-balance-enhanced {
+		color: #64748b;
+		font-weight: 600;
+		font-size: 1.1rem;
+		padding: 0.5rem 1rem;
+		background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+		border-radius: 0.75rem;
+		display: inline-block;
+		margin-top: 0.5rem;
+	}
 
-    .amount-input {
-        border: none;
-        padding: 1rem 1.5rem;
-        font-size: 1.2rem;
-        font-weight: 600;
-        background: transparent;
-        flex: 1;
-        text-align: center;
-    }
+	/* Enhanced Amount Input Section */
+	.amount-input-section {
+		background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+		border-radius: 1rem;
+		padding: 2rem;
+		border: 2px solid #e2e8f0;
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+	}
 
-    .amount-input:focus {
-        outline: none;
-        box-shadow: none;
-    }
+	.form-label-enhanced {
+		font-weight: 700;
+		color: #1e293b;
+		font-size: 1.1rem;
+		margin-bottom: 1rem;
+		display: block;
+	}
 
-    .amount-input::placeholder {
-        color: #94a3b8;
-        font-weight: 400;
-    }
+	.amount-input-group {
+		position: relative;
+		display: flex;
+		align-items: center;
+		background: white;
+		border: 2px solid #e2e8f0;
+		border-radius: 1rem;
+		overflow: hidden;
+		transition: all 0.3s ease;
+		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+	}
 
-    .amount-input-suffix {
-        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-        color: #64748b;
-        padding: 1rem 1.5rem;
-        font-size: 1.1rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 60px;
-        border-right: 2px solid #e2e8f0;
-    }
+		.amount-input-group:focus-within {
+			border-color: #667eea;
+			box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+		}
 
-    .amount-help-text {
-        color: #64748b;
-        font-size: 0.9rem;
-        margin-top: 1rem;
-        padding: 0.75rem 1rem;
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        border-radius: 0.75rem;
-        border-left: 4px solid #667eea;
-    }
+	.amount-input-prefix {
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		color: white;
+		padding: 1rem 1.5rem;
+		font-size: 1.2rem;
+		font-weight: 600;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 60px;
+	}
 
-    /* Enhanced Buttons */
-    .btn-cancel {
-        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-        border: 2px solid #cbd5e1;
-        color: #64748b;
-        border-radius: 0.75rem;
-        padding: 0.75rem 1.5rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
+	.amount-input {
+		border: none;
+		padding: 1rem 1.5rem;
+		font-size: 1.2rem;
+		font-weight: 600;
+		background: transparent;
+		flex: 1;
+		text-align: center;
+	}
 
-    .btn-cancel:hover {
-        background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-        color: #475569;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
+		.amount-input:focus {
+			outline: none;
+			box-shadow: none;
+		}
 
-    .btn-settle-confirm {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        border: none;
-        border-radius: 0.75rem;
-        padding: 0.75rem 2rem;
-        font-weight: 700;
-        color: white;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-    }
+		.amount-input::placeholder {
+			color: #94a3b8;
+			font-weight: 400;
+		}
 
-    .btn-settle-confirm:hover {
-        background: linear-gradient(135deg, #059669 0%, #047857 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
-        color: white;
-    }
+	.amount-input-suffix {
+		background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+		color: #64748b;
+		padding: 1rem 1.5rem;
+		font-size: 1.1rem;
+		font-weight: 700;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 60px;
+		border-right: 2px solid #e2e8f0;
+	}
 
-    .btn-settle-confirm:active {
-        transform: translateY(0);
-    }
+	.amount-help-text {
+		color: #64748b;
+		font-size: 0.9rem;
+		margin-top: 1rem;
+		padding: 0.75rem 1rem;
+		background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+		border-radius: 0.75rem;
+		border-left: 4px solid #667eea;
+	}
 
-    /* Responsive Design for Modal */
-    @@media (max-width: 768px) {
-        .modal-dialog {
-            margin: 1rem;
-        }
-        
-        .modal-close-btn {
-            top: 0.75rem;
-            right: 0.75rem;
-            width: 35px;
-            height: 35px;
-            font-size: 1rem;
-        }
-        
-        .customer-info-header-enhanced {
-            flex-direction: column;
-            text-align: center;
-            gap: 1rem;
-        }
-        
-        .customer-avatar {
-            width: 60px;
-            height: 60px;
-        }
-        
-        .customer-avatar i {
-            font-size: 2rem;
-        }
-        
-        .customer-name-enhanced {
-            font-size: 1.25rem;
-        }
-        
-        .amount-input-group {
-            flex-direction: column;
-        }
-        
-        .amount-input-prefix,
-        .amount-input-suffix {
-            width: 100%;
-            min-width: auto;
-        }
-        
-        .amount-input {
-            text-align: center;
-            border-top: 1px solid #e2e8f0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-    }
+	/* Enhanced Buttons */
+	.btn-cancel {
+		background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+		border: 2px solid #cbd5e1;
+		color: #64748b;
+		border-radius: 0.75rem;
+		padding: 0.75rem 1.5rem;
+		font-weight: 600;
+		transition: all 0.3s ease;
+	}
 
-    /* Currency formatting */
-    .egp-currency::before {
-        content: "ج.م ";
-    }
+		.btn-cancel:hover {
+			background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+			color: #475569;
+			transform: translateY(-1px);
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		}
 
-    /* Enhanced table responsiveness */
-    .table-responsive {
-        border-radius: 0.75rem;
-        overflow: hidden;
-    }
+	.btn-settle-confirm {
+		background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+		border: none;
+		border-radius: 0.75rem;
+		padding: 0.75rem 2rem;
+		font-weight: 700;
+		color: white;
+		transition: all 0.3s ease;
+		box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+	}
 
-    /* Smooth transitions for all interactive elements */
-    * {
-        transition: all 0.2s ease;
-    }
+		.btn-settle-confirm:hover {
+			background: linear-gradient(135deg, #059669 0%, #047857 100%);
+			transform: translateY(-2px);
+			box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+			color: white;
+		}
 
-    /* Improved mobile responsiveness for customer accounts table */
-    @@media (max-width: 767.98px) {
-        .customer-accounts-table th,
-        .customer-accounts-table td {
-            font-size: 0.85rem;
-            padding: 0.5rem 0.25rem;
-            white-space: nowrap;
-        }
-        .table-responsive {
-            overflow-x: auto;
-        }
-    }
+		.btn-settle-confirm:active {
+			transform: translateY(0);
+		}
 
-    /* Enhanced Pagination Styles */
-    .customer-pagination-nav {
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-        border-radius: 1rem;
-        padding: 1.5rem 0 1rem 0;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 2px 8px rgba(67, 206, 162, 0.08);
-    }
-    .customer-pagination-nav .pagination {
-        gap: 0.5rem;
-    }
-    .customer-pagination-nav .page-item {
-        border-radius: 2rem !important;
-        overflow: hidden;
-    }
-    .customer-pagination-nav .page-link.pagination-btn {
-        border: none;
-        border-radius: 2rem !important;
-        min-width: 44px;
-        min-height: 44px;
-        font-size: 1.15rem;
-        font-weight: 600;
-        color: #185a9d;
-        background: #fff;
-        box-shadow: 0 2px 8px rgba(67, 206, 162, 0.08);
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .customer-pagination-nav .page-link.pagination-btn:hover,
-    .customer-pagination-nav .page-link.pagination-btn:focus {
-        background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
-        color: #fff;
-        box-shadow: 0 4px 16px rgba(67, 206, 162, 0.18);
-    }
-    .customer-pagination-nav .page-item.active .page-link.pagination-btn {
-        background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
-        color: #fff;
-        font-weight: 700;
-        box-shadow: 0 6px 20px rgba(67, 206, 162, 0.25);
-        border: none;
-    }
-    .customer-pagination-nav .page-item.disabled .page-link.pagination-btn {
-        background: #e2e8f0;
-        color: #b0b7c3;
-        cursor: not-allowed;
-        box-shadow: none;
-    }
-    @@media (max-width: 767.98px) {
-        .customer-pagination-nav .page-link.pagination-btn {
-            min-width: 36px;
-            min-height: 36px;
-            font-size: 1rem;
-        }
-        .customer-pagination-nav {
-            padding: 1rem 0 0.5rem 0;
-        }
-    }
+	/* Responsive Design for Modal */
+	@@media (max-width: 768px) {
+		.modal-dialog {
+			margin: 1rem;
+		}
+
+		.modal-close-btn {
+			top: 0.75rem;
+			right: 0.75rem;
+			width: 35px;
+			height: 35px;
+			font-size: 1rem;
+		}
+
+		.customer-info-header-enhanced {
+			flex-direction: column;
+			text-align: center;
+			gap: 1rem;
+		}
+
+		.customer-avatar {
+			width: 60px;
+			height: 60px;
+		}
+
+			.customer-avatar i {
+				font-size: 2rem;
+			}
+
+		.customer-name-enhanced {
+			font-size: 1.25rem;
+		}
+
+		.amount-input-group {
+			flex-direction: column;
+		}
+
+		.amount-input-prefix,
+		.amount-input-suffix {
+			width: 100%;
+			min-width: auto;
+		}
+
+		.amount-input {
+			text-align: center;
+			border-top: 1px solid #e2e8f0;
+			border-bottom: 1px solid #e2e8f0;
+		}
+	}
+
+	/* Currency formatting */
+	.egp-currency::before {
+		content: "ج.م ";
+	}
+
+	/* Enhanced table responsiveness */
+	.table-responsive {
+		border-radius: 0.75rem;
+		overflow: hidden;
+	}
+
+	/* Smooth transitions for all interactive elements */
+	* {
+		transition: all 0.2s ease;
+	}
+
+	/* Improved mobile responsiveness for customer accounts table */
+	@@media (max-width: 767.98px) {
+		.customer-accounts-table th,
+		.customer-accounts-table td {
+			font-size: 0.85rem;
+			padding: 0.5rem 0.25rem;
+			white-space: nowrap;
+		}
+
+		.table-responsive {
+			overflow-x: auto;
+		}
+	}
+
+	/* Enhanced Pagination Styles */
+	.customer-pagination-nav {
+		background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+		border-radius: 1rem;
+		padding: 1.5rem 0 1rem 0;
+		margin-bottom: 1.5rem;
+		box-shadow: 0 2px 8px rgba(67, 206, 162, 0.08);
+	}
+
+		.customer-pagination-nav .pagination {
+			gap: 0.5rem;
+		}
+
+		.customer-pagination-nav .page-item {
+			border-radius: 2rem !important;
+			overflow: hidden;
+		}
+
+		.customer-pagination-nav .page-link.pagination-btn {
+			border: none;
+			border-radius: 2rem !important;
+			min-width: 44px;
+			min-height: 44px;
+			font-size: 1.15rem;
+			font-weight: 600;
+			color: #185a9d;
+			background: #fff;
+			box-shadow: 0 2px 8px rgba(67, 206, 162, 0.08);
+			transition: all 0.2s;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+			.customer-pagination-nav .page-link.pagination-btn:hover,
+			.customer-pagination-nav .page-link.pagination-btn:focus {
+				background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+				color: #fff;
+				box-shadow: 0 4px 16px rgba(67, 206, 162, 0.18);
+			}
+
+		.customer-pagination-nav .page-item.active .page-link.pagination-btn {
+			background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+			color: #fff;
+			font-weight: 700;
+			box-shadow: 0 6px 20px rgba(67, 206, 162, 0.25);
+			border: none;
+		}
+
+		.customer-pagination-nav .page-item.disabled .page-link.pagination-btn {
+			background: #e2e8f0;
+			color: #b0b7c3;
+			cursor: not-allowed;
+			box-shadow: none;
+		}
+
+	@@media (max-width: 767.98px) {
+		.customer-pagination-nav .page-link.pagination-btn {
+			min-width: 36px;
+			min-height: 36px;
+			font-size: 1rem;
+		}
+
+		.customer-pagination-nav {
+			padding: 1rem 0 0.5rem 0;
+		}
+	}
 </style>

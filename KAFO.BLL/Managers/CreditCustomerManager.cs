@@ -44,12 +44,12 @@ namespace KAFO.BLL.Managers
             var customer = Get(id);
             if (customer != null)
             {
-              
+
                 if (customer.TotalOwed != 0)
                 {
                     return "لا يمكن حذف العميل لأن لديه رصيد غير مسدد.";
                 }
-                if (customer.Balance!=0)
+                if (customer.Balance != 0)
                 {
                     return "لا يمكن حذف العميل لأن لديه أموال في الحساب.";
                 }
@@ -119,43 +119,43 @@ namespace KAFO.BLL.Managers
                         DepositMoney = i.TotalInvoice
                     }).ToList()
                 : new List<CreditCustomerTransactionData>();
-                            return new CreditCustomerAccountData
-                {
-                    Id = customer.Id,
-                    Name = customer.CustomerName,
-                    Phone = customer.PhoneNumber ?? "",
-                    Email = customer.Email,
-                    Gender = customer.Gender ?? "",
-                    Balance = customer.Balance,
-                    Credit = customer.TotalOwed,
-                    Transactions = transactions
-                };
-            }
-
-            public SettlementResult SettleAccount(int customerId, decimal amount, int userId)
+            return new CreditCustomerAccountData
             {
-                try
+                Id = customer.Id,
+                Name = customer.CustomerName,
+                Phone = customer.PhoneNumber ?? "",
+                Email = customer.Email,
+                Gender = customer.Gender ?? "",
+                Balance = customer.Balance,
+                Credit = customer.TotalOwed,
+                Transactions = transactions
+            };
+        }
+
+        public SettlementResult SettleAccount(int customerId, decimal amount, int userId, bool? withdraw)
+        {
+            try
+            {
+                if (amount <= 0)
                 {
-                    if (amount <= 0)
+                    return new SettlementResult
                     {
-                        return new SettlementResult
-                        {
-                            Success = false,
-                            Message = "يجب أن يكون المبلغ أكبر من صفر"
-                        };
-                    }
+                        Success = false,
+                        Message = "يجب أن يكون المبلغ أكبر من صفر"
+                    };
+                }
 
-                    var customer = _unitOfWork.CustomerAccounts.FindById(customerId);
-                    if (customer == null)
+                var customer = _unitOfWork.CustomerAccounts.FindById(customerId);
+                if (customer == null)
+                {
+                    return new SettlementResult
                     {
-                        return new SettlementResult
-                        {
-                            Success = false,
-                            Message = "العميل غير موجود"
-                        };
-                    }
+                        Success = false,
+                        Message = "العميل غير موجود"
+                    };
+                }
 
-                                    var currentUser = _unitOfWork.Users.FindById(userId);
+                var currentUser = _unitOfWork.Users.FindById(userId);
                 if (currentUser == null)
                 {
                     return new SettlementResult
@@ -164,30 +164,31 @@ namespace KAFO.BLL.Managers
                         Message = "لم يتم العثور على المستخدم الحالي"
                     };
                 }
+                var oldTotalOwed = customer.TotalOwed;
+                var oldTotalPaid = customer.TotalPaid;
+                var message = "";
 
-                    var oldTotalOwed = customer.TotalOwed;
-                    var oldTotalPaid = customer.TotalPaid;
-                    var message = "";
-
+                if (withdraw == null)
+                {
                     // Check if customer has debt to settle
                     if (customer.TotalOwed > 0)
                     {
-                        var currentDebt = customer.TotalOwed; 
-                        
+                        var currentDebt = customer.TotalOwed;
+
                         // If amount is greater than debt, settle debt first, then add remaining as credit
                         if (amount >= currentDebt)
                         {
                             var remainingAmount = amount - currentDebt;
-                            
+
                             // Settle all debt
                             customer.SettleDebt(currentDebt);
-                            
+
                             // Add remaining as credit (TotalPaid)
                             if (remainingAmount > 0)
                             {
                                 customer.AddPayment(remainingAmount);
                             }
-                            
+
                             message = $"تم تسوية دين العميل {customer.CustomerName} بالكامل ({currentDebt:C}) وإضافة رصيد إضافي ({remainingAmount:C})";
                         }
                         else
@@ -203,8 +204,6 @@ namespace KAFO.BLL.Managers
                         customer.AddPayment(amount);
                         message = $"تم إضافة رصيد للعميل {customer.CustomerName} بمبلغ {amount:C}";
                     }
-
-                    // Create credit terminate invoice
                     var creditTerminateInvoice = new CreditTerminateInvoice
                     {
                         CreatedAt = DateTime.Now,
@@ -214,37 +213,75 @@ namespace KAFO.BLL.Managers
                     };
 
                     _unitOfWork.CreditTerminateInvoice.Add(creditTerminateInvoice);
-                    _unitOfWork.Save();
 
-                    return new SettlementResult
-                    {
-                        Success = true,
-                        Message = message,
-                        CustomerId = customer.Id,
-                        NewTotalOwed = customer.TotalOwed,
-                        NewTotalPaid = customer.TotalPaid,
-                        OldTotalOwed = oldTotalOwed,
-                        OldTotalPaid = oldTotalPaid,
-                        CustomerName = customer.CustomerName,
-                        AmountPaid = amount
-                    };
+                    // Create credit terminate invoice
                 }
-                catch (ArgumentException ex)
+                else if (withdraw == true)
                 {
-                    return new SettlementResult
+                    if (customer.TotalOwed > 0)
                     {
-                        Success = false,
-                        Message = ex.Message
-                    };
+                        return new SettlementResult
+                        {
+                            Success = false,
+                            Message = "لا يمكن سحب الأموال من العميل لأنه لديه دين مستحق"
+                        };
+                    }
+                    else if (customer.Balance < amount)
+                    {
+                        return new SettlementResult
+                        {
+                            Success = false,
+                            Message = "لا يوجد رصيد كافي للسحب"
+                        };
+                    }
+                    else
+                    {
+
+                        customer.WithdrawBalance(amount);
+                        message = $"تم سحب مبلغ {amount:C} من رصيد العميل {customer.CustomerName}";
+                        var creditWithdrawInvoice = new CreditWithdrawInvoice
+                        {
+                            CreatedAt = DateTime.Now,
+                            User = currentUser,
+                            CustomerAccount = customer,
+                            TotalInvoice = amount
+                        };
+
+                        _unitOfWork.CreditWithdrawInvoices.Add(creditWithdrawInvoice);
+                    }
                 }
-                catch (Exception ex)
+
+                _unitOfWork.Save();
+
+                return new SettlementResult
                 {
-                    return new SettlementResult
-                    {
-                        Success = false,
-                        Message = "حدث خطأ أثناء تصفية الحساب: " + ex.Message
-                    };
-                }
+                    Success = true,
+                    Message = message,
+                    CustomerId = customer.Id,
+                    NewTotalOwed = customer.TotalOwed,
+                    NewTotalPaid = customer.TotalPaid,
+                    OldTotalOwed = oldTotalOwed,
+                    OldTotalPaid = oldTotalPaid,
+                    CustomerName = customer.CustomerName,
+                    AmountPaid = amount
+                };
+            }
+            catch (ArgumentException ex)
+            {
+                return new SettlementResult
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
+            }
+            catch (Exception ex)
+            {
+                return new SettlementResult
+                {
+                    Success = false,
+                    Message = "حدث خطأ أثناء تصفية الحساب: " + ex.Message
+                };
             }
         }
-} 
+    }
+}

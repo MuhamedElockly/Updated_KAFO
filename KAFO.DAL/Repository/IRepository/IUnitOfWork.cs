@@ -11,7 +11,7 @@ namespace Kafo.DAL.Repository
         IInvoiceRepository Invoices { get; }
         IUserRepository Users { get; }
         ICreditTerminateInvoice CreditTerminateInvoice { get; }
-
+        ICreditWithdrawInvoice CreditWithdrawInvoices { get; }
         void Save();
     }
 }

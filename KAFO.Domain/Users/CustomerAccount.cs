@@ -93,5 +93,17 @@ namespace KAFO.Domain.Users
             TotalOwed = Math.Max(0, TotalOwed - amount); // Ensure TotalOwed never goes below 0
             NormalizeAccount();
         }
+     
+        public void WithdrawBalance(decimal amount)
+        {
+            if (amount <= 0)
+                throw new ArgumentException("المبلغ يجب أن يكون أكبر من صفر");
+                
+            if (amount > Balance)
+                throw new ArgumentException("لا يمكن سحب مبلغ أكبر من الرصيد المتاح");
+                
+            TotalPaid = Math.Max(0, TotalPaid - amount);
+            NormalizeAccount();
+        }
     }
 }
