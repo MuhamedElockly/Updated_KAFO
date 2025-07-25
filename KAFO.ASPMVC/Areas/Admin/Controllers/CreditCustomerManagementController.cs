@@ -157,7 +157,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
                         CreatedAt = invoice.CreatedAt,
                         UserName = invoice.User?.Name ?? "غير محدد",
                         TotalInvoice = invoice.TotalInvoice,
-                        InvoiceType = invoice.Type.ToString(),
+                   //     InvoiceType = invoice.Type.ToString(),
                         CustomerName = invoice.CustomerAccount?.CustomerName ?? "-",
                         ItemsCount = invoice.Items?.Count ?? 0,
                         ImageUrl = invoice.ImageUrl
