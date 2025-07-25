@@ -48,7 +48,8 @@
                         <i class="fas fa-credit-card me-2"></i>
                         إجمالي المستحق
                     </div>
-                    <h3 class="stats-value text-warning">@Model.Sum(c => Math.Max(0, c.TotalOwed)).ToString("C")</h3>
+                    <h3 class="stats-value text-warning">@Model.Sum(c => Math.Max(0, c.TotalOwed)).ToString("N2") ج.م</h3>
+
                 </div>
             </div>
             <div class="col-lg-4 col-md-6">
@@ -57,7 +58,7 @@
                         <i class="fas fa-balance-scale me-2"></i>
                         الرصيد الإجمالي
                     </div>
-                    <h3 class="stats-value text-info">@Model.Sum(c => c.Balance).ToString("C")</h3>
+                    <h3 class="stats-value text-info">@Model.Sum(c => c.Balance).ToString("N2") ج.م</h3>
                 </div>
             </div>
         </div>
@@ -129,7 +130,7 @@
                                             <td class="text-center">
                                                 <span class="badge badge-amount negative">
                                                     <i class="fas fa-minus me-1"></i>
-                                                    @Math.Max(0, item.TotalOwed).ToString("C")
+                                                    @Math.Max(0, item.TotalOwed).ToString("N2") ج.م
                                                 </span>
                                             </td>
                                             <td class="text-center">
@@ -140,7 +141,7 @@
                                                 }
                                                 <span class="badge badge-amount @balanceClass">
                                                     <i class="fas @balanceIcon me-1"></i>
-                                                    @balance.ToString("C")
+                                                    @balance.ToString("N2") ج.م
                                                 </span>
                                             </td>
                                             <td class="text-center">
