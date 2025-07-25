@@ -47,7 +47,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 
             return PartialView("_CreditCustomersManagement", vm);
         }
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin,seller")]
         public IActionResult Create()
         {
             try
@@ -62,7 +62,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin,seller")]
         public IActionResult Create(KAFO.ASPMVC.Areas.Admin.ViewModels.CreditCustomerAddVM model, string from = null)
         {
             try
