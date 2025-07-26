@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using KAFO.BLL.Managers;
 using System;
+using System.Globalization;
 
 namespace KAFO.BLL.Managers
 {
@@ -105,7 +106,8 @@ namespace KAFO.BLL.Managers
 
         public CreditCustomerAccountData GetWithInvoicesData(int customerId)
         {
-            var customer = _unitOfWork.CustomerAccounts.Get(
+			
+			var customer = _unitOfWork.CustomerAccounts.Get(
                 c => c.Id == customerId,
                 includeProperties: "Deposits,Deposits.User"
             );
@@ -134,7 +136,8 @@ namespace KAFO.BLL.Managers
 
         public SettlementResult SettleAccount(int customerId, decimal amount, int userId, bool? withdraw)
         {
-            try
+			CultureInfo egyptCulture = new CultureInfo("ar-EG");
+			try
             {
                 if (amount <= 0)
                 {
@@ -189,20 +192,20 @@ namespace KAFO.BLL.Managers
                                 customer.AddPayment(remainingAmount);
                             }
 
-                            message = $"تم تسوية دين العميل {customer.CustomerName} بالكامل ({currentDebt:C}) وإضافة رصيد إضافي ({remainingAmount:C})";
+                            message = $"تم تسوية دين العميل {customer.CustomerName} بالكامل ({currentDebt:C}) وإضافة رصيد إضافي ({amount.ToString("C", egyptCulture)})";
                         }
                         else
                         {
                             // Settle partial debt
                             customer.SettleDebt(amount);
-                            message = $"تم تسوية جزء من دين العميل {customer.CustomerName} بمبلغ {amount:C}";
+                            message = $"تم تسوية جزء من دين العميل {customer.CustomerName} بمبلغ {amount.ToString("C", egyptCulture)}";
                         }
                     }
                     else
                     {
                         // No debt, add as credit
                         customer.AddPayment(amount);
-                        message = $"تم إضافة رصيد للعميل {customer.CustomerName} بمبلغ {amount:C}";
+                        message = $"تم إضافة رصيد للعميل {customer.CustomerName} بمبلغ {amount.ToString("C", egyptCulture)}";
                     }
                     var creditTerminateInvoice = new CreditTerminateInvoice
                     {
@@ -238,7 +241,7 @@ namespace KAFO.BLL.Managers
                     {
 
                         customer.WithdrawBalance(amount);
-                        message = $"تم سحب مبلغ {amount:C} من رصيد العميل {customer.CustomerName}";
+                        message = $"تم سحب مبلغ {amount.ToString("C", egyptCulture)} من رصيد العميل {customer.CustomerName}";
                         var creditWithdrawInvoice = new CreditWithdrawInvoice
                         {
                             CreatedAt = DateTime.Now,

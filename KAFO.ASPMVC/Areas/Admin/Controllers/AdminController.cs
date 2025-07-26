@@ -242,24 +242,24 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 					}
 				}
 
-				// If no real invoices, add mock data for testing
-				if (!hasRealInvoices)
-				{
-					for (int i = 1; i <= 7; i++)
-					{
-						invoices.Add(new InvoiceVM
-						{
-							Id = 1000 + i,
-							CreatedAt = DateTime.Now.AddDays(-i),
-							UserName = "مسؤول " + i,
-							TotalInvoice = 100 * i + (invoiceType == "purchase" ? 50 : 0),
-							InvoiceType = invoiceType == "sell" ? (i % 2 == 0 ? "نقدي" : "آجل") : "شراء",
-							CustomerName = invoiceType == "sell" ? (i % 2 == 0 ? "-" : $"عميل {i}") : "-",
-							ItemsCount = 2 + (i % 3),
-							ImageUrl = null
-						});
-					}
-				}
+				//// If no real invoices, add mock data for testing
+				//if (!hasRealInvoices)
+				//{
+				//	for (int i = 1; i <= 7; i++)
+				//	{
+				//		invoices.Add(new InvoiceVM
+				//		{
+				//			Id = 1000 + i,
+				//			CreatedAt = DateTime.Now.AddDays(-i),
+				//			UserName = "مسؤول " + i,
+				//			TotalInvoice = 100 * i + (invoiceType == "purchase" ? 50 : 0),
+				//			InvoiceType = invoiceType == "sell" ? (i % 2 == 0 ? "نقدي" : "آجل") : "شراء",
+				//			CustomerName = invoiceType == "sell" ? (i % 2 == 0 ? "-" : $"عميل {i}") : "-",
+				//			ItemsCount = 2 + (i % 3),
+				//			ImageUrl = null
+				//		});
+				//	}
+				//}
 			}
 
 			// Apply pagination only if we have invoices

@@ -150,40 +150,7 @@ namespace KAFO.BLL.Managers
                     }
                 }
 
-                // If no real invoices, add mock data for testing
-                if (!hasRealInvoices)
-                {
-                    for (int i = 1; i <= 7; i++)
-                    {
-                        var mockItems = new List<object>();
-                        var itemsCount = 2 + (i % 3);
-                        
-                        for (int j = 1; j <= itemsCount; j++)
-                        {
-                            var price = 10 + (j * 5) + (i * 2);
-                            var quantity = 1 + (j % 3);
-                            mockItems.Add(new
-                            {
-                                productName = $"منتج {j}",
-                                quantity = quantity,
-                                unitPrice = price,
-                                totalPrice = price * quantity
-                            });
-                        }
-                        
-                        invoices.Add(new
-                        {
-                            id = 1000 + i,
-                            createdAt = DateTime.Now.AddDays(-i),
-                            userName = "مسؤول " + i,
-                            total = 100 * i + (invoiceType == "purchase" ? 50 : 0),
-                            type = invoiceType == "sell" ? (i % 2 == 0 ? "Cash" : "Credit") : "Purchase",
-                            customerName = invoiceType == "sell" ? (i % 2 == 0 ? "-" : $"عميل {i}") : "-",
-                            itemsCount = itemsCount,
-                            items = mockItems
-                        });
-                    }
-                }
+
             }
 
             // Return ordered results
