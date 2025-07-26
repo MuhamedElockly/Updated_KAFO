@@ -32,6 +32,7 @@ namespace KAFO.Domain.Users
         
         public virtual ICollection<Invoice> Invoices { get; set; } = [];
         public virtual ICollection<CreditTerminateInvoice> Deposits { get; set; } = [];
+        public virtual ICollection<CreditWithdrawInvoice> Withdraws { get; set; } = [];
         public bool IsDeleted { get; set; } = false;
 
         public CustomerAccount()

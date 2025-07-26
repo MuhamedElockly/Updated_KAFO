@@ -1,485 +1,485 @@
 @model KAFO.ASPMVC.Areas.Admin.ViewModels.CreditCustomerAccountVM
 @{
-    ViewData["Title"] = "حساب عميل آجل";
-    Layout = "_DefaultLayout";
-    // For testing: add more transactions if less than 10
-    // if (Model.Transactions.Count < 10)
-    // {
-    // var extra = 10 - Model.Transactions.Count;
-    // for (int i = 0; i < extra; i++)
-    // {
-    // Model.Transactions.Add(new KAFO.ASPMVC.Areas.Admin.ViewModels.CreditCustomerTransactionVM {
-    // SellerName = $"بائع تجريبي {i+1}",
-    // Time = DateTime.Now.AddDays(-i),
-    // DepositMoney = (i % 2 == 0 ? 100 + i * 10 : -50 - i * 5)
-    // });
-    // }
-    // }
-    var transactionsJson = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Transactions);
-    var invoicesJson = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Invoices);
+	ViewData["Title"] = "حساب عميل آجل";
+	Layout = "_DefaultLayout";
+	// For testing: add more transactions if less than 10
+	// if (Model.Transactions.Count < 10)
+	// {
+	// var extra = 10 - Model.Transactions.Count;
+	// for (int i = 0; i < extra; i++)
+	// {
+	// Model.Transactions.Add(new KAFO.ASPMVC.Areas.Admin.ViewModels.CreditCustomerTransactionVM {
+	// SellerName = $"بائع تجريبي {i+1}",
+	// Time = DateTime.Now.AddDays(-i),
+	// DepositMoney = (i % 2 == 0 ? 100 + i * 10 : -50 - i * 5)
+	// });
+	// }
+	// }
+	var transactionsJson = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Transactions);
+	var invoicesJson = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Invoices);
 }
 <link rel="stylesheet" href="~/css/credit-customers.css" />
 
 <div class="credit-customer-bg py-4">
-    <div class="row justify-content-center mb-4">
-        <div class="col-lg-10 col-xl-9">
-            <div class="d-flex justify-content-center align-items-center mb-4">
-                <div class="page-title">
-                    <h2 class="mb-0">
-                        <i class="fas fa-user-circle me-3"></i>
-                        تفاصيل حساب العميل
-                    </h2>
-                </div>
-            </div>
-            <div class="glass-card p-4 mb-4">
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <div class="balance-card balance-positive">
-                            <div class="balance-icon">
-                                <i class="fas fa-wallet fa-2x"></i>
-                            </div>
-                            <div class="balance-content">
-                                <h3 class="balance-label">الرصيد المتاح</h3>
-                                <div class="balance-amount">
-                                    @Model.Balance.ToString("N2") <span class="currency">ج.م</span>
-                                </div>
-                                <div class="balance-status">متاح للاستخدام</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="balance-card balance-credit">
-                            <div class="balance-icon">
-                                <i class="fas fa-credit-card fa-2x"></i>
-                            </div>
-                            <div class="balance-content">
-                                <h3 class="balance-label">المبلغ الآجل</h3>
-                                <div class="balance-amount">
-                                    @Model.Credit.ToString("N2") <span class="currency">ج.م</span>
-                                </div>
-                                <div class="balance-status">مستحق للدفع</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="glass-card p-4 mb-4">
-                <div class="tabs-header mb-4">
-                    <h3 class="tabs-title">
-                        <i class="fas fa-info-circle me-2"></i>
-                        معلومات العميل
-                    </h3>
-                </div>
-                <ul class="nav nav-tabs modern-tabs mb-4" id="customerTab" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details"
-                                type="button" role="tab" aria-controls="details" aria-selected="true">
-                            <i class="fas fa-user-tag me-2"></i> بيانات العميل
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="transactions-tab" data-bs-toggle="tab"
-                                data-bs-target="#transactions" type="button" role="tab" aria-controls="transactions"
-                                aria-selected="false">
-                            <i class="fas fa-list-alt me-2"></i> سجل المعاملات
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices"
-                                type="button" role="tab" aria-controls="invoices" aria-selected="false">
-                            <i class="fas fa-file-invoice me-2"></i> فواتير العميل
-                        </button>
-                    </li>
-                </ul>
-                <div class="tab-content" id="customerTabContent">
-                    <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
-                        <div class="customer-profile-section">
-                            <div class="customer-profile-card">
-                                <div class="profile-header">
-                                    <div class="profile-avatar">
-                                        <i class="fas fa-user-circle"></i>
-                                    </div>
-                                    <div class="profile-info">
-                                        <h2 class="customer-name">@Model.Name</h2>
-                                        <div class="customer-id">رقم العميل: @Model.Id</div>
-                                    </div>
-                                </div>
-                                <div class="profile-details">
-                                    <div class="detail-row">
-                                        <div class="detail-item">
-                                            <div class="detail-icon">
-                                                <i class="fas fa-phone"></i>
-                                            </div>
-                                            <div class="detail-content">
-                                                <label>رقم الهاتف</label>
-                                                <span>@Model.Phone</span>
-                                            </div>
-                                        </div>
-                                        @if (!string.IsNullOrEmpty(Model.Email))
-                                        {
-                                            <div class="detail-item">
-                                                <div class="detail-icon">
-                                                    <i class="fas fa-envelope"></i>
-                                                </div>
-                                                <div class="detail-content">
-                                                    <label>البريد الإلكتروني</label>
-                                                    <span>@Model.Email</span>
-                                                </div>
-                                            </div>
-                                        }
-                                        <div class="detail-item">
-                                            <div class="detail-icon">
-                                                <i class="fas fa-venus-mars"></i>
-                                            </div>
-                                            <div class="detail-content">
-                                                <label>الجنس</label>
-                                                <span>@Model.Gender</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="transactions" role="tabpanel" aria-labelledby="transactions-tab">
-                        <div class="transactions-section">
-                            <div class="transactions-header">
-                                <h3 class="transactions-title">
-                                    <i class="fas fa-list-alt me-2"></i>
-                                    سجل المعاملات
-                                </h3>
-                                <div class="transactions-stats">
-                                    <span class="stat-item">
-                                        <i class="fas fa-chart-line me-1"></i>
-                                        إجمالي المعاملات: <strong id="total-transactions">0</strong>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="transactions-table-container">
-                                <div class="table-responsive">
-                                    <table class="table transactions-table">
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    <i class="fas fa-user-tie me-2"></i>
-                                                    اسم البائع
-                                                </th>
-                                                <th>
-                                                    <i class="fas fa-clock me-2"></i>
-                                                    الوقت
-                                                </th>
-                                                <th>
-                                                    <i class="fas fa-money-bill-wave me-2"></i>
-                                                    المبلغ المودع
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="transactions-table-body">
-                                            <!-- JS will render rows here -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="pagination-wrapper">
-                                    <nav>
-                                        <ul class="pagination justify-content-center" id="transactions-pagination">
-                                            <!-- JS will render pagination here -->
-                                        </ul>
-                                    </nav>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="invoices" role="tabpanel" aria-labelledby="invoices-tab">
-                        <div class="transactions-section">
-                            <div class="transactions-header">
-                                <h3 class="transactions-title">
-                                    <i class="fas fa-file-invoice me-2"></i>
-                                    فواتير العميل
-                                </h3>
-                                <div class="transactions-stats">
-                                    <span class="stat-item">
-                                        <i class="fas fa-chart-line me-1"></i>
-                                        إجمالي الفواتير: <strong id="total-invoices">0</strong>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="transactions-table-container">
-                                <div class="table-responsive">
-                                    <table class="table transactions-table">
-                                        <thead>
-                                            <tr>
-                                                <th>رقم الفاتورة</th>
-                                                <th>التاريخ</th>
-                                                <th>المستخدم</th>
-                                                <th>الإجمالي</th>
-                                                @* <th>النوع</th> *@
-                                                <th>عدد الأصناف</th>
-                                                @* <th>رابط الصورة</th> *@
-                                                <th>تفاصيل</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="invoices-table-body">
-                                            <!-- JS will render rows here -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="pagination-wrapper">
-                                    <nav>
-                                        <ul class="pagination justify-content-center" id="invoices-pagination">
-                                            <!-- JS will render pagination here -->
-                                        </ul>
-                                    </nav>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="row justify-content-center mb-4">
+		<div class="col-lg-10 col-xl-9">
+			<div class="d-flex justify-content-center align-items-center mb-4">
+				<div class="page-title">
+					<h2 class="mb-0">
+						<i class="fas fa-user-circle me-3"></i>
+						تفاصيل حساب العميل
+					</h2>
+				</div>
+			</div>
+			<div class="glass-card p-4 mb-4">
+				<div class="row g-4">
+					<div class="col-md-6">
+						<div class="balance-card balance-positive">
+							<div class="balance-icon">
+								<i class="fas fa-wallet fa-2x"></i>
+							</div>
+							<div class="balance-content">
+								<h3 class="balance-label">الرصيد المتاح</h3>
+								<div class="balance-amount">
+									@Model.Balance.ToString("N2") <span class="currency">ج.م</span>
+								</div>
+								<div class="balance-status">متاح للاستخدام</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="balance-card balance-credit">
+							<div class="balance-icon">
+								<i class="fas fa-credit-card fa-2x"></i>
+							</div>
+							<div class="balance-content">
+								<h3 class="balance-label">المبلغ الآجل</h3>
+								<div class="balance-amount">
+									@Model.Credit.ToString("N2") <span class="currency">ج.م</span>
+								</div>
+								<div class="balance-status">مستحق للدفع</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="glass-card p-4 mb-4">
+				<div class="tabs-header mb-4">
+					<h3 class="tabs-title">
+						<i class="fas fa-info-circle me-2"></i>
+						معلومات العميل
+					</h3>
+				</div>
+				<ul class="nav nav-tabs modern-tabs mb-4" id="customerTab" role="tablist">
+					<li class="nav-item" role="presentation">
+						<button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details"
+								type="button" role="tab" aria-controls="details" aria-selected="true">
+							<i class="fas fa-user-tag me-2"></i> بيانات العميل
+						</button>
+					</li>
+					<li class="nav-item" role="presentation">
+						<button class="nav-link" id="transactions-tab" data-bs-toggle="tab"
+								data-bs-target="#transactions" type="button" role="tab" aria-controls="transactions"
+								aria-selected="false">
+							<i class="fas fa-list-alt me-2"></i> سجل المعاملات
+						</button>
+					</li>
+					<li class="nav-item" role="presentation">
+						<button class="nav-link" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices"
+								type="button" role="tab" aria-controls="invoices" aria-selected="false">
+							<i class="fas fa-file-invoice me-2"></i> فواتير العميل
+						</button>
+					</li>
+				</ul>
+				<div class="tab-content" id="customerTabContent">
+					<div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+						<div class="customer-profile-section">
+							<div class="customer-profile-card">
+								<div class="profile-header">
+									<div class="profile-avatar">
+										<i class="fas fa-user-circle"></i>
+									</div>
+									<div class="profile-info">
+										<h2 class="customer-name">@Model.Name</h2>
+										<div class="customer-id">رقم العميل: @Model.Id</div>
+									</div>
+								</div>
+								<div class="profile-details">
+									<div class="detail-row">
+										<div class="detail-item">
+											<div class="detail-icon">
+												<i class="fas fa-phone"></i>
+											</div>
+											<div class="detail-content">
+												<label>رقم الهاتف</label>
+												<span>@Model.Phone</span>
+											</div>
+										</div>
+										@if (!string.IsNullOrEmpty(Model.Email))
+										{
+											<div class="detail-item">
+												<div class="detail-icon">
+													<i class="fas fa-envelope"></i>
+												</div>
+												<div class="detail-content">
+													<label>البريد الإلكتروني</label>
+													<span>@Model.Email</span>
+												</div>
+											</div>
+										}
+										<div class="detail-item">
+											<div class="detail-icon">
+												<i class="fas fa-venus-mars"></i>
+											</div>
+											<div class="detail-content">
+												<label>الجنس</label>
+												<span>@Model.Gender</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane fade" id="transactions" role="tabpanel" aria-labelledby="transactions-tab">
+						<div class="transactions-section">
+							<div class="transactions-header">
+								<h3 class="transactions-title">
+									<i class="fas fa-list-alt me-2"></i>
+									سجل المعاملات
+								</h3>
+								<div class="transactions-stats">
+									<span class="stat-item">
+										<i class="fas fa-chart-line me-1"></i>
+										إجمالي المعاملات: <strong id="total-transactions">0</strong>
+									</span>
+								</div>
+							</div>
+							<div class="transactions-table-container">
+								<div class="table-responsive">
+									<table class="table transactions-table">
+										<thead>
+											<tr>
+												<th>
+													<i class="fas fa-user-tie me-2"></i>
+													اسم البائع
+												</th>
+												<th>
+													<i class="fas fa-clock me-2"></i>
+													الوقت
+												</th>
+												<th>
+													<i class="fas fa-money-bill-wave me-2"></i>
+													المبلغ المودع
+												</th>
+											</tr>
+										</thead>
+										<tbody id="transactions-table-body">
+											<!-- JS will render rows here -->
+										</tbody>
+									</table>
+								</div>
+								<div class="pagination-wrapper">
+									<nav>
+										<ul class="pagination justify-content-center" id="transactions-pagination">
+											<!-- JS will render pagination here -->
+										</ul>
+									</nav>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane fade" id="invoices" role="tabpanel" aria-labelledby="invoices-tab">
+						<div class="transactions-section">
+							<div class="transactions-header">
+								<h3 class="transactions-title">
+									<i class="fas fa-file-invoice me-2"></i>
+									فواتير العميل
+								</h3>
+								<div class="transactions-stats">
+									<span class="stat-item">
+										<i class="fas fa-chart-line me-1"></i>
+										إجمالي الفواتير: <strong id="total-invoices">0</strong>
+									</span>
+								</div>
+							</div>
+							<div class="transactions-table-container">
+								<div class="table-responsive">
+									<table class="table transactions-table">
+										<thead>
+											<tr>
+												<th>رقم الفاتورة</th>
+												<th>التاريخ</th>
+												<th>المستخدم</th>
+												<th>الإجمالي</th>
+												@* <th>النوع</th> *@
+												<th>عدد الأصناف</th>
+												@* <th>رابط الصورة</th> *@
+												<th>تفاصيل</th>
+											</tr>
+										</thead>
+										<tbody id="invoices-table-body">
+											<!-- JS will render rows here -->
+										</tbody>
+									</table>
+								</div>
+								<div class="pagination-wrapper">
+									<nav>
+										<ul class="pagination justify-content-center" id="invoices-pagination">
+											<!-- JS will render pagination here -->
+										</ul>
+									</nav>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <!-- SweetAlert2 CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    var allTransactions = @Html.Raw(transactionsJson);
-    var allInvoices = @Html.Raw(invoicesJson);
-    var recordsPerPage = 5;
-    var currentTransactionsPage = 1;
-    var currentInvoicesPage = 1;
-    var totalTransactionsPages = Math.ceil(allTransactions.length / recordsPerPage);
-    var totalInvoicesPages = Math.ceil(allInvoices.length / recordsPerPage);
+	var allTransactions = @Html.Raw(transactionsJson);
+	var allInvoices = @Html.Raw(invoicesJson);
+	var recordsPerPage = 5;
+	var currentTransactionsPage = 1;
+	var currentInvoicesPage = 1;
+	var totalTransactionsPages = Math.ceil(allTransactions.length / recordsPerPage);
+	var totalInvoicesPages = Math.ceil(allInvoices.length / recordsPerPage);
 
-    function renderTransactions(page) {
-        try {
-            Swal.fire({
-                title: 'جاري التحميل...',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); }
-            });
-            setTimeout(function () { // Simulate loading for effect
-                currentTransactionsPage = page;
-                var start = (page - 1) * recordsPerPage;
-                var end = start + recordsPerPage;
-                var paged = allTransactions.slice(start, end);
-                var tbody = '';
-                paged.forEach(function (t) {
-                    var amountClass = t.DepositMoney >= 0 ? 'positive' : 'negative';
-                    var amountIcon = t.DepositMoney >= 0 ? 'fa-arrow-up' : 'fa-arrow-down';
-                    tbody += `<tr class="transaction-row">
-                            <td>
-                                <div class="seller-info">
-                                    <div class="seller-avatar">
-                                        <i class="fas fa-user-tie"></i>
-                                    </div>
-                                    <div class="seller-details">
-                                        <span class="seller-name">${t.SellerName}</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="time-info">
-                                    <i class="fas fa-clock me-2"></i>
-                                    <span>${formatDate(t.Time)}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="amount-info ${amountClass}">
-                                    <div class="amount-icon">
-                                        <i class="fas ${amountIcon}"></i>
-                                    </div>
-                                    <div class="amount-details">
-                                        <span class="amount-value">${parseFloat(t.DepositMoney).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                        <span class="currency">ج.م</span>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>`;
-                });
-                $("#transactions-table-body").html(tbody);
-                $("#total-transactions").text(allTransactions.length);
-                totalTransactionsPages = Math.ceil(allTransactions.length / recordsPerPage);
-                renderTransactionsPagination();
-                Swal.close();
-            }, 400); // 400ms for smooth effect
-        } catch (err) {
-            Swal.fire({
-                icon: 'error',
-                title: 'حدث خطأ غير متوقع',
-                text: err.message || 'يرجى المحاولة مرة أخرى.',
-                confirmButtonColor: '#6a11cb',
-                background: '#fff',
-                color: '#222',
-                showClass: { popup: 'animate__animated animate__fadeInDown' },
-                hideClass: { popup: 'animate__animated animate__fadeOutUp' }
-            });
-        }
-    }
+	function renderTransactions(page) {
+		try {
+			Swal.fire({
+				title: 'جاري التحميل...',
+				allowOutsideClick: false,
+				didOpen: () => { Swal.showLoading(); }
+			});
+			setTimeout(function () { // Simulate loading for effect
+				currentTransactionsPage = page;
+				var start = (page - 1) * recordsPerPage;
+				var end = start + recordsPerPage;
+				var paged = allTransactions.slice(start, end);
+				var tbody = '';
+				paged.forEach(function (t) {
+					var amountClass = t.IsDeposit  ? 'positive' : 'negative';
+					var amountIcon = t.IsDeposit  ? 'fa-arrow-up' : 'fa-arrow-down';
+					tbody += `<tr class="transaction-row">
+								<td>
+									<div class="seller-info">
+										<div class="seller-avatar">
+											<i class="fas fa-user-tie"></i>
+										</div>
+										<div class="seller-details">
+											<span class="seller-name">${t.SellerName}</span>
+										</div>
+									</div>
+								</td>
+								<td>
+									<div class="time-info">
+										<i class="fas fa-clock me-2"></i>
+										<span>${formatDate(t.Time)}</span>
+									</div>
+								</td>
+								<td>
+									<div class="amount-info ${amountClass}">
+										<div class="amount-icon">
+											<i class="fas ${amountIcon}"></i>
+										</div>
+										<div class="amount-details">
+											<span class="amount-value">${parseFloat(t.Amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+											<span class="currency">ج.م</span>
+										</div>
+									</div>
+								</td>
+							</tr>`;
+				});
+				$("#transactions-table-body").html(tbody);
+				$("#total-transactions").text(allTransactions.length);
+				totalTransactionsPages = Math.ceil(allTransactions.length / recordsPerPage);
+				renderTransactionsPagination();
+				Swal.close();
+			}, 400); // 400ms for smooth effect
+		} catch (err) {
+			Swal.fire({
+				icon: 'error',
+				title: 'حدث خطأ غير متوقع',
+				text: err.message || 'يرجى المحاولة مرة أخرى.',
+				confirmButtonColor: '#6a11cb',
+				background: '#fff',
+				color: '#222',
+				showClass: { popup: 'animate__animated animate__fadeInDown' },
+				hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+			});
+		}
+	}
 
-    function renderTransactionsPagination() {
-        var pag = '';
-        pag += `<li class="page-item ${currentTransactionsPage == 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="if(currentTransactionsPage>1) renderTransactions(currentTransactionsPage-1); return false;"><i class="fas fa-chevron-right me-1"></i>السابق</a></li>`;
-        for (var i = 1; i <= totalTransactionsPages; i++) {
-            pag += `<li class="page-item ${i == currentTransactionsPage ? 'active' : ''}"><a class="page-link" href="#" onclick="renderTransactions(${i}); return false;">${i}</a></li>`;
-        }
-        pag += `<li class="page-item ${currentTransactionsPage == totalTransactionsPages ? 'disabled' : ''}"><a class="page-link" href="#" onclick="if(currentTransactionsPage<totalTransactionsPages) renderTransactions(currentTransactionsPage+1); return false;">التالي<i class="fas fa-chevron-left me-1"></i></a></li>`;
-        $("#transactions-pagination").html(pag);
-    }
+	function renderTransactionsPagination() {
+		var pag = '';
+		pag += `<li class="page-item ${currentTransactionsPage == 1 ? 'disabled' : ''}">
+					<a class="page-link" href="#" onclick="if(currentTransactionsPage>1) renderTransactions(currentTransactionsPage-1); return false;"><i class="fas fa-chevron-right me-1"></i>السابق</a></li>`;
+		for (var i = 1; i <= totalTransactionsPages; i++) {
+			pag += `<li class="page-item ${i == currentTransactionsPage ? 'active' : ''}"><a class="page-link" href="#" onclick="renderTransactions(${i}); return false;">${i}</a></li>`;
+		}
+		pag += `<li class="page-item ${currentTransactionsPage == totalTransactionsPages ? 'disabled' : ''}"><a class="page-link" href="#" onclick="if(currentTransactionsPage<totalTransactionsPages) renderTransactions(currentTransactionsPage+1); return false;">التالي<i class="fas fa-chevron-left me-1"></i></a></li>`;
+		$("#transactions-pagination").html(pag);
+	}
 
-    function renderInvoices(page) {
-        try {
-            Swal.fire({
-                title: 'جاري التحميل...',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); }
-            });
-            setTimeout(function () {
-                currentInvoicesPage = page;
-                var start = (page - 1) * recordsPerPage;
-                var end = start + recordsPerPage;
-                var paged = allInvoices.slice(start, end);
-                var tbody = '';
-                paged.forEach(function (invoice) {
-                    tbody += `<tr>
-                            <td>${invoice.Id}</td>
-                            <td>${formatDate(invoice.CreatedAt)}</td>
-                            <td>${invoice.UserName}</td>
-                            <td>${parseFloat(invoice.TotalInvoice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م</td>
-                            <td>${invoice.ItemsCount}</td>
-                            <td>
-                                <button type="button"
-                                    class="btn btn-info btn-sm show-invoice-details"
-                                    data-invoice='${JSON.stringify(invoice)}'
-                                    style="background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); color: #fff; border: none; border-radius: 8px; font-weight: 600;">
-                                    <i class="fas fa-eye"></i> تفاصيل
-                                </button>
-                            </td>
-                        </tr>`;
-                });
-                $("#invoices-table-body").html(tbody);
-                $("#total-invoices").text(allInvoices.length);
-                totalInvoicesPages = Math.ceil(allInvoices.length / recordsPerPage);
-                renderInvoicesPagination();
-                Swal.close();
-            }, 400);
-        } catch (err) {
-            Swal.fire({
-                icon: 'error',
-                title: 'حدث خطأ غير متوقع',
-                text: err.message || 'يرجى المحاولة مرة أخرى.',
-                confirmButtonColor: '#6a11cb',
-                background: '#fff',
-                color: '#222',
-                showClass: { popup: 'animate__animated animate__fadeInDown' },
-                hideClass: { popup: 'animate__animated animate__fadeOutUp' }
-            });
-        }
-    }
+	function renderInvoices(page) {
+		try {
+			Swal.fire({
+				title: 'جاري التحميل...',
+				allowOutsideClick: false,
+				didOpen: () => { Swal.showLoading(); }
+			});
+			setTimeout(function () {
+				currentInvoicesPage = page;
+				var start = (page - 1) * recordsPerPage;
+				var end = start + recordsPerPage;
+				var paged = allInvoices.slice(start, end);
+				var tbody = '';
+				paged.forEach(function (invoice) {
+					tbody += `<tr>
+								<td>${invoice.Id}</td>
+								<td>${formatDate(invoice.CreatedAt)}</td>
+								<td>${invoice.UserName}</td>
+								<td>${parseFloat(invoice.TotalInvoice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م</td>
+								<td>${invoice.ItemsCount}</td>
+								<td>
+									<button type="button"
+										class="btn btn-info btn-sm show-invoice-details"
+										data-invoice='${JSON.stringify(invoice)}'
+										style="background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); color: #fff; border: none; border-radius: 8px; font-weight: 600;">
+										<i class="fas fa-eye"></i> تفاصيل
+									</button>
+								</td>
+							</tr>`;
+				});
+				$("#invoices-table-body").html(tbody);
+				$("#total-invoices").text(allInvoices.length);
+				totalInvoicesPages = Math.ceil(allInvoices.length / recordsPerPage);
+				renderInvoicesPagination();
+				Swal.close();
+			}, 400);
+		} catch (err) {
+			Swal.fire({
+				icon: 'error',
+				title: 'حدث خطأ غير متوقع',
+				text: err.message || 'يرجى المحاولة مرة أخرى.',
+				confirmButtonColor: '#6a11cb',
+				background: '#fff',
+				color: '#222',
+				showClass: { popup: 'animate__animated animate__fadeInDown' },
+				hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+			});
+		}
+	}
 
-    function renderInvoicesPagination() {
-        var pag = '';
-        pag += `<li class="page-item ${currentInvoicesPage == 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="if(currentInvoicesPage>1) renderInvoices(currentInvoicesPage-1); return false;"><i class="fas fa-chevron-right me-1"></i>السابق</a></li>`;
-        for (var i = 1; i <= totalInvoicesPages; i++) {
-            pag += `<li class="page-item ${i == currentInvoicesPage ? 'active' : ''}"><a class="page-link" href="#" onclick="renderInvoices(${i}); return false;">${i}</a></li>`;
-        }
-        pag += `<li class="page-item ${currentInvoicesPage == totalInvoicesPages ? 'disabled' : ''}"><a class="page-link" href="#" onclick="if(currentInvoicesPage<totalInvoicesPages) renderInvoices(currentInvoicesPage+1); return false;">التالي<i class="fas fa-chevron-left me-1"></i></a></li>`;
-        $("#invoices-pagination").html(pag);
-    }
+	function renderInvoicesPagination() {
+		var pag = '';
+		pag += `<li class="page-item ${currentInvoicesPage == 1 ? 'disabled' : ''}">
+					<a class="page-link" href="#" onclick="if(currentInvoicesPage>1) renderInvoices(currentInvoicesPage-1); return false;"><i class="fas fa-chevron-right me-1"></i>السابق</a></li>`;
+		for (var i = 1; i <= totalInvoicesPages; i++) {
+			pag += `<li class="page-item ${i == currentInvoicesPage ? 'active' : ''}"><a class="page-link" href="#" onclick="renderInvoices(${i}); return false;">${i}</a></li>`;
+		}
+		pag += `<li class="page-item ${currentInvoicesPage == totalInvoicesPages ? 'disabled' : ''}"><a class="page-link" href="#" onclick="if(currentInvoicesPage<totalInvoicesPages) renderInvoices(currentInvoicesPage+1); return false;">التالي<i class="fas fa-chevron-left me-1"></i></a></li>`;
+		$("#invoices-pagination").html(pag);
+	}
 
-    function formatDate(dateStr) {
-        var d = new Date(dateStr);
-        var y = d.getFullYear();
-        var m = (d.getMonth() + 1).toString().padStart(2, '0');
-        var day = d.getDate().toString().padStart(2, '0');
-        var h = d.getHours().toString().padStart(2, '0');
-        var min = d.getMinutes().toString().padStart(2, '0');
-        return `${y}/${m}/${day} ${h}:${min}`;
-    }
+	function formatDate(dateStr) {
+		var d = new Date(dateStr);
+		var y = d.getFullYear();
+		var m = (d.getMonth() + 1).toString().padStart(2, '0');
+		var day = d.getDate().toString().padStart(2, '0');
+		var h = d.getHours().toString().padStart(2, '0');
+		var min = d.getMinutes().toString().padStart(2, '0');
+		return `${y}/${m}/${day} ${h}:${min}`;
+	}
 
-    Swal.fire({
-        title: 'جاري التحميل...',
-        allowOutsideClick: false,
-        didOpen: () => { Swal.showLoading(); }
-    });
-    $(function () {
-        try {
-            renderTransactions(1);
-            renderInvoices(1);
-        } catch (err) {
-            Swal.fire({
-                icon: 'error',
-                title: 'حدث خطأ غير متوقع',
-                text: err.message || 'يرجى المحاولة مرة أخرى.',
-                confirmButtonColor: '#6a11cb',
-                background: '#fff',
-                color: '#222',
-                showClass: { popup: 'animate__animated animate__fadeInDown' },
-                hideClass: { popup: 'animate__animated animate__fadeOutUp' }
-            });
-        } finally {
-            Swal.close();
-        }
-    });
+	Swal.fire({
+		title: 'جاري التحميل...',
+		allowOutsideClick: false,
+		didOpen: () => { Swal.showLoading(); }
+	});
+	$(function () {
+		try {
+			renderTransactions(1);
+			renderInvoices(1);
+		} catch (err) {
+			Swal.fire({
+				icon: 'error',
+				title: 'حدث خطأ غير متوقع',
+				text: err.message || 'يرجى المحاولة مرة أخرى.',
+				confirmButtonColor: '#6a11cb',
+				background: '#fff',
+				color: '#222',
+				showClass: { popup: 'animate__animated animate__fadeInDown' },
+				hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+			});
+		} finally {
+			Swal.close();
+		}
+	});
 </script>
 <!-- Invoice Details Modal (ensure only one instance and at the end of body) -->
 <div class="modal fade" id="invoiceDetailsModal" tabindex="-1" aria-labelledby="invoiceDetailsModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius: 18px; box-shadow: 0 8px 32px rgba(67, 97, 238, 0.15);">
-            <div class="modal-header"
-                 style="background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); color: #fff; border-top-left-radius: 18px; border-top-right-radius: 18px;">
-                <h5 class="modal-title" id="invoiceDetailsModalLabel">
-                    <i class="fas fa-file-invoice me-2"></i>تفاصيل
-                    الفاتورة
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                        style="filter: invert(1);"></button>
-            </div>
-            <div class="modal-body p-4">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">رقم الفاتورة</dt>
-                    <dd class="col-sm-8" id="modalInvoiceId"></dd>
-                    <dt class="col-sm-4">التاريخ</dt>
-                    <dd class="col-sm-8" id="modalInvoiceDate"></dd>
-                    <dt class="col-sm-4">المستخدم</dt>
-                    <dd class="col-sm-8" id="modalInvoiceUser"></dd>
-                    <dt class="col-sm-4">الإجمالي</dt>
-                    <dd class="col-sm-8" id="modalInvoiceTotal"></dd>
-                    <dt class="col-sm-4">النوع</dt>
-                    <dd class="col-sm-8" id="modalInvoiceType"></dd>
-                    <dt class="col-sm-4">عدد الأصناف</dt>
-                    <dd class="col-sm-8" id="modalInvoiceItems"></dd>
-                    @* <dt class="col-sm-4">رابط الصورة</dt> *@
-                    <dd class="col-sm-8" id="modalInvoiceImage"></dd>
-                </dl>
-            </div>
-            <div class="modal-footer" style="border-bottom-left-radius: 18px; border-bottom-right-radius: 18px;">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
-            </div>
-        </div>
-    </div>
+	 aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content" style="border-radius: 18px; box-shadow: 0 8px 32px rgba(67, 97, 238, 0.15);">
+			<div class="modal-header"
+				 style="background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); color: #fff; border-top-left-radius: 18px; border-top-right-radius: 18px;">
+				<h5 class="modal-title" id="invoiceDetailsModalLabel">
+					<i class="fas fa-file-invoice me-2"></i>تفاصيل
+					الفاتورة
+				</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+						style="filter: invert(1);"></button>
+			</div>
+			<div class="modal-body p-4">
+				<dl class="row mb-0">
+					<dt class="col-sm-4">رقم الفاتورة</dt>
+					<dd class="col-sm-8" id="modalInvoiceId"></dd>
+					<dt class="col-sm-4">التاريخ</dt>
+					<dd class="col-sm-8" id="modalInvoiceDate"></dd>
+					<dt class="col-sm-4">المستخدم</dt>
+					<dd class="col-sm-8" id="modalInvoiceUser"></dd>
+					<dt class="col-sm-4">الإجمالي</dt>
+					<dd class="col-sm-8" id="modalInvoiceTotal"></dd>
+					<dt class="col-sm-4">النوع</dt>
+					<dd class="col-sm-8" id="modalInvoiceType"></dd>
+					<dt class="col-sm-4">عدد الأصناف</dt>
+					<dd class="col-sm-8" id="modalInvoiceItems"></dd>
+					@* <dt class="col-sm-4">رابط الصورة</dt> *@
+					<dd class="col-sm-8" id="modalInvoiceImage"></dd>
+				</dl>
+			</div>
+			<div class="modal-footer" style="border-bottom-left-radius: 18px; border-bottom-right-radius: 18px;">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
-    $(document).on('click', '.show-invoice-details', function () {
-        var invoice = $(this).data('invoice');
-        if (typeof invoice === 'string') invoice = JSON.parse(invoice);
-        $('#modalInvoiceId').text(invoice.Id);
-        $('#modalInvoiceDate').text(new Date(invoice.CreatedAt).toLocaleString('ar-EG'));
-        $('#modalInvoiceUser').text(invoice.UserName);
-        $('#modalInvoiceTotal').text(parseFloat(invoice.TotalInvoice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ج.م');
-        $('#modalInvoiceType').text(invoice.InvoiceType);
-        $('#modalInvoiceItems').text(invoice.ItemsCount);
-        if (invoice.ImageUrl) {
-            $('#modalInvoiceImage').html('<a href="' + invoice.ImageUrl + '" target="_blank">عرض الصورة</a>');
-        } else {
-            $('#modalInvoiceImage').text('-');
-        }
-        var modalEl = document.getElementById('invoiceDetailsModal');
-        if (modalEl) {
-            var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-            modal.show();
-        }
-    });
+	$(document).on('click', '.show-invoice-details', function () {
+		var invoice = $(this).data('invoice');
+		if (typeof invoice === 'string') invoice = JSON.parse(invoice);
+		$('#modalInvoiceId').text(invoice.Id);
+		$('#modalInvoiceDate').text(new Date(invoice.CreatedAt).toLocaleString('ar-EG'));
+		$('#modalInvoiceUser').text(invoice.UserName);
+		$('#modalInvoiceTotal').text(parseFloat(invoice.TotalInvoice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ج.م');
+		$('#modalInvoiceType').text(invoice.InvoiceType);
+		$('#modalInvoiceItems').text(invoice.ItemsCount);
+		if (invoice.ImageUrl) {
+			$('#modalInvoiceImage').html('<a href="' + invoice.ImageUrl + '" target="_blank">عرض الصورة</a>');
+		} else {
+			$('#modalInvoiceImage').text('-');
+		}
+		var modalEl = document.getElementById('invoiceDetailsModal');
+		if (modalEl) {
+			var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+			modal.show();
+		}
+	});
 </script>
