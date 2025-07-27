@@ -219,7 +219,7 @@ namespace KAFO.BLL.Managers
 								customer.AddPayment(remainingAmount);
 							}
 
-							message = $"تم تسوية دين العميل {customer.CustomerName} بالكامل ({currentDebt:C}) وإضافة رصيد إضافي ({amount.ToString("C", egyptCulture)})";
+							message = $"تم تسوية دين العميل {customer.CustomerName} بالكامل ({currentDebt.ToString("C", egyptCulture)}) وإضافة رصيد إضافي ({(amount - currentDebt).ToString("C", egyptCulture)})";
 						}
 						else
 						{
