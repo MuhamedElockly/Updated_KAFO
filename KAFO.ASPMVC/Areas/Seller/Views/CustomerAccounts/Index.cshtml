@@ -156,13 +156,21 @@
 													<i class="fas fa-money-bill-wave me-2"></i>
 													تصفية الحساب
 												</button>
+
 											</td>
 											<td class="text-center">
 												<a asp-area="Admin" asp-controller="CreditCustomerManagement" asp-action="ViewAccount" asp-route-id="@item.Id"
-												   class="btn btn-view-account" title="عرض تفاصيل الحساب">
+												   class="btn btn-view-account mx-2" title="عرض تفاصيل الحساب">
 													<i class="fas fa-eye me-2"></i>
 													عرض الحساب
 												</a>
+												<form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline delete-form">
+													@Html.AntiForgeryToken()
+													<button type="button" class="btn btn-delete-pill delete-btn" title="حذف" data-id="@item.Id">
+														<i class="fas fa-trash-alt me-2"></i>
+														حذف
+													</button>
+												</form>
 											</td>
 										</tr>
 									}
@@ -384,7 +392,107 @@
 					});
 				});
 			});
+					$(document).ready(function() {
+			$('.delete-btn').on('click', function(e) {
+				e.preventDefault();
+				var button = $(this);
+				var form = button.closest('.delete-form');
+				var id = button.data('id');
 
+				// Show confirmation dialog
+				Swal.fire({
+					title: 'تأكيد الحذف',
+					text: 'هل أنت متأكد من رغبتك في حذف هذا العنصر؟',
+					icon: 'warning',
+					showCancelButton: true,
+					confirmButtonColor: '#d33',
+					cancelButtonColor: '#3085d6',
+					confirmButtonText: 'نعم، احذف',
+					cancelButtonText: 'إلغاء',
+					background: '#fff',
+					color: '#222',
+					showClass: { popup: 'animate__animated animate__fadeInDown' },
+					hideClass: { popup: 'animate__animated animate__fadeOutUp' }
+				}).then((result) => {
+					if (result.isConfirmed) {
+						// Show loading
+						Swal.fire({
+							title: 'جاري الحذف...',
+							html: `
+								<div class="text-center">
+									<div class="spinner-border text-primary mb-3" role="status">
+										<span class="visually-hidden">جاري التحميل...</span>
+									</div>
+									<p class="text-muted">يرجى الانتظار بينما يتم معالجة طلبك</p>
+								</div>
+							`,
+							allowOutsideClick: false,
+							showConfirmButton: false,
+							background: '#fff',
+							color: '#222'
+						});
+
+						// Prepare form data
+						var formData = new FormData(form[0]);
+						formData.append('__RequestVerificationToken', $('input[name="__RequestVerificationToken"]', form).val());
+
+						// AJAX request
+						$.ajax({
+							url: form.attr('action'),
+							type: 'POST',
+							data: formData,
+							processData: false,
+							contentType: false,
+							success: function(response) {
+								Swal.close();
+
+								if (response.success) {
+									// Success message
+									Swal.fire({
+										icon: 'success',
+										title: 'تم الحذف بنجاح!',
+										text: response.message || 'تم حذف العنصر بنجاح',
+										confirmButtonColor: '#10b981',
+										background: '#fff',
+										color: '#222'
+									}).then(() => {
+										location.reload(); // Refresh page
+									});
+								} else {
+									// Error message
+									Swal.fire({
+										icon: 'error',
+										title: 'فشل في الحذف',
+										text: response.message || 'حدث خطأ أثناء محاولة الحذف',
+										confirmButtonColor: '#ef4444',
+										background: '#fff',
+										color: '#222'
+									});
+								}
+							},
+							error: function(xhr) {
+								Swal.close();
+								var errorMessage = 'حدث خطأ في الاتصال بالخادم';
+
+								try {
+									var jsonResponse = JSON.parse(xhr.responseText);
+									errorMessage = jsonResponse.message || errorMessage;
+								} catch(e) {}
+
+								Swal.fire({
+									icon: 'error',
+									title: 'خطأ',
+									text: errorMessage,
+									confirmButtonColor: '#ef4444',
+									background: '#fff',
+									color: '#222'
+								});
+							}
+						});
+					}
+				});
+			});
+		});
 			// AJAX Form submission with SweetAlert
 			$('#settleAccountForm').on('submit', function (e) {
 				e.preventDefault();
@@ -1117,4 +1225,35 @@
 			padding: 1rem 0 0.5rem 0;
 		}
 	}
+
+	.btn-delete-pill {
+		color: #fff;
+		background-color: #dc3545;
+		border-color: #dc3545;
+		padding: 0.375rem 1rem;
+		border-radius: 10rem;
+		text-decoration: none;
+		display: inline-block;
+		font-weight: 400;
+	}
+
+		.btn-delete-pill:hover {
+			background-color: #bb2d3b;
+		}
+
+	.btn-view-account {
+		color: #fff;
+		background-color: #20c997; /* Teal */
+		border: none;
+		padding: 0.5rem 1rem;
+		font-weight: 500;
+		box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+		transition: all 0.2s;
+	}
+
+		.btn-view-account:hover {
+			background-color: #199d7a;
+			transform: translateY(-1px);
+			box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+		}
 </style>

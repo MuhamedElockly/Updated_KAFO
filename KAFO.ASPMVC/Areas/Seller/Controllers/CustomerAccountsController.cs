@@ -1,12 +1,11 @@
 ﻿using KAFO.BLL.Managers;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace KAFO.ASPMVC.Controllers
 {
     [Area("Seller")]
- //   [Authorize(Roles = "seller")]
+    //   [Authorize(Roles = "seller")]
     public class CustomerAccountsController : Controller
     {
         private readonly CreditCustomerManager _creditCustomerManager;
@@ -23,7 +22,7 @@ namespace KAFO.ASPMVC.Controllers
                 .Where(c => !c.IsDeleted)
                 .OrderByDescending(c => c.Id)
                 .ToList();
-            
+
             return View(customers);
         }
 
@@ -38,12 +37,12 @@ namespace KAFO.ASPMVC.Controllers
             return View(customerAccount);
         }
 
-       
+
 
         // AJAX: CustomerAccounts/SettleAccountAjax
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult SettleAccountAjax(int customerId, decimal amount ,bool? withdraw)
+        public IActionResult SettleAccountAjax(int customerId, decimal amount, bool? withdraw)
         {
             try
             {
@@ -53,10 +52,11 @@ namespace KAFO.ASPMVC.Controllers
                     return Json(new { success = false, message = "لم يتم العثور على معرف المستخدم الحالي" });
                 }
 
-                var result = _creditCustomerManager.SettleAccount(customerId, amount, userId,withdraw);
+                var result = _creditCustomerManager.SettleAccount(customerId, amount, userId, withdraw);
 
-                return Json(new { 
-                    success = result.Success, 
+                return Json(new
+                {
+                    success = result.Success,
                     message = result.Message,
                     customerId = result.CustomerId,
                     newTotalOwed = result.NewTotalOwed,
@@ -68,6 +68,27 @@ namespace KAFO.ASPMVC.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, message = "حدث خطأ أثناء تصفية الحساب: " + ex.Message });
+            }
+        }
+        [HttpPost]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                var result = _creditCustomerManager.Delete(id);
+                if (result == null)
+                {
+                    //return Json(new { success = true });
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    return Json(new { success = false, message = result });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "حدث خطأ غير متوقع: " + ex.Message });
             }
         }
     }

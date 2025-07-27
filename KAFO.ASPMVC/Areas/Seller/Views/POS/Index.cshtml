@@ -7,199 +7,162 @@
     // SelectList selectListItems = new SelectList(invoiceTypes);
 }
 <link rel="stylesheet" href="~/css/POS.css" asp-append-version="true" />
-<div class="container-fluid">
-    <div class="main-container">
 
-        <form asp-controller="Invoice" asp-action="Create" asp-route-dist="pos" method="post" id="invoiceForm">
+<form asp-controller="Invoice" asp-action="Create" asp-route-dist="pos" method="post" id="invoiceForm">
+    <div class="row id="main-flex">
+        <!-- Products Section -->
+        <div class="product-list col-lg-8 d-flex flex-column">
+            <label asp-for="Type" class="form-label fw-bold">نوع الفاتورة</label>
             <div class="row">
-                <!-- Products Section -->
-                <div class="col-lg-8">
-                    <!-- Invoice Type Selection -->
-                    <div class="mb-2">
-                        <label asp-for="Type" class="form-label fw-bold">نوع الفاتورة</label>
-                        <select asp-for="Type" class="form-select" id="InvoiceTypeSelect">
-                            @for (int i = 0 ; i < invoiceTypes.Count ; i++)
-                            {
-                                <option value="@i">@invoiceTypes[i]</option>
-                            }
-                        </select>
-                        <span asp-validation-for="Type" class="mt-2 text-danger"></span>
-                        <select asp-for="CustomerAccountId" class="mt-2 form-select" id="customerSelect" style="display: none;">
-                            <option value="">اختر العميل</option>
-                            @if (ViewBag.Customers != null)
-                            {
-                                foreach (var customer in (List<KAFO.Domain.Users.CustomerAccount>) ViewBag.Customers)
-                                {
-                                    <option value="@customer.Id">@customer.CustomerName</option>
-                                }
-                            }
-                        </select>
-                    </div>
+                <!-- Invoice Type Selection -->
+                <div class="mb-2 col-6">
 
-                    <!-- Search Bar -->
-                    <div class="search-container">
-                        <div class="position-relative">
-                            <input type="text" class="form-control search-input" placeholder="البحث عن المنتجات..." id="searchInput">
-                        </div>
-                    </div>
-
-                    <!-- Category Pills -->
-                    <div class="category-pills">
-                        <div>
-                            <button type="button" class="category-pill" onclick="filterProducts('all', this)">
-                            <i class="fas fa-th-large me-1"></i>
-                                الكل
-                            </button>
-                            @foreach (Category cat in ViewBag.Cats)
-                            {
-                                <button type="button" class="category-pill" onclick="filterProducts('@cat.Name', this)">
-                                    @cat.Name
-                                </button>
-                            }
-                        </div>
-                    </div>
-
-
-                    <!-- Products Grid -->
-                    <div class="products-grid" id="productsGrid">
-                        <h6 class="mb-3 fw-bold text-secondary">
-                            <i class="fas fa-shopping-bag me-2"></i>
-                            المنتجات
-                        </h6>
-                        <div class="products-scroll-wrapper">
-                            <div class="row flex-nowrap" id="productsList">
-                                @if (ViewBag.Products != null)
-                                {
-                                    @foreach (var product in ViewBag.Products)
-                                    {
-                                        <div class="col-md-4 col-sm-6 mb-3" data-category="@product.Category.Name" style="min-width: 250px; max-width: 270px;">
-                                            <div class="product-card position-relative" onclick="addToCart(@product.Id, '@product.Name', @product.SellingPrice, '@product.ImageUrl')">
-                                                <div class="ImgContainer">
-                                                    <img src="@product.ImageUrl" class="product-image" alt="@product.Name">
-                                                </div>
-                                                <div class="product-info">
-                                                    <h6 class="product-title">@product.Name</h6>
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <div>
-                                                            <span class="product-price">@product.SellingPrice.ToString("N2") ج.م</span>
-                                                        </div>
-                                                        <div>
-                                                            <span class="product-price">متبقي  @product.StockQuantity قطع </span>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart(@product.Id, '@product.Name', @product.SellingPrice, '@product.ImageUrl')">
-                                                        <i class="fas fa-cart-plus me-1"></i>
-                                                        إضافة للسلة
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
-                                }
-                            </div>
-                        </div>
+                    <select asp-for="Type" class="form-select" id="InvoiceTypeSelect">
+                        @for (int i = 0 ; i < invoiceTypes.Count ; i++)
+                        {
+                            <option value="@i">@invoiceTypes[i]</option>
+                        }
+                    </select>
+                </div>
+                <!-- Search Bar -->
+                <div class="search-container  col-6">
+                    <div class="position-relative">
+                        <input type="text" class="form-control search-input" placeholder="البحث عن المنتجات..." id="searchInput">
                     </div>
                 </div>
+                <div id="customerSelect" style="display: none;" class="mb-2 col-12">
+                    <span asp-validation-for="Type" class="mt-2 text-danger"></span>
+                    <select asp-for="CustomerAccountId" class="mt-2 form-select col-12" id="customerSelectV">
+                        <option value="">اختر العميل</option>
+                        @if (ViewBag.Customers != null)
+                        {
+                            foreach (var customer in (List<KAFO.Domain.Users.CustomerAccount>) ViewBag.Customers)
+                            {
+                                <option value="@customer.Id">@customer.CustomerName</option>
+                            }
+                        }
+                    </select>
+                </div>
 
-                <!-- Cart Section -->
-                <div class="col-lg-4">
-                <span class="EmptyCart text-danger"></span>
-                    <div class="cart-container">
-                        <div class="cart-header">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-shopping-cart me-2"></i>
-                                    سلة المشتريات
-                                </h5>
-                                <span class="badge bg-light text-dark" id="cartItemsCount">0</span>
+            </div>
+
+            <!-- Category Pills -->
+            <div class="category-pills">
+                <div>
+                    <button type="button" class="category-pill" onclick="filterProducts('all', this)">
+                        <i class="fas fa-th-large me-1"></i>
+                        الكل
+                    </button>
+                    @foreach (Category cat in ViewBag.Cats)
+                    {
+                        <button type="button" class="category-pill" onclick="filterProducts('@cat.Name', this)">
+                            @cat.Name
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="products-grid">
+                <h6 class="mb-3 fw-bold text-secondary">
+                    <i class="fas fa-shopping-bag me-2"></i>
+                    المنتجات
+                </h6>
+                <div class="products-scroll-wrapper flex-grow-1 overflow-auto">
+                    <div class="row flex-nowrap flex-md-wrap" id="productsList">
+                        @if (ViewBag.Products != null)
+                        {
+                            <div class="products-grid-container">
+                                @foreach (var product in ViewBag.Products)
+                                {
+                                    <div class="product-grid-item" data-category="@product.Category.Name">
+                                        <div class="product-card position-relative" onclick="addToCart(@product.Id, '@product.Name', @product.SellingPrice, '@product.ImageUrl')">
+                                            <div class="ImgContainer">
+                                                <img src="@product.ImageUrl" class="product-image" alt="@product.Name">
+                                            </div>
+                                            <div class="product-info">
+                                                <h6 class="product-title">@product.Name</h6>
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        <span class="product-price">@product.SellingPrice.ToString("N2") ج.م</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="product-price">متبقي @product.StockQuantity قطع</span>
+                                                    </div>
+                                                </div>
+                                                <button type="button" class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart(@product.Id, '@product.Name', @product.SellingPrice, '@product.ImageUrl')">
+                                                    <i class="fas fa-cart-plus me-1"></i>
+                                                    إضافة للسلة
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
                             </div>
-                        </div>
-
-                        <div class="cart-items" id="cartItems">
-                            <div class="text-center text-muted py-5" id="emptyCartMessage">
-                                <i class="fas fa-shopping-cart fa-3x mb-3 opacity-50"></i>
-                                <p>سلة المشتريات فارغة</p>
-                                <small>اختر المنتجات لإضافتها إلى السلة</small>
-                            </div>
-                        </div>
-
-                        <!-- Hidden inputs for invoice items -->
-                        <div id="invoiceItemsInputs"></div>
-
-                        <div class="cart-summary">
-                            <div class="summary-row">
-                                <span>المجموع الكلي:</span>
-                                <span id="total">0.00 ج.م</span>
-                            </div>
-
-                            <input type="hidden" asp-for="TotalInvoice" id="totalInvoiceInput" />
-
-                            <div class="action-buttons">
-                                <button type="button" class="action-btn btn-cancel" onclick="clearCart()">
-                                    <i class="fas fa-times-circle"></i>
-                                    إلغاء
-                                </button>
-                                <button type="submit" class="action-btn btn-charge" id="processPaymentBtn">
-                                    <i class="fas fa-credit-card"></i>
-                                    دفع
-                                </button>
-                            </div>
-                        </div>
+                        }
                     </div>
                 </div>
             </div>
-        </form>
+        </div>
+        <!-- Cart Section -->
+        <div class="col-lg-4 h-100 d-flex flex-column">
+            <span class="EmptyCart text-danger"></span>
+            <!-- Barcode Scan Input (Desktop Only) -->
+            <div class="barcode-scan-container d-none d-lg-block mb-3">
+                <input type="text" id="barcodeScanInput" class="form-control barcode-scan-input" placeholder="امسح الباركود هنا..." autocomplete="off" autofocus onkeydown="if(event.key==='Enter'){ event.preventDefault(); if(this.value.trim()){ handleBarcodeScan(this.value); this.value=''; } this.focus(); }">
+                @* <input type="text" *@
+                @*        id="barcodeScanInput" *@
+                @*        class="form-control barcode-scan-input" *@
+                @*        placeholder="امسح الباركود هنا..." *@
+                @*        autocomplete="off" *@
+                @*        autofocus *@
+                @*        oninput="if(this.value.trim()){ handleBarcodeScan(this.value); this.value=''; this.focus(); }"> *@
+
+            </div>
+            <!-- Barcode Scan Input (Mobile Only) -->
+            <div class="barcode-scan-container d-block d-lg-none mb-3">
+                <input type="text" id="barcodeScanInputMobile" class="form-control barcode-scan-input" placeholder="امسح الباركود هنا..." autocomplete="off" onkeydown="if(event.key==='Enter'){ event.preventDefault(); if(this.value.trim()){ handleBarcodeScan(this.value); this.value=''; } this.focus(); }">
+            </div>
+            <div class="cart-container flex-grow-1 d-flex flex-column">
+                <div class="cart-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            سلة المشتريات
+                        </h5>
+                        <span class="badge bg-light text-dark" id="cartItemsCount">0</span>
+                    </div>
+                </div>
+                <div class="cart-items flex-grow-1 overflow-auto" id="cartItems">
+                    <div class="text-center text-muted py-5" id="emptyCartMessage">
+                        <i class="fas fa-shopping-cart fa-3x mb-3 opacity-50"></i>
+                        <p>سلة المشتريات فارغة</p>
+                        <small>اختر المنتجات لإضافتها إلى السلة</small>
+                    </div>
+                </div>
+                <!-- Hidden inputs for invoice items -->
+                <div id="invoiceItemsInputs"></div>
+                <div class="cart-summary mt-auto">
+                    <div class="summary-row">
+                        <span>المجموع الكلي:</span>
+                        <span id="total">0.00 ج.م</span>
+                    </div>
+                    <input type="hidden" asp-for="TotalInvoice" id="totalInvoiceInput" />
+                    <div class="action-buttons">
+                        <button type="button" class="action-btn btn-cancel" onclick="clearCart()">
+                            <i class="fas fa-times-circle"></i>
+                            إلغاء
+                        </button>
+                        <button type="submit" class="action-btn btn-charge" id="processPaymentBtn">
+                            <i class="fas fa-credit-card"></i>
+                            دفع
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-
-@* <!-- Payment Modal --> *@
-@* <div class="modal fade" id="paymentModal" tabindex="-1"> *@
-@*     <div class="modal-dialog modal-dialog-centered"> *@
-@*         <div class="modal-content" style="border-radius: var(--border-radius); border: none; box-shadow: var(--box-shadow-lg);"> *@
-@*             <div class="modal-header bg-primary text-white" style="border-radius: var(--border-radius) var(--border-radius) 0 0;"> *@
-@*                 <h5 class="modal-title"> *@
-@*                     <i class="fas fa-credit-card me-2"></i> *@
-@*                     معالجة الدفع *@
-@*                 </h5> *@
-@*                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button> *@
-@*             </div> *@
-@*             <div class="modal-body p-4"> *@
-@*                 <div class="text-center mb-4"> *@
-@*                     <div class="spinner-border text-primary" role="status"> *@
-@*                         <span class="visually-hidden">جاري المعالجة...</span> *@
-@*                     </div> *@
-@*                     <p class="mt-3 mb-0">جاري معالجة عملية الدفع...</p> *@
-@*                     <small class="text-muted">يرجى الانتظار</small> *@
-@*                 </div> *@
-@*                 <div class="bg-light p-3 rounded"> *@
-@*                     <div class="d-flex justify-content-between"> *@
-@*                         <strong>المبلغ المطلوب:</strong> *@
-@*                         <strong class="text-success" id="paymentAmount">0.00 ج.م</strong> *@
-@*                     </div> *@
-@*                 </div> *@
-@*             </div> *@
-@*         </div> *@
-@*     </div> *@
-@* </div> *@
-
-@* <!-- Success Modal --> *@
-@* <div class="modal fade" id="successModal" tabindex="-1"> *@
-@*     <div class="modal-dialog modal-dialog-centered"> *@
-@*         <div class="modal-content" style="border-radius: var(--border-radius); border: none; box-shadow: var(--box-shadow-lg);"> *@
-@*             <div class="modal-body text-center p-5"> *@
-@*                 <div class="text-success mb-4"> *@
-@*                     <i class="fas fa-check-circle fa-4x"></i> *@
-@*                 </div> *@
-@*                 <h4 class="text-success mb-3">تمت العملية بنجاح!</h4> *@
-@*                 <p class="text-muted mb-4">تم إتمام عملية الدفع وحفظ الفاتورة</p> *@
-@*                 <button type="button" class="btn btn-primary btn-lg" data-bs-dismiss="modal" onclick="clearCart()"> *@
-@*                     <i class="fas fa-check me-2"></i> *@
-@*                     موافق *@
-@*                 </button> *@
-@*             </div> *@
-@*         </div> *@
-@*     </div> *@
-@* </div> *@
+</form>
 
 <!-- Custom Alert Modal -->
 <div class="modal fade" id="alertModal" tabindex="-1">
@@ -226,37 +189,65 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        function FocusBarcodeScan()
+        {
+            var barcodeInput = $('#barcodeScanInput');
+            if (barcodeInput.length) {
+                barcodeInput.focus();
+                // Remove blur refocus handler
+            }
+            barcodeInput.val(''); // Clear the input text
+
+        }
+        // Barcode scan handler (desktop only)
+        function handleBarcodeScan(barcode) {
+            debugger
+            if (!window.allProductsByBarcode) {
+                // Build a JS map of barcode -> product from ViewBag.Products
+                window.allProductsByBarcode = {};
+        @if (ViewBag.Products != null)
+        {
+            foreach (var product in ViewBag.Products)
+            {
+                if (!string.IsNullOrEmpty(product.Barcode))
+                {
+                    <text>window.allProductsByBarcode['@product.Barcode'] = { id: @product.Id, name: '@product.Name', price: @product.SellingPrice, image: '@product.ImageUrl' };</text>
+                }
+            }
+        }
+            }
+            var p = window.allProductsByBarcode[barcode];
+            if (p) {
+                FocusBarcodeScan();
+                addToCart(p.id, p.name, p.price, p.image);
+            } else {
+                        Swal.fire({
+          title: 'تنبيه',
+          text: 'لم يتم العثور على منتج بهذا الباركود',
+          icon: 'warning',
+                allowOutsideClick: true,
+        allowEscapeKey: true,
+        allowEnterKey: true,
+        showConfirmButton: true, // Hide OK button if you just want it to auto-close
+        timer: 2000 // No auto-close unless user interacts
+        }).then(() => {
+          FocusBarcodeScan();
+        });
+            }
+
+        }
+        // Remove forced refocus logic so user can focus other components
+        $(document).ready(function() {
+            FocusBarcodeScan();
+        });
         // Update quantity function with zero check
         function updateQuantity(id, change) {
+            debugger
             const item = cart.find(item => item.id === id);
             if (item) {
-                if (change > 0) {
-                    // Find the product card to check stock
-                    const productCard = $(`.product-card[onclick*="${id}"]`);
-                    let availableStock = 0;
-                    let stockDisplay;
-                    if (productCard.length) {
-                        stockDisplay = productCard.find('.product-price:contains("متبقي")');
-                        if (stockDisplay.length) {
-                            availableStock = parseInt(stockDisplay.text().match(/\d+/)[0]);
-                        }
-                    }
-                    let InvoiceTypeSelectedval = $('#InvoiceTypeSelect').val();
-                    let ifDecreaseItemsInvoice = (InvoiceTypeSelectedval === "0") || (InvoiceTypeSelectedval === "1") || (InvoiceTypeSelectedval === "5");
-                    if (item.quantity >= availableStock && ifDecreaseItemsInvoice) {
-                        showAlert('تنبيه', 'لا يوجد كمية كافية في المخزن', 'warning');
-                        return;
-                    }
-                    // SweetAlert for quantity increased
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'تمت الزيادة',
-                        text: 'تمت زيادة الكمية في السلة',
-                        timer: 900,
-                        showConfirmButton: false
-                    });
-                }
-                item.quantity += change;
+                 addToCart(item.id,item.name,item.price,item.image,change);
+
+
                 if (item.quantity <= 0) {
                     removeFromCart(id);
                 } else {
@@ -332,19 +323,23 @@
         @if (!ViewData.ModelState.IsValid)
         {
             <text>
-                        $('#alertModal').modal('show');
+                            $('#alertModal').modal('show');
             </text>
         }
             // Handle form submission to prevent empty cart
             $('form').submit(function(e) {
+                debugger
                 if (cart.length === 0) {
                     e.preventDefault();
+        e.stopImmediatePropagation(); // Prevents other submit handlers from executing
                     // $('.EmptyCart').text('لا يمكن تقديم الفاتورة بدون أي منتجات في السلة');
                     showAlert('تنبيه', 'لا يمكن تقديم الفاتورة بدون أي منتجات في السلة', 'warning');
                     return false;
                 }
-                        if($('#InvoiceTypeSelect').val() === "1" && $('#customerSelect').val() === ''){
-            showAlert('تنبيه', 'برجاء اختيار العميل', 'warning');
+                        if($('#InvoiceTypeSelect').val() === "1" && $('#customerSelectV').val() === ''){
+            e.preventDefault();
+        e.stopImmediatePropagation();
+                            showAlert('تنبيه', 'برجاء اختيار العميل', 'warning');
             return false;
         }
             });
@@ -357,7 +352,7 @@
                     $('#customerSelect').show();
                 } else {
                     $('#customerSelect').hide();
-                    $('#customerSelect').val(''); // Reset the selection
+                    $('#customerSelectV').val(''); // Reset the selection
                 }
             });
 
@@ -366,12 +361,13 @@
 
             // Search functionality
             $('#searchInput').on('input', function() {
+                debugger
                 const searchTerm = $(this).val().toLowerCase();
-                const products = $('.product-card');
+                const products = $('.product-grid-item');
 
                 products.each(function() {
                     const title = $(this).find('.product-title').text().toLowerCase();
-                    const productContainer = $(this).closest('[data-category]').closest('.col-md-4, .col-sm-6');
+                    const productContainer = $(this).closest('[data-category]').closest('.product-grid-item');
 
                     if (title.includes(searchTerm)) {
                         productContainer.show();
@@ -418,7 +414,8 @@
 
         // Filter products by category name - UPDATED VERSION
         function filterProducts(categoryName, clickedElement) {
-            const products = $('.col-md-4, .col-sm-6'); // Target the column divs directly
+            debugger
+            const products = $('.product-grid-item'); // Target the column divs directly
             const categoryPills = $('.category-pill');
 
             // Update active pill
@@ -429,6 +426,7 @@
                 products.show();
             } else {
                 products.each(function() {
+                    debugger
                     const productCategory = $(this).attr('data-category');
                     if (productCategory === categoryName) {
                         $(this).show();
@@ -440,13 +438,13 @@
         }
 
         // Add item to cart
-        function addToCart(id, name, price, image) {
+        function addToCart(id, name, price, image,q=1) {
             // Find the product card to check stock
             const productCard = $(`.product-card[onclick*="${id}"]`);
+            const stockDisplay = productCard.find('.product-price:contains("متبقي")');
             let availableStock = 0;
 
             if (productCard.length) {
-                const stockDisplay = productCard.find('.product-price:contains("متبقي")');
                 if (stockDisplay.length) {
                     availableStock = parseInt(stockDisplay.text().match(/\d+/)[0]);
                 }
@@ -455,7 +453,7 @@
             let InvoiceTypeSelectedval = $('#InvoiceTypeSelect').val()
             let ifDecreaseItemsInvoice = (InvoiceTypeSelectedval === "0") || (InvoiceTypeSelectedval === "1") || (InvoiceTypeSelectedval === "5") ;
 
-            if (availableStock <= 0 && ifDecreaseItemsInvoice) {
+            if (availableStock <= 0 && ifDecreaseItemsInvoice && q>0) { //existingItem.quantity >= availableStock
                 showAlert('تنبيه', 'هذا المنتج غير متوفر في المخزن', 'warning');
                 return;
             }
@@ -463,19 +461,19 @@
             const existingItem = cart.find(item => item.id === id);
 
             if (existingItem) {
-                if (existingItem.quantity >= availableStock && ifDecreaseItemsInvoice) {
+                if (availableStock <= 0 && ifDecreaseItemsInvoice && q>0) { //existingItem.quantity >= availableStock
                     showAlert('تنبيه', 'لا يوجد كمية كافية في المخزن', 'warning');
                     return;
                 }
-                existingItem.quantity += 1;
+                existingItem.quantity += q;
                 // SweetAlert for quantity increased
-                Swal.fire({
-                    icon: 'success',
-                    title: 'تمت الزيادة',
-                    text: 'تمت زيادة الكمية في السلة',
-                    timer: 900,
-                    showConfirmButton: false
-                });
+                // Swal.fire({
+                //     icon: 'success',
+                //     title: 'تمت الزيادة',
+                //     text: 'تمت زيادة الكمية في السلة',
+                //     timer: 900,
+                //     showConfirmButton: false
+                // });
             } else {
                 cart.push({
                     id: id,
@@ -485,13 +483,13 @@
                     quantity: 1
                 });
                 // SweetAlert for new product added
-                Swal.fire({
-                    icon: 'success',
-                    title: 'تمت الإضافة',
-                    text: 'تمت إضافة المنتج إلى السلة',
-                    timer: 1200,
-                    showConfirmButton: false
-                });
+                // Swal.fire({
+                //     icon: 'success',
+                //     title: 'تمت الإضافة',
+                //     text: 'تمت إضافة المنتج إلى السلة',
+                //     timer: 1200,
+                //     showConfirmButton: false
+                // });
             }
 
             updateCartDisplay();
@@ -500,16 +498,18 @@
 
             // Update the stock display
             if (productCard.length && stockDisplay.length) {
-                const newStock = availableStock - 1;
+                const newStock = availableStock - q;
                 stockDisplay.text(stockDisplay.text().replace(/\d+/, newStock));
 
                 // Disable if stock reaches zero
                 if (newStock <= 0) {
                     productCard.find('.add-to-cart-btn')
                         .prop('disabled', true)
-                        .removeClass('add-to-cart-btn')
-                        .addClass('btn-outline-secondary')
                         .html('<i class="fas fa-times me-1"></i> غير متوفر');
+                }else{
+                     productCard.find('.add-to-cart-btn')
+                        .prop('disabled', false)
+                        .html('<i class="fas fa-cart-plus me-1"></i> إضافة للسلة');
                 }
             }
         }
@@ -519,46 +519,6 @@
             cart = cart.filter(item => item.id !== id);
             updateCartDisplay();
             updateInvoiceItemsInputs();
-        }
-
-        // Update item quantity
-        function updateQuantity(id, change) {
-            const item = cart.find(item => item.id === id);
-            if (item) {
-                if (change > 0) {
-                    // Find the product card to check stock
-                    const productCard = $(`.product-card[onclick*="${id}"]`);
-                    let availableStock = 0;
-                    let stockDisplay;
-                    if (productCard.length) {
-                        stockDisplay = productCard.find('.product-price:contains("متبقي")');
-                        if (stockDisplay.length) {
-                            availableStock = parseInt(stockDisplay.text().match(/\d+/)[0]);
-                        }
-                    }
-                    let InvoiceTypeSelectedval = $('#InvoiceTypeSelect').val();
-                    let ifDecreaseItemsInvoice = (InvoiceTypeSelectedval === "0") || (InvoiceTypeSelectedval === "1") || (InvoiceTypeSelectedval === "5");
-                    if (item.quantity >= availableStock && ifDecreaseItemsInvoice) {
-                        showAlert('تنبيه', 'لا يوجد كمية كافية في المخزن', 'warning');
-                        return;
-                    }
-                    // SweetAlert for quantity increased
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'تمت الزيادة',
-                        text: 'تمت زيادة الكمية في السلة',
-                        timer: 900,
-                        showConfirmButton: false
-                    });
-                }
-                item.quantity += change;
-                if (item.quantity <= 0) {
-                    removeFromCart(id);
-                } else {
-                    updateCartDisplay();
-                    updateInvoiceItemsInputs();
-                }
-            }
         }
 
         // Update invoice items hidden inputs
@@ -612,31 +572,44 @@
                     total += itemTotal;
 
                     cartHTML += `
-                                                <div class="cart-item border rounded p-2 mb-2 bg-white shadow-sm" style="max-width: 350px;">
+                    <div class="cart-item border rounded p-2 mb-2 bg-white shadow-sm">
             <div class="row align-items-center g-2">
-                <div class="col-4">
-                    <img src="${item.image}" class="img-fluid rounded" alt="${item.name}" style="max-height: 80px;">
+                <!-- Product Image Column -->
+                <div class="col-3 col-md-2">
+                    <img src="${item.image}"
+                         class="cart-item-img img-fluid rounded"
+                         alt="${item.name}">
                 </div>
-                <div class="col-5 text-center">
-                    <h6 class="mb-2 text-truncate">${item.name}</h6>
-                    <div class="input-group input-group-xs w-75 mx-auto">
-                        <button type="button" class="btn btn-outline-secondary btn-xs" onclick="updateQuantity(${item.id}, -1)">
-                            <i class="fas fa-minus fa-xs"></i>
+
+                <!-- Product Info and Quantity Controls -->
+                <div class="col-6 col-md-7">
+                    <h6 class="cart-item-name mb-2 text-truncate fw-semibold">${item.name}</h6>
+                    <div class="d-flex justify-content-center align-items-center gap-2">
+                        <button type="button"
+                                class="cart-qty-btn btn btn-outline-secondary btn-sm"
+                                onclick="updateQuantity(${item.id}, -1)">
+                                    <i class="fas fa-minus" style="margin: unset;"></i>
                         </button>
                         <input type="hidden" asp-for="Items.ProductId" value="${item.id}"/>
                         <input type="hidden" asp-for="Items.Quantity" value="${item.quantity}"/>
-                        <span class="input-group-text px-2">${item.quantity}</span>
-                        <button type="button" class="btn btn-outline-secondary btn-xs" onclick="updateQuantity(${item.id}, 1)">
-                            <i class="fas fa-plus fa-xs"></i>
+                        <span class="cart-qty-display px-3 py-1 border rounded">${item.quantity}</span>
+                        <button type="button"
+                                class="cart-qty-btn btn btn-outline-secondary btn-sm"
+                                onclick="updateQuantity(${item.id}, 1)">
+                            <i class="fas fa-plus"  style="margin: unset;"></i>
                         </button>
                     </div>
                 </div>
-                <div class="col-3 text-end pe-2">
+
+                <!-- Price and Delete Column -->
+                <div class="col-3 col-md-3 ">
                     <div class="mb-2">
-                        <strong class="text-success small">${itemTotal.toFixed(2)} ج.م</strong>
+                        <strong class="cart-item-price text-success fs-5">${itemTotal.toFixed(2)} ج.م</strong>
                     </div>
-                    <button type="button" class="btn btn-danger btn-xs" onclick="removeFromCart(${item.id})">
-                        <i class="fas fa-trash fa-xs"></i>
+                    <button type="button"
+                            class="cart-delete-btn btn btn-outline-danger btn-sm"
+                            onclick="removeFromCart(${item.id})">
+                        <i class="fas fa-trash"  style="margin: unset;"></i>
                     </button>
                 </div>
             </div>
@@ -745,7 +718,7 @@
                             Swal.fire({
                                 icon: 'error',
                                 title: 'خطأ',
-                                text: response.message
+                                text: response.message.split('.')[0]
                             });
                         }
                     },
@@ -761,27 +734,3 @@
         });
     </script>
 }
-<style>
-.products-scroll-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 0.5rem;
-}
-#productsList {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 1rem;
-}
-@@media (max-width: 991.98px) {
-    .products-scroll-wrapper {
-        margin-left: -1rem;
-        margin-right: -1rem;
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-    #productsList > div {
-        min-width: 220px;
-        max-width: 250px;
-    }
-}
-</style>
