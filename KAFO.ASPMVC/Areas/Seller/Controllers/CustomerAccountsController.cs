@@ -78,8 +78,7 @@ namespace KAFO.ASPMVC.Controllers
                 var result = _creditCustomerManager.Delete(id);
                 if (result == null)
                 {
-                    //return Json(new { success = true });
-                    return RedirectToAction(nameof(Index));
+                    return Json(new { success = true });
                 }
                 else
                 {
