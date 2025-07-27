@@ -62,7 +62,8 @@ namespace KAFO.Domain.Products
             decimal totalQuantity = StockQuantity + newQuantity;
             AveragePurchasePrice = totalPaid / totalQuantity;
             //must increase the quantity to be compatible with the new Average price - i can not update the average proce without add the new quantity
-            IncreaseStockQuantity(newQuantity);
+            if (newQuantity > 0) IncreaseStockQuantity(newQuantity);
+            else DecreaseStockQuantity(newQuantity * -1);
             SellingPrice = newSellingPrice;
             LastPurchasingPrice = newPurchasingPrice;
             // return the total Revenue if we sell the current stock

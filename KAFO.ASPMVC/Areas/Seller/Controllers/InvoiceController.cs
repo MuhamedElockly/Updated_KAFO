@@ -64,6 +64,7 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
         public async Task<IActionResult> Create()
         {
             ViewBag.Products = _unitOfWork.Products.GetAll("Category", p => p.IsActive);
+            ViewBag.CustomerAccounts = _unitOfWork.CustomerAccounts.GetAll();
             return View();
         }
 

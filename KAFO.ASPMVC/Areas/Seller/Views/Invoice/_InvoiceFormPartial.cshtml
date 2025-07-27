@@ -7,26 +7,37 @@
     <div class="card-body">
         <input type="hidden" asp-for="ImageUrl" />
         <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label asp-for="CreatedAt" class="control-label">تاريخ الفاتورة</label>
-                    <input asp-for="CreatedAt" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
-                    <span asp-validation-for="CreatedAt" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <div class="form-group">
                     <label asp-for="Type" class="control-label">نوع الفاتورة</label>
                     <select asp-for="Type" id="invoiceType" class="form-control">
                         <option value="2">شراء</option>
+                        <option value="5">مرتجع شراء</option>
                     </select>
                     <span asp-validation-for="Type" class="text-danger"></span>
                 </div>
             </div>
         </div>
+        @* <div class="Credit"> *@
+        @*     <div class="row mt-3"> *@
+        @*         <div class="col-md-12"> *@
+        @*             <div class="form-group"> *@
+        @*                 <label asp-for="CustomerAccountId" class="control-label">العميل</label> *@
+        @*                 <select asp-for="CustomerAccountId" class="form-control"> *@
+        @*                     <option value="">-- اختر عميل --</option> *@
+        @*                     @foreach (CustomerAccount customer in ViewBag.CustomerAccounts) *@
+        @*                     { *@
+        @*                         <option value="@customer.Id">@customer.CustomerName</option> *@
+        @*                     } *@
+        @*                 </select> *@
+        @*                 <span asp-validation-for="CustomerAccountId" class="text-danger"></span> *@
+        @*             </div> *@
+        @*         </div> *@
+        @*     </div> *@
+        @* </div> *@
         <!-- Invoice Image Upload -->
         <div class="row mt-3">
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <div class="form-group">
                     <label for="invoiceImageInput" class="form-label">صورة الفاتورة الورقية (اختياري)</label>
                     <div class="image-upload-container" id="invoiceImageUploadContainer" style="border: 2px dashed #d1d3e2; border-radius: 0.5rem; padding: 1.5rem; text-align: center; cursor: pointer;">
@@ -42,20 +53,7 @@
                 </div>
             </div>
         </div>
-        @if (Model?.Type == InvoiceType.Credit || Model?.Type == InvoiceType.CreditReturn)
-        {
-            <div class="row mt-3">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label asp-for="CustomerAccountId" class="control-label">العميل</label>
-                        <select asp-for="CustomerAccountId" class="form-control" asp-items="ViewBag.CustomerAccounts">
-                            <option value="">-- اختر عميل --</option>
-                        </select>
-                        <span asp-validation-for="CustomerAccountId" class="text-danger"></span>
-                    </div>
-                </div>
-            </div>
-        }
+        
     </div>
 </div>
 
