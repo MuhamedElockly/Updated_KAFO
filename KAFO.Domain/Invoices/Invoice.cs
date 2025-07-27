@@ -1,5 +1,4 @@
 ﻿using KAFO.Domain.Products;
-using KAFO.Domain.Statics;
 using KAFO.Domain.Users;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -12,11 +11,11 @@ namespace KAFO.Domain.Invoices
         public InvoiceType Type { get; set; }
         [Required]
         public ICollection<InvoiceItem> Items { set; get; } = [];
-        
+
         [ForeignKey(nameof(User))]
         public int UserId { get; set; }
         public User User { set; get; }
-        
+
         public decimal TotalInvoice { set; get; }
         public bool IsDeleted { get; set; } = false;
 
@@ -83,9 +82,6 @@ namespace KAFO.Domain.Invoices
 
         public virtual void CompleteInvoice()
         {
-            if (Items.Count < 1)
-                throw new Exception(Messages.EmptyInvoice);
-
             switch (Type)
             {
                 case InvoiceType.Cash:
@@ -105,8 +101,6 @@ namespace KAFO.Domain.Invoices
                     break;
                 case InvoiceType.PurchasingReturn:
                     PurchasingReturnInvoiceCompleteInvoice();
-                    break;
-                default:
                     break;
             }
 
@@ -128,7 +122,7 @@ namespace KAFO.Domain.Invoices
                 //    // update products Quantity
                 //    item.Product.IncreaseStockQuantity(item.Quantity);
                 //}
-                item.Product.ChangePurchasingPriceAndQuantity(item.Product.LastPurchasingPrice, item.UnitSellingPrice, item.Quantity);
+                item.Product.ChangePurchasingPriceAndQuantity(item.UnitPurchasingPrice, item.UnitSellingPrice, item.Quantity);
                 //item.Product.IncreaseStockQuantity(item.Quantity);
             }
         }
@@ -176,19 +170,29 @@ namespace KAFO.Domain.Invoices
                 item.Product.DecreaseStockQuantity(item.Quantity);
             }
         }
-        private void PurchasingReturnInvoiceCompleteInvoice()
-        {
-            throw new NotImplementedException();
-        }
-
-        private void CreditReturnInvoiceCompleteInvoice()
-        {
-            throw new NotImplementedException();
-        }
 
         private void CashReturnInvoiceCompleteInvoice()
         {
-            throw new NotImplementedException();
+            foreach (var item in Items)
+            {
+                item.Product.IncreaseStockQuantity(item.Quantity);
+            }
+        }
+        private void CreditReturnInvoiceCompleteInvoice()
+        {
+            foreach (var item in Items)
+            {
+                item.Product.IncreaseStockQuantity(item.Quantity);
+            }
+            CustomerAccount!.TotalOwed -= TotalInvoice;
+        }
+
+        private void PurchasingReturnInvoiceCompleteInvoice()
+        {
+            foreach (var item in Items)
+            {
+                item.Product.ChangePurchasingPriceAndQuantity(item.UnitPurchasingPrice, item.UnitSellingPrice, item.Quantity * -1);
+            }
         }
 
         public decimal CalculateTotalInvoice()

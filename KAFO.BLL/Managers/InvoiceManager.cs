@@ -1,8 +1,5 @@
 using Kafo.DAL.Repository;
 using KAFO.Domain.Invoices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace KAFO.BLL.Managers
 {
@@ -154,7 +151,7 @@ namespace KAFO.BLL.Managers
             }
 
             // Return ordered results
-            return invoices.OrderByDescending(i => ((dynamic)i).createdAt).ToList();
+            return invoices.OrderByDescending(i => ( (dynamic) i ).createdAt).ToList();
         }
 
         public List<Invoice> GetInvoicesByDateRange(DateTime startDate, DateTime endDate)
@@ -243,5 +240,7 @@ namespace KAFO.BLL.Managers
 
             return query.OrderByDescending(i => i.CreatedAt).ToList();
         }
+
+
     }
-} 
+}

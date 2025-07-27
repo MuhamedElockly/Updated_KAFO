@@ -1,6 +1,7 @@
 ﻿using Kafo.DAL.Data;
 using Kafo.DAL.Repository;
 using KAFO.Domain.Invoices;
+using KAFO.Domain.Products;
 using Microsoft.EntityFrameworkCore;
 
 namespace KAFO.BLL.Managers
@@ -16,28 +17,54 @@ namespace KAFO.BLL.Managers
             _appDBContext = appDBContext;
         }
 
+        #region Complete Invoices
         public Dictionary<string, string> AddInvoice(Invoice invoice)
         {
-            var dic = new Dictionary<string, string>();
-
             var Products = _unitOfWork.Products.GetAll(filter: p => p.IsActive);
-            //var Cats = _unitOfWork.Categories.GetAll();
-            var Customers = _unitOfWork.CustomerAccounts.GetAll();
+            Dictionary<string, string> errorDic;
+            errorDic = PrepareInvoice(invoice, Products);
+            if (errorDic.Count > 0)
+                return errorDic; // Return errors if any
 
-            if (invoice.Type == InvoiceType.Credit && invoice.CustomerAccountId == null)
+            // custom logic or vlaidation
+            switch (invoice.Type)
             {
-                dic.Add("", "يجب اختيار حساب العميل");
-                return dic;
+                case InvoiceType.Cash:
+                    errorDic = AddCashInvoice(invoice);
+                    break;
+                case InvoiceType.Credit:
+                    errorDic = AddCreditInvoice(invoice);
+                    break;
+                case InvoiceType.Purchasing:
+                    errorDic = AddPurchaseInvoice(invoice);
+                    break;
+                case InvoiceType.CashReturn:
+                    errorDic = AddCashReturnInvoice(invoice);
+                    break;
+                case InvoiceType.CreditReturn:
+                    errorDic = AddCreditReturnInvoice(invoice);
+                    break;
+                case InvoiceType.PurchasingReturn:
+                    errorDic = AddPurchasingReturnInvoice(invoice);
+                    break;
+                default:
+                    throw new NotImplementedException("Invoice type not implemented: " + invoice.Type);
             }
-            if (invoice.Type == InvoiceType.Credit && invoice.CustomerAccountId != null)
-            {
-                invoice.CustomerAccount = Customers.FirstOrDefault(c => c.Id == invoice.CustomerAccountId);
-                if (invoice.CustomerAccount == null)
-                {
-                    dic.Add("", "حساب العميل غير موجود");
-                    return dic;
-                }
-            }
+
+            if (errorDic.Count > 0)
+                return errorDic; // Return errors if any
+
+            invoice.CompleteInvoice();
+            _unitOfWork.Invoices.Add(invoice);
+            _unitOfWork.Save();
+
+            return errorDic;
+        }
+
+        private Dictionary<string, string> PrepareInvoice(Invoice invoice, IEnumerable<Product> Products)
+        {
+            invoice.CreatedAt = DateTime.Now;
+            var dic = new Dictionary<string, string>();
 
             // Filter out invalid items (no product selected or invalid product)
             var validItems = new List<InvoiceItem>();
@@ -54,11 +81,8 @@ namespace KAFO.BLL.Managers
                 }
                 item.Invoice = invoice;
                 item.Product = product;
-                // Use the values from the invoice item (editable by user)
-                item.UnitPurchasingPrice = item.UnitPurchasingPrice > 0 ? item.UnitPurchasingPrice : product.AveragePurchasePrice;
-                item.UnitSellingPrice = item.UnitSellingPrice > 0 ? item.UnitSellingPrice : product.SellingPrice;
-                // Only handle selling and credit invoices here
                 validItems.Add(item);
+                invoice.TotalInvoice += item.UnitPurchasingPrice * item.Quantity;
             }
             invoice.Items = validItems;
 
@@ -67,24 +91,85 @@ namespace KAFO.BLL.Managers
                 dic.Add("", "يجب إضافة صنف واحد على الأقل للفاتورة.");
                 return dic;
             }
+            return dic;
+        }
 
-            if (dic.Count == 0)
+        public Dictionary<string, string> AddCashInvoice(Invoice invoice)
+        {
+            var dic = new Dictionary<string, string>();
+            //foreach (var item in invoice.Items)
+            //{
+            //    item.UnitPurchasingPrice = item.UnitPurchasingPrice == item.Product.AveragePurchasePrice ? item.Product.AveragePurchasePrice : item.UnitPurchasingPrice;
+            //    item.UnitSellingPrice = item.UnitSellingPrice == item.Product.SellingPrice ? item.Product.SellingPrice : item.UnitSellingPrice;
+            //}
+
+            return dic;
+
+        }
+
+        private Dictionary<string, string> AddPurchasingReturnInvoice(Invoice invoice)
+        {
+            var dic = new Dictionary<string, string>();
+            foreach (var item in invoice.Items)
             {
-                invoice.CompleteInvoice();
-                _unitOfWork.Invoices.Add(invoice);
-                _unitOfWork.Save();
+                if (item.Product.StockQuantity < item.Quantity)
+                    dic.Add("", $"المنتج {item.Product.Name} رصيده اقل من المراد ارجاعه");
             }
             return dic;
         }
-        public List<Invoice> GetCompleteAll()
+
+        public Dictionary<string, string> AddPurchaseInvoice(Invoice invoice)
         {
-            return _appDBContext.Invoices
-                .Include(i => i.User)
-                .Include(i => i.CustomerAccount)
-                .Include(i => i.Items)
-                .ThenInclude(ii => ii.Product)
-                .ToList();
+            var dic = new Dictionary<string, string>();
+            foreach (var item in invoice.Items)
+            {
+                // Update BoxPurchasePrice with the latest value from the invoice item - update the avg price in complete invoice
+                if (item.Product.BoxPurchasePrice > 0)
+                {
+                    item.Product.BoxPurchasePrice = item.UnitPurchasingPrice * item.Product.BoxQuantity;
+                    _unitOfWork.Products.Update(item.Product);
+                }
+            }
+            return dic;
         }
+
+        private Dictionary<string, string> AddCreditReturnInvoice(Invoice invoice)
+        {
+            var dic = new Dictionary<string, string>();
+            invoice.CustomerAccount = _unitOfWork.CustomerAccounts.Get(c => c.Id == invoice.CustomerAccountId);
+            if (invoice.CustomerAccount!.TotalOwed < invoice.TotalInvoice) // && invoice.CustomerAccount.TotalPaid < invoice.TotalInvoice
+                dic.Add("", "قيمة مديونية العميل اقل من قيمة الفاتورة");
+            return dic;
+        }
+
+        private Dictionary<string, string> AddCashReturnInvoice(Invoice invoice)
+        {
+            var dic = new Dictionary<string, string>();
+            //foreach (var item in invoice.Items)
+            //{
+            //    if (item.UnitSellingPrice != item.Product.SellingPrice || item.UnitPurchasingPrice != item.Product.SellingPrice)
+            //        dic.Add("", "لا يمكن تعديل السعر في فاتورة المرتجع");
+            //}
+            return dic;
+        }
+
+        private Dictionary<string, string> AddCreditInvoice(Invoice invoice)
+        {
+            var dic = new Dictionary<string, string>();
+            return dic;
+        }
+        #endregion
+
+        #region Others
+        //public List<Invoice> GetCompleteAll()
+        //{
+        //    return _appDBContext.Invoices
+        //        .Include(i => i.User)
+        //        .Include(i => i.CustomerAccount)
+        //        .Include(i => i.Items)
+        //        .ThenInclude(ii => ii.Product)
+        //        .ToList();
+        //}
         public Invoice? GetComplete(int id)
         {
             return _appDBContext.Invoices
@@ -105,59 +190,6 @@ namespace KAFO.BLL.Managers
         {
             throw new NotImplementedException();
         }
-
-        // New method to handle purchase invoices
-        public Dictionary<string, string> AddPurchaseInvoice(Invoice invoice)
-        {
-            var dic = new Dictionary<string, string>();
-            var Products = _unitOfWork.Products.GetAll(filter: p => p.IsActive);
-            var validItems = new List<InvoiceItem>();
-            foreach (var item in invoice.Items)
-            {
-                if (item == null || item.ProductId == 0)
-                {
-                    continue; // skip invalid
-                }
-                var product = Products.FirstOrDefault(p => p.Id == item.ProductId);
-                if (product == null)
-                {
-                    continue; // skip invalid
-                }
-                item.Invoice = invoice;
-                item.Product = product;
-                item.UnitPurchasingPrice = item.UnitPurchasingPrice > 0 ? item.UnitPurchasingPrice : product.AveragePurchasePrice;
-                item.UnitSellingPrice = item.UnitSellingPrice > 0 ? item.UnitSellingPrice : product.SellingPrice;
-                // Update product prices and stock for purchase invoices
-                product.ChangePurchasingPriceAndQuantity(item.UnitPurchasingPrice, item.UnitSellingPrice, item.Quantity);
-                invoice.TotalInvoice += item.UnitPurchasingPrice * item.Quantity;
-                // Update BoxPurchasePrice with the latest value from the invoice item
-                if (item.Product.BoxPurchasePrice > 0)
-                {
-                    product.BoxPurchasePrice = item.UnitPurchasingPrice*item.Product.BoxQuantity;
-                    _unitOfWork.Products.Update(product);
-                }
-                validItems.Add(item);
-
-            }
-            invoice.Items = validItems;
-            if (invoice.Items == null || invoice.Items.Count == 0)
-            {
-                dic.Add("", "يجب إضافة صنف واحد على الأقل للفاتورة.");
-                return dic;
-            }
-            if (dic.Count == 0)
-            {
-                //invoice.CompleteInvoice();
-                //// Detach product from items to avoid EF double update
-                //foreach (var item in invoice.Items)
-                //{
-                //    item.Product = null;
-                //}
-                
-                _unitOfWork.Invoices.Add(invoice);
-                _unitOfWork.Save();
-            }
-            return dic;
-        }
+        #endregion
     }
 }

@@ -1,0 +1,1555 @@
+﻿<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    /**
+     * POS System JavaScript - Refactored for better maintainability
+     * This script handles barcode scanning, cart management, and invoice processing
+     */
+
+    // ========================================
+    // GLOBAL VARIABLES
+    // ========================================
+    let cart = [];
+    let cartTotal = 0;
+
+    // ========================================
+    // BARCODE SCANNING FUNCTIONALITY
+    // ========================================
+
+    /**
+     * Focus on barcode scan input and clear its value
+     */
+    function FocusBarcodeScan() {
+        const barcodeInput = $('#barcodeScanInput');
+        if (barcodeInput.length) {
+            barcodeInput.focus();
+            barcodeInput.val(''); // Clear the input text
+        }
+    }
+
+    /**
+     * Handle barcode scan for desktop devices
+     * @@param {string} barcode - The scanned barcode
+     */
+    function handleBarcodeScan(barcode) {
+        debugger;
+
+        // Initialize products map if not exists
+        if (!window.allProductsByBarcode) {
+            window.allProductsByBarcode = {};
+    @if (ViewBag.Products != null)
+    {
+        foreach (var product in ViewBag.Products)
+        {
+            if (!string.IsNullOrEmpty(product.Barcode))
+            {
+                <text>
+                                    window.allProductsByBarcode['@product.Barcode'] = {
+                                        id: @product.Id,
+                                        name: '@product.Name',
+                                        price: @product.SellingPrice,
+                                        image: '@product.ImageUrl'
+                                    };
+                </text>
+            }
+        }
+    }
+        }
+
+        const product = window.allProductsByBarcode[barcode];
+
+        if (product) {
+            FocusBarcodeScan();
+            addToCart(product.id, product.name, product.price, product.image);
+        } else {
+            // Show product not found alert
+            Swal.fire({
+                title: 'تنبيه',
+                text: 'لم يتم العثور على منتج بهذا الباركود',
+                icon: 'warning',
+                allowOutsideClick: true,
+                allowEscapeKey: true,
+                allowEnterKey: true,
+                showConfirmButton: true,
+                timer: 2000
+            }).then(() => {
+                FocusBarcodeScan();
+            });
+        }
+    }
+
+    // ========================================
+    // ALERT AND CONFIRMATION DIALOGS
+    // ========================================
+
+    /**
+     * Show a beautiful alert modal
+     * @@param {string} title - Alert title
+     * @@param {string} message - Alert message
+     * @@param {string} type - Alert type (warning, error, success, info)
+     */
+    function showAlert(title, message, type = 'warning') {
+        const modal = $('#alertModal');
+        const iconMap = {
+            'warning': 'exclamation-circle',
+            'error': 'times-circle',
+            'success': 'check-circle',
+            'info': 'info-circle'
+        };
+        const colorMap = {
+            'warning': 'warning',
+            'error': 'danger',
+            'success': 'success',
+            'info': 'primary'
+        };
+
+        $('#alertTitle').text(title);
+        $('#alertMessage').text(message);
+        $('#alertIcon').html(`<i class="fas fa-${iconMap[type]} fa-4x text-${colorMap[type]}"></i>`);
+
+        // Remove any existing click handlers
+        $('#alertConfirmBtn').off('click');
+
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+    }
+
+    /**
+     * Show a confirmation dialog with custom callback
+     * @@param {string} title - Dialog title
+     * @@param {string} message - Dialog message
+     * @@param {Function} confirmCallback - Function to execute on confirmation
+     * @@param {string} type - Dialog type (warning, error, success, info)
+     */
+    function showConfirm(title, message, confirmCallback, type = 'warning') {
+        const modal = $('#alertModal');
+        const iconMap = {
+            'warning': 'exclamation-triangle',
+            'error': 'times-circle',
+            'success': 'check-circle',
+            'info': 'question-circle'
+        };
+        const colorMap = {
+            'warning': 'warning',
+            'error': 'danger',
+            'success': 'success',
+            'info': 'primary'
+        };
+
+        $('#alertTitle').text(title);
+        $('#alertMessage').text(message);
+        $('#alertIcon').html(`<i class="fas fa-${iconMap[type]} fa-4x text-${colorMap[type]}"></i>`);
+
+        // Remove any existing click handlers and add new one
+        $('#alertConfirmBtn').off('click').on('click', function() {
+            confirmCallback();
+        });
+
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+    }
+
+    // ========================================
+    // CART MANAGEMENT FUNCTIONALITY
+    // ========================================
+
+    /**
+     * Update quantity of an item in cart
+     * @@param {number} id - Product ID
+     * @@param {number} change - Quantity change (+/-)
+     */
+    function updateQuantity(id, change) {
+        debugger;
+        const item = cart.find(item => item.id === id);
+
+        if (item) {
+            addToCart(item.id, item.name, item.price, item.image, change);
+
+            if (item.quantity <= 0) {
+                removeFromCart(id);
+            } else {
+                updateCartDisplay();
+                updateInvoiceItemsInputs();
+            }
+        }
+    }
+
+    /**
+     * Add item to cart with stock validation
+     * @@param {number} id - Product ID
+     * @@param {string} name - Product name
+     * @@param {number} price - Product price
+     * @@param {string} image - Product image URL
+     * @@param {number} quantity - Quantity to add (default: 1)
+     */
+    function addToCart(id, name, price, image, quantity = 1) {
+        // Get product stock information
+        const productCard = $(`.product-card[onclick*="${id}"]`);
+        const stockDisplay = productCard.find('.product-price:contains("متبقي")');
+        let availableStock = 0;
+
+        if (productCard.length && stockDisplay.length) {
+            availableStock = parseInt(stockDisplay.text().match(/\d+/)[0]);
+        }
+
+        // Check invoice type for stock behavior
+        const invoiceTypeValue = $('#InvoiceTypeSelect').val();
+        const shouldDecreaseStock = (invoiceTypeValue === "0") ||
+                                   (invoiceTypeValue === "1") ||
+                                   (invoiceTypeValue === "5");
+        const isReturn = (invoiceTypeValue === "3") || (invoiceTypeValue === "4"); // مرتجع or مرتجع اجل
+
+        // Validate stock availability for regular invoices
+        if (availableStock <= 0 && shouldDecreaseStock && quantity > 0) {
+            showAlert('تنبيه', 'هذا المنتج غير متوفر في المخزن', 'warning');
+            return;
+        }
+
+        const existingItem = cart.find(item => item.id === id);
+
+        if (existingItem) {
+            if (availableStock <= 0 && shouldDecreaseStock && quantity > 0) {
+                showAlert('تنبيه', 'لا يوجد كمية كافية في المخزن', 'warning');
+                return;
+            }
+            existingItem.quantity += quantity;
+        } else {
+            cart.push({
+                id: id,
+                name: name,
+                price: price,
+                image: image,
+                quantity: 1
+            });
+        }
+
+        updateCartDisplay();
+        updateInvoiceItemsInputs();
+        showAddToCartAnimation();
+
+        // Update stock display on product card
+        updateProductStockDisplay(productCard, stockDisplay, availableStock, quantity, isReturn);
+    }
+
+    /**
+     * Update product stock display on product card
+     * @@param {jQuery} productCard - Product card element
+     * @@param {jQuery} stockDisplay - Stock display element
+     * @@param {number} availableStock - Current available stock
+     * @@param {number} quantity - Quantity being added/removed
+     * @@param {boolean} isReturn - Whether this is a return transaction
+     */
+    function updateProductStockDisplay(productCard, stockDisplay, availableStock, quantity, isReturn = false) {
+        if (productCard.length && stockDisplay.length) {
+            // For returns, increase stock; for sales, decrease stock
+            const newStock = isReturn ? availableStock + quantity : availableStock - quantity;
+            stockDisplay.text(stockDisplay.text().replace(/\d+/, newStock));
+
+            const addButton = productCard.find('.add-to-cart-btn');
+            if (newStock <= 0 && !isReturn) {
+                addButton.prop('disabled', true)
+                         .html('<i class="fas fa-times me-1"></i> غير متوفر');
+            } else {
+                addButton.prop('disabled', false)
+                         .html('<i class="fas fa-cart-plus me-1"></i> إضافة للسلة');
+            }
+        }
+    }
+
+    /**
+     * Remove item from cart and handle stock based on invoice type
+     * @@param {number} id - Product ID to remove
+     */
+    function removeFromCart(id) {
+        const itemToRemove = cart.find(item => item.id === id);
+        if (itemToRemove) {
+            const productCard = $(`.product-card[onclick*="${id}"]`);
+            const stockDisplay = productCard.find('.product-price:contains("متبقي")');
+
+            if (productCard.length && stockDisplay.length) {
+                const currentStock = parseInt(stockDisplay.text().match(/\d+/)[0]);
+                const invoiceType = $('#InvoiceTypeSelect').val();
+                const isReturn = (invoiceType === "3") || (invoiceType === "4");
+
+                let newStock;
+                if (isReturn) {
+                    // For return invoices, subtract cart quantity from product stock
+                    newStock = currentStock - itemToRemove.quantity;
+                } else {
+                    // For sales invoices, return quantity to product stock
+                    newStock = currentStock + itemToRemove.quantity;
+                }
+
+                stockDisplay.text(stockDisplay.text().replace(/\d+/, Math.max(0, newStock)));
+
+                // Update button state
+                const addButton = productCard.find('.add-to-cart-btn');
+                if (newStock <= 0 && !isReturn) {
+                    addButton.prop('disabled', true)
+                             .html('<i class="fas fa-times me-1"></i> غير متوفر');
+                } else if (isReturn || newStock > 0) {
+                    addButton.prop('disabled', false)
+                             .html('<i class="fas fa-cart-plus me-1"></i> إضافة للسلة');
+                }
+            }
+        }
+
+        cart = cart.filter(item => item.id !== id);
+        updateCartDisplay();
+        updateInvoiceItemsInputs();
+    }
+
+    /**
+     * Clear entire cart with confirmation
+     */
+    function clearCart() {
+        if (cart.length === 0) return;
+
+        showConfirm('تنبيه', 'هل أنت متأكد أنك تريد إفراغ السلة؟', function() {
+            cart = [];
+            updateCartDisplay();
+            updateInvoiceItemsInputs();
+        });
+    }
+
+    /**
+     * Clear all items from cart (alternative clear function)
+     */
+    function clearAllItems() {
+        if (cart.length === 0) return;
+
+        showConfirm('تنبيه', 'هل أنت متأكد أنك تريد حذف جميع العناصر من السلة؟', function() {
+            cart = [];
+            updateCartDisplay();
+            updateInvoiceItemsInputs();
+
+            // Add shake animation to cart icon
+            const cartIcon = $('.cart-header i');
+            if (cartIcon.length) {
+                cartIcon.addClass('fa-shake');
+                setTimeout(() => cartIcon.removeClass('fa-shake'), 1000);
+            }
+        });
+    }
+
+    /**
+     * Update cart display in UI
+     */
+    function updateCartDisplay() {
+        const cartItemsContainer = $('#cartItems');
+        const cartItemsCount = $('#cartItemsCount');
+
+        if (cart.length === 0) {
+            displayEmptyCart(cartItemsContainer, cartItemsCount);
+        } else {
+            displayCartItems(cartItemsContainer, cartItemsCount);
+        }
+    }
+
+    /**
+     * Display empty cart message
+     * @@param {jQuery} container - Cart items container
+     * @@param {jQuery} countElement - Cart count element
+     */
+    function displayEmptyCart(container, countElement) {
+        const emptyMessage = `
+            <div class="text-center text-muted py-5" id="emptyCartMessage">
+                <i class="fas fa-shopping-cart fa-3x mb-3 opacity-50"></i>
+                <p>سلة المشتريات فارغة</p>
+                <small>اختر المنتجات لإضافتها إلى السلة</small>
+            </div>
+        `;
+        container.html(emptyMessage);
+        countElement.text('0');
+        $('#total').text('0.00 ج.م');
+        $('#totalInvoiceInput').val('0');
+    }
+
+    /**
+     * Display cart items
+     * @@param {jQuery} container - Cart items container
+     * @@param {jQuery} countElement - Cart count element
+     */
+    function displayCartItems(container, countElement) {
+        let cartHTML = '';
+        let total = 0;
+
+        cart.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+
+            cartHTML += generateCartItemHTML(item, itemTotal);
+        });
+
+        container.html(cartHTML);
+        countElement.text(cart.reduce((sum, item) => sum + item.quantity, 0));
+        $('#total').text(`${total.toFixed(2)} ج.م`);
+        $('#totalInvoiceInput').val(total.toFixed(2));
+        cartTotal = total;
+    }
+
+    /**
+     * Generate HTML for a single cart item
+     * @@param {Object} item - Cart item object
+     * @@param {number} itemTotal - Item total price
+     * @@returns {string} HTML string for cart item
+     */
+    function generateCartItemHTML(item, itemTotal) {
+        return `
+            <div class="cart-item border rounded p-2 mb-2 bg-white shadow-sm">
+                <div class="row align-items-center g-2">
+                    <!-- Product Image Column -->
+                    <div class="col-3 col-md-2">
+                        <img src="${item.image}"
+                             class="cart-item-img img-fluid rounded"
+                             alt="${item.name}">
+                    </div>
+
+                    <!-- Product Info and Quantity Controls -->
+                    <div class="col-6 col-md-7">
+                        <h6 class="cart-item-name mb-2 text-truncate fw-semibold">${item.name}</h6>
+                        <div class="d-flex justify-content-center align-items-center gap-2">
+                            <button type="button"
+                                    class="cart-qty-btn btn btn-outline-secondary btn-sm"
+                                    onclick="updateQuantity(${item.id}, -1)">
+                                <i class="fas fa-minus" style="margin: unset;"></i>
+                            </button>
+                            <input type="hidden" asp-for="Items.ProductId" value="${item.id}"/>
+                            <input type="hidden" asp-for="Items.Quantity" value="${item.quantity}"/>
+                            <span class="cart-qty-display px-3 py-1 border rounded">${item.quantity}</span>
+                            <button type="button"
+                                    class="cart-qty-btn btn btn-outline-secondary btn-sm"
+                                    onclick="updateQuantity(${item.id}, 1)">
+                                <i class="fas fa-plus" style="margin: unset;"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Price and Delete Column -->
+                    <div class="col-3 col-md-3">
+                        <div class="mb-2">
+                            <strong class="cart-item-price text-success fs-5">${itemTotal.toFixed(2)} ج.م</strong>
+                        </div>
+                        <button type="button"
+                                class="cart-delete-btn btn btn-outline-danger btn-sm"
+                                onclick="removeFromCart(${item.id})">
+                            <i class="fas fa-trash" style="margin: unset;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Update hidden inputs for invoice items
+     */
+    function updateInvoiceItemsInputs() {
+        const container = $('#invoiceItemsInputs');
+        container.empty();
+
+        cart.forEach((item, index) => {
+            const inputs = `
+                <input type="hidden" name="Items[${index}].ProductId" value="${item.id}" />
+                <input type="hidden" name="Items[${index}].ProductName" value="${item.name}" />
+                <input type="hidden" name="Items[${index}].Quantity" value="${item.quantity}" />
+                <input type="hidden" name="Items[${index}].UnitPrice" value="${item.price}" />
+                <input type="hidden" name="Items[${index}].Total" value="${(item.price * item.quantity).toFixed(2)}" />
+            `;
+            container.append(inputs);
+        });
+    }
+
+    // ========================================
+    // PRODUCT FILTERING AND SEARCH
+    // ========================================
+
+    /**
+     * Filter products by category
+     * @@param {string} categoryName - Category name or 'all' for all products
+     * @@param {HTMLElement} clickedElement - The clicked category button
+     */
+    function filterProducts(categoryName, clickedElement) {
+        debugger;
+        const products = $('.product-grid-item');
+        const categoryPills = $('.category-pill');
+
+        // Update active pill
+        categoryPills.removeClass('active');
+        $(clickedElement).addClass('active');
+
+        if (categoryName === 'all') {
+            products.show();
+        } else {
+            products.each(function() {
+                const productCategory = $(this).attr('data-category');
+                if (productCategory === categoryName) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+    }
+
+    // ========================================
+    // UTILITY FUNCTIONS
+    // ========================================
+
+    /**
+     * Show add to cart animation
+     */
+    function showAddToCartAnimation() {
+        const cartIcon = $('.cart-header i');
+        if (cartIcon.length) {
+            cartIcon.addClass('fa-bounce');
+            setTimeout(() => cartIcon.removeClass('fa-bounce'), 1000);
+        }
+    }
+
+    /**
+     * Subtract cart quantities from product stock (for return invoices)
+     */
+    function subtractCartFromProductStock() {
+        cart.forEach(item => {
+            const productCard = $(`.product-card[onclick*="${item.id}"]`);
+            const stockDisplay = productCard.find('.product-price:contains("متبقي")');
+
+            if (productCard.length && stockDisplay.length) {
+                const currentStock = parseInt(stockDisplay.text().match(/\d+/)[0]);
+                const newStock = currentStock - item.quantity;
+                stockDisplay.text(stockDisplay.text().replace(/\d+/, Math.max(0, newStock)));
+
+                // Update button state based on new stock
+                const addButton = productCard.find('.add-to-cart-btn');
+                if (newStock <= 0) {
+                    addButton.prop('disabled', true)
+                             .html('<i class="fas fa-times me-1"></i> غير متوفر');
+                }
+            }
+        });
+    }
+
+    /**
+     * Update product buttons based on invoice type
+     * @@param {string} invoiceType - The selected invoice type value
+     */
+    function updateProductButtonsForInvoiceType(invoiceType) {
+        const isReturn = (invoiceType === "3") || (invoiceType === "4"); // Cash Return or Credit Return
+
+        $('.product-card').each(function() {
+            const productCard = $(this);
+            const stockDisplay = productCard.find('.product-price:contains("متبقي")');
+            const addButton = productCard.find('.add-to-cart-btn');
+
+            if (stockDisplay.length) {
+                const stock = parseInt(stockDisplay.text().match(/\d+/)[0]);
+
+                if (isReturn) {
+                    // For returns, enable all buttons regardless of stock
+                    addButton.prop('disabled', false)
+                             .html('<i class="fas fa-cart-plus me-1"></i> إضافة للسلة');
+                } else {
+                    // For sales, disable if stock is zero
+                    if (stock <= 0) {
+                        addButton.prop('disabled', true)
+                                 .html('<i class="fas fa-times me-1"></i> غير متوفر');
+                    } else {
+                        addButton.prop('disabled', false)
+                                 .html('<i class="fas fa-cart-plus me-1"></i> إضافة للسلة');
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Initialize product buttons based on stock availability
+     */
+    function initializeProductButtons() {
+        $('.product-card').each(function() {
+            const productCard = $(this);
+            const stockDisplay = productCard.find('.product-price:contains("متبقي")');
+            const addButton = productCard.find('.add-to-cart-btn');
+
+            if (stockDisplay.length) {
+                const stock = parseInt(stockDisplay.text().match(/\d+/)[0]);
+                if (stock <= 0) {
+                    addButton.prop('disabled', true)
+                             .html('<i class="fas fa-times me-1"></i> غير متوفر');
+                }
+            }
+        });
+    }
+
+    /**
+     * Update current time display
+     */
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('ar-SA', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        const timeElement = $('#currentTime');
+        if (timeElement.length) {
+            timeElement.text(timeString);
+        }
+    }
+
+    // ========================================
+    // EVENT HANDLERS AND INITIALIZATION
+    // ========================================
+
+    $(document).ready(function() {
+        // Initialize barcode scan focus
+        FocusBarcodeScan();
+
+        // Show alert modal if model state is invalid
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <text>$('#alertModal').modal('show');</text>
+    }
+
+        // Initialize time display
+        updateTime();
+        setInterval(updateTime, 60000); // Update every minute
+
+        // Initialize category filter - set "الكل" as active
+        $('.category-pill').first().addClass('active');
+
+        // Enhanced mobile touch events
+        if ('ontouchstart' in window) {
+            $(document).on('touchstart', function() {}, {passive: true});
+        }
+
+        // Initialize product buttons based on stock
+        initializeProductButtons();
+
+        // ========================================
+        // FORM SUBMISSION HANDLERS
+        // ========================================
+
+        // Handle main form submission with validation
+        $('form').submit(function(e) {
+            debugger;
+            if (cart.length === 0) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                showAlert('تنبيه', 'لا يمكن تقديم الفاتورة بدون أي منتجات في السلة', 'warning');
+                return false;
+            }
+
+            // Validate customer selection for credit invoices and credit returns
+            if (($('#InvoiceTypeSelect').val() === "1" || $('#InvoiceTypeSelect').val() === "4") && $('#customerSelectV').val() === '') {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                showAlert('تنبيه', 'برجاء اختيار العميل', 'warning');
+                return false;
+            }
+        });
+
+        // Handle invoice form AJAX submission
+        $('#invoiceForm').on('submit', function(e) {
+            e.preventDefault();
+            const form = $(this);
+            const formData = form.serialize() + '&dist=pos';
+
+            // Show loading spinner
+            Swal.fire({
+                title: 'جاري المعالجة...',
+                text: 'يرجى الانتظار حتى يتم حفظ الفاتورة',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: formData,
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // For return invoices, subtract cart quantities from product stock
+                        const invoiceType = $('#InvoiceTypeSelect').val();
+                        const isReturn = (invoiceType === "3") || (invoiceType === "4");
+
+                        if (isReturn) {
+                            subtractCartFromProductStock();
+                        }
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'نجاح',
+                            text: response.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'خطأ',
+                            text: response.message.split('.')[0]
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: 'حدث خطأ غير متوقع.'
+                    });
+                }
+            });
+        });
+
+        // ========================================
+        // UI EVENT HANDLERS
+        // ========================================
+
+        // Handle invoice type change
+        $('#InvoiceTypeSelect').change(function() {
+            const selectedValue = $(this).val();
+            // Show customer select for credit invoices (1) and credit returns (4)
+            if (selectedValue === "1" || selectedValue === "4") {
+                $('#customerSelect').show();
+            } else {
+                $('#customerSelect').hide();
+                $('#customerSelectV').val('');
+            }
+
+            // Update product buttons based on invoice type
+            updateProductButtonsForInvoiceType(selectedValue);
+        }).trigger('change'); // Trigger on page load
+
+        // Handle search functionality
+        $('#searchInput').on('input', function() {
+            debugger;
+            const searchTerm = $(this).val().toLowerCase();
+            const products = $('.product-grid-item');
+
+            products.each(function() {
+                const title = $(this).find('.product-title').text().toLowerCase();
+                const productContainer = $(this).closest('[data-category]').closest('.product-grid-item');
+
+                if (title.includes(searchTerm)) {
+                    productContainer.show();
+                } else {
+                    productContainer.hide();
+                }
+            });
+
+            // Reapply category filter if search is cleared
+            if (searchTerm === '') {
+                const activeCategory = $('.category-pill.active');
+                if (activeCategory.length) {
+                    const categoryText = activeCategory.text().trim();
+                    if (categoryText === 'الكل') {
+                        filterProducts('all', activeCategory[0]);
+                    } else {
+                        const categoryName = categoryText.replace(/^\s*[\w\s]*\s+/, '').trim();
+                        filterProductsByName(categoryName, activeCategory[0]);
+                    }
+                }
+            }
+        });
+
+        // Prevent form submission when clicking product cards
+        $(document).on('click', function(e) {
+            if ($(e.target).closest('.product-card').length &&
+                !$(e.target).closest('.add-to-cart-btn').length) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@* <!-- SweetAlert2 CDN --> *@
+@* <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> *@
+
+@* <script> *@
+@*     /** *@
+@*      * POS System JavaScript - Refactored for better maintainability *@
+@*      * This script handles barcode scanning, cart management, and invoice processing *@
+@*      */ *@
+
+@*     // ======================================== *@
+@*     // GLOBAL VARIABLES *@
+@*     // ======================================== *@
+@*     let cart = []; *@
+@*     let cartTotal = 0; *@
+
+@*     // ======================================== *@
+@*     // BARCODE SCANNING FUNCTIONALITY *@
+@*     // ======================================== *@
+
+@*     /** *@
+@*      * Focus on barcode scan input and clear its value *@
+@*      */ *@
+@*     function FocusBarcodeScan() { *@
+@*         const barcodeInput = $('#barcodeScanInput'); *@
+@*         if (barcodeInput.length) { *@
+@*             barcodeInput.focus(); *@
+@*             barcodeInput.val(''); // Clear the input text *@
+@*         } *@
+@*     } *@
+
+@*     /** *@
+@*      * Handle barcode scan for desktop devices *@
+@*      * @@param {string} barcode - The scanned barcode *@
+@*      */ *@
+@*     function handleBarcodeScan(barcode) { *@
+@*         debugger; *@
+
+@*         // Initialize products map if not exists *@
+@*         if (!window.allProductsByBarcode) { *@
+@*             window.allProductsByBarcode = {}; *@
+@*     @if (ViewBag.Products != null) *@
+@*     { *@
+@*         foreach (var product in ViewBag.Products) *@
+@*         { *@
+@*             if (!string.IsNullOrEmpty(product.Barcode)) *@
+@*             { *@
+@*                 <text> *@
+@*                                     window.allProductsByBarcode['@product.Barcode'] = { *@
+@*                                         id: @product.Id, *@
+@*                                         name: '@product.Name', *@
+@*                                         price: @product.SellingPrice, *@
+@*                                         image: '@product.ImageUrl' *@
+@*                                     }; *@
+@*                 </text> *@
+@*             } *@
+@*         } *@
+@*     } *@
+@*         } *@
+
+@*         const product = window.allProductsByBarcode[barcode]; *@
+
+@*         if (product) { *@
+@*             FocusBarcodeScan(); *@
+@*             addToCart(product.id, product.name, product.price, product.image); *@
+@*         } else { *@
+@*             // Show product not found alert *@
+@*             Swal.fire({ *@
+@*                 title: 'تنبيه', *@
+@*                 text: 'لم يتم العثور على منتج بهذا الباركود', *@
+@*                 icon: 'warning', *@
+@*                 allowOutsideClick: true, *@
+@*                 allowEscapeKey: true, *@
+@*                 allowEnterKey: true, *@
+@*                 showConfirmButton: true, *@
+@*                 timer: 2000 *@
+@*             }).then(() => { *@
+@*                 FocusBarcodeScan(); *@
+@*             }); *@
+@*         } *@
+@*     } *@
+
+@*     // ======================================== *@
+@*     // ALERT AND CONFIRMATION DIALOGS *@
+@*     // ======================================== *@
+
+@*     /** *@
+@*      * Show a beautiful alert modal *@
+@*      * @@param {string} title - Alert title *@
+@*      * @@param {string} message - Alert message *@
+@*      * @@param {string} type - Alert type (warning, error, success, info) *@
+@*      */ *@
+@*     function showAlert(title, message, type = 'warning') { *@
+@*         const modal = $('#alertModal'); *@
+@*         const iconMap = { *@
+@*             'warning': 'exclamation-circle', *@
+@*             'error': 'times-circle', *@
+@*             'success': 'check-circle', *@
+@*             'info': 'info-circle' *@
+@*         }; *@
+@*         const colorMap = { *@
+@*             'warning': 'warning', *@
+@*             'error': 'danger', *@
+@*             'success': 'success', *@
+@*             'info': 'primary' *@
+@*         }; *@
+
+@*         $('#alertTitle').text(title); *@
+@*         $('#alertMessage').text(message); *@
+@*         $('#alertIcon').html(`<i class="fas fa-${iconMap[type]} fa-4x text-${colorMap[type]}"></i>`); *@
+
+@*         // Remove any existing click handlers *@
+@*         $('#alertConfirmBtn').off('click'); *@
+
+@*         const bsModal = new bootstrap.Modal(modal); *@
+@*         bsModal.show(); *@
+@*     } *@
+
+@*     /** *@
+@*      * Show a confirmation dialog with custom callback *@
+@*      * @@param {string} title - Dialog title *@
+@*      * @@param {string} message - Dialog message *@
+@*      * @@param {Function} confirmCallback - Function to execute on confirmation *@
+@*      * @@param {string} type - Dialog type (warning, error, success, info) *@
+@*      */ *@
+@*     function showConfirm(title, message, confirmCallback, type = 'warning') { *@
+@*         const modal = $('#alertModal'); *@
+@*         const iconMap = { *@
+@*             'warning': 'exclamation-triangle', *@
+@*             'error': 'times-circle', *@
+@*             'success': 'check-circle', *@
+@*             'info': 'question-circle' *@
+@*         }; *@
+@*         const colorMap = { *@
+@*             'warning': 'warning', *@
+@*             'error': 'danger', *@
+@*             'success': 'success', *@
+@*             'info': 'primary' *@
+@*         }; *@
+
+@*         $('#alertTitle').text(title); *@
+@*         $('#alertMessage').text(message); *@
+@*         $('#alertIcon').html(`<i class="fas fa-${iconMap[type]} fa-4x text-${colorMap[type]}"></i>`); *@
+
+@*         // Remove any existing click handlers and add new one *@
+@*         $('#alertConfirmBtn').off('click').on('click', function() { *@
+@*             confirmCallback(); *@
+@*         }); *@
+
+@*         const bsModal = new bootstrap.Modal(modal); *@
+@*         bsModal.show(); *@
+@*     } *@
+
+@*     // ======================================== *@
+@*     // CART MANAGEMENT FUNCTIONALITY *@
+@*     // ======================================== *@
+
+@*     /** *@
+@*      * Update quantity of an item in cart *@
+@*      * @@param {number} id - Product ID *@
+@*      * @@param {number} change - Quantity change (+/-) *@
+@*      */ *@
+@*     function updateQuantity(id, change) { *@
+@*         debugger; *@
+@*         const item = cart.find(item => item.id === id); *@
+
+@*         if (item) { *@
+@*             addToCart(item.id, item.name, item.price, item.image, change); *@
+
+@*             if (item.quantity <= 0) { *@
+@*                 removeFromCart(id); *@
+@*             } else { *@
+@*                 updateCartDisplay(); *@
+@*                 updateInvoiceItemsInputs(); *@
+@*             } *@
+@*         } *@
+@*     } *@
+
+@*     /** *@
+@*      * Add item to cart with stock validation *@
+@*      * @@param {number} id - Product ID *@
+@*      * @@param {string} name - Product name *@
+@*      * @@param {number} price - Product price *@
+@*      * @@param {string} image - Product image URL *@
+@*      * @@param {number} quantity - Quantity to add (default: 1) *@
+@*      */ *@
+@*     function addToCart(id, name, price, image, quantity = 1) { *@
+@*         // Get product stock information *@
+@*         const productCard = $(`.product-card[onclick*="${id}"]`); *@
+@*         const stockDisplay = productCard.find('.product-price:contains("متبقي")'); *@
+@*         let availableStock = 0; *@
+
+@*         if (productCard.length && stockDisplay.length) { *@
+@*             availableStock = parseInt(stockDisplay.text().match(/\d+/)[0]); *@
+@*         } *@
+
+@*         // Check invoice type for stock behavior *@
+@*         const invoiceTypeValue = $('#InvoiceTypeSelect').val(); *@
+@*         const shouldDecreaseStock = (invoiceTypeValue === "0") || *@
+@*                                    (invoiceTypeValue === "1") || *@
+@*                                    (invoiceTypeValue === "5"); *@
+@*         const isReturn = (invoiceTypeValue === "3") || (invoiceTypeValue === "4"); // مرتجع or مرتجع اجل *@
+
+@*         // Validate stock availability for regular invoices *@
+@*         if (availableStock <= 0 && shouldDecreaseStock && quantity > 0) { *@
+@*             showAlert('تنبيه', 'هذا المنتج غير متوفر في المخزن', 'warning'); *@
+@*             return; *@
+@*         } *@
+
+@*         const existingItem = cart.find(item => item.id === id); *@
+
+@*         if (existingItem) { *@
+@*             if (availableStock <= 0 && shouldDecreaseStock && quantity > 0) { *@
+@*                 showAlert('تنبيه', 'لا يوجد كمية كافية في المخزن', 'warning'); *@
+@*                 return; *@
+@*             } *@
+@*             existingItem.quantity += quantity; *@
+@*         } else { *@
+@*             cart.push({ *@
+@*                 id: id, *@
+@*                 name: name, *@
+@*                 price: price, *@
+@*                 image: image, *@
+@*                 quantity: 1 *@
+@*             }); *@
+@*         } *@
+
+@*         updateCartDisplay(); *@
+@*         updateInvoiceItemsInputs(); *@
+@*         showAddToCartAnimation(); *@
+
+@*         // Update stock display on product card *@
+@*         updateProductStockDisplay(productCard, stockDisplay, availableStock, quantity, isReturn); *@
+@*     } *@
+
+@*     /** *@
+@*      * Update product stock display on product card *@
+@*      * @@param {jQuery} productCard - Product card element *@
+@*      * @@param {jQuery} stockDisplay - Stock display element *@
+@*      * @@param {number} availableStock - Current available stock *@
+@*      * @@param {number} quantity - Quantity being added/removed *@
+@*      * @@param {boolean} isReturn - Whether this is a return transaction *@
+@*      */ *@
+@*     function updateProductStockDisplay(productCard, stockDisplay, availableStock, quantity, isReturn = false) { *@
+@*         if (productCard.length && stockDisplay.length) { *@
+@*             // For returns, increase stock; for sales, decrease stock *@
+@*             const newStock = isReturn ? availableStock + quantity : availableStock - quantity; *@
+@*             stockDisplay.text(stockDisplay.text().replace(/\d+/, newStock)); *@
+
+@*             const addButton = productCard.find('.add-to-cart-btn'); *@
+@*             if (newStock <= 0 && !isReturn) { *@
+@*                 addButton.prop('disabled', true) *@
+@*                          .html('<i class="fas fa-times me-1"></i> غير متوفر'); *@
+@*             } else { *@
+@*                 addButton.prop('disabled', false) *@
+@*                          .html('<i class="fas fa-cart-plus me-1"></i> إضافة للسلة'); *@
+@*             } *@
+@*         } *@
+@*     } *@
+
+@*     /** *@
+@*      * Remove item from cart and return quantity to product stock *@
+@*      * @@param {number} id - Product ID to remove *@
+@*      */ *@
+@*     function removeFromCart(id) { *@
+@*         const itemToRemove = cart.find(item => item.id === id); *@
+@*         if (itemToRemove) { *@
+@*             // Return quantity to product stock display *@
+@*             const productCard = $(`.product-card[onclick*="${id}"]`); *@
+@*             const stockDisplay = productCard.find('.product-price:contains("متبقي")'); *@
+
+@*             if (productCard.length && stockDisplay.length) { *@
+@*                 const currentStock = parseInt(stockDisplay.text().match(/\d+/)[0]); *@
+@*                 const newStock = currentStock + itemToRemove.quantity; *@
+@*                 stockDisplay.text(stockDisplay.text().replace(/\d+/, newStock)); *@
+
+@*                 // Re-enable add to cart button if it was disabled *@
+@*                 const addButton = productCard.find('.add-to-cart-btn'); *@
+@*                 if (addButton.prop('disabled')) { *@
+@*                     addButton.prop('disabled', false) *@
+@*                              .html('<i class="fas fa-cart-plus me-1"></i> إضافة للسلة'); *@
+@*                 } *@
+@*             } *@
+@*         } *@
+
+@*         cart = cart.filter(item => item.id !== id); *@
+@*         updateCartDisplay(); *@
+@*         updateInvoiceItemsInputs(); *@
+@*     } *@
+
+@*     /** *@
+@*      * Clear entire cart with confirmation *@
+@*      */ *@
+@*     function clearCart() { *@
+@*         if (cart.length === 0) return; *@
+
+@*         showConfirm('تنبيه', 'هل أنت متأكد أنك تريد إفراغ السلة؟', function() { *@
+@*             cart = []; *@
+@*             updateCartDisplay(); *@
+@*             updateInvoiceItemsInputs(); *@
+@*         }); *@
+@*     } *@
+
+@*     /** *@
+@*      * Clear all items from cart (alternative clear function) *@
+@*      */ *@
+@*     function clearAllItems() { *@
+@*         if (cart.length === 0) return; *@
+
+@*         showConfirm('تنبيه', 'هل أنت متأكد أنك تريد حذف جميع العناصر من السلة؟', function() { *@
+@*             cart = []; *@
+@*             updateCartDisplay(); *@
+@*             updateInvoiceItemsInputs(); *@
+
+@*             // Add shake animation to cart icon *@
+@*             const cartIcon = $('.cart-header i'); *@
+@*             if (cartIcon.length) { *@
+@*                 cartIcon.addClass('fa-shake'); *@
+@*                 setTimeout(() => cartIcon.removeClass('fa-shake'), 1000); *@
+@*             } *@
+@*         }); *@
+@*     } *@
+
+@*     /** *@
+@*      * Update cart display in UI *@
+@*      */ *@
+@*     function updateCartDisplay() { *@
+@*         const cartItemsContainer = $('#cartItems'); *@
+@*         const cartItemsCount = $('#cartItemsCount'); *@
+
+@*         if (cart.length === 0) { *@
+@*             displayEmptyCart(cartItemsContainer, cartItemsCount); *@
+@*         } else { *@
+@*             displayCartItems(cartItemsContainer, cartItemsCount); *@
+@*         } *@
+@*     } *@
+
+@*     /** *@
+@*      * Display empty cart message *@
+@*      * @@param {jQuery} container - Cart items container *@
+@*      * @@param {jQuery} countElement - Cart count element *@
+@*      */ *@
+@*     function displayEmptyCart(container, countElement) { *@
+@*         const emptyMessage = ` *@
+@*             <div class="text-center text-muted py-5" id="emptyCartMessage"> *@
+@*                 <i class="fas fa-shopping-cart fa-3x mb-3 opacity-50"></i> *@
+@*                 <p>سلة المشتريات فارغة</p> *@
+@*                 <small>اختر المنتجات لإضافتها إلى السلة</small> *@
+@*             </div> *@
+@*         `; *@
+@*         container.html(emptyMessage); *@
+@*         countElement.text('0'); *@
+@*         $('#total').text('0.00 ج.م'); *@
+@*         $('#totalInvoiceInput').val('0'); *@
+@*     } *@
+
+@*     /** *@
+@*      * Display cart items *@
+@*      * @@param {jQuery} container - Cart items container *@
+@*      * @@param {jQuery} countElement - Cart count element *@
+@*      */ *@
+@*     function displayCartItems(container, countElement) { *@
+@*         let cartHTML = ''; *@
+@*         let total = 0; *@
+
+@*         cart.forEach(item => { *@
+@*             const itemTotal = item.price * item.quantity; *@
+@*             total += itemTotal; *@
+
+@*             cartHTML += generateCartItemHTML(item, itemTotal); *@
+@*         }); *@
+
+@*         container.html(cartHTML); *@
+@*         countElement.text(cart.reduce((sum, item) => sum + item.quantity, 0)); *@
+@*         $('#total').text(`${total.toFixed(2)} ج.م`); *@
+@*         $('#totalInvoiceInput').val(total.toFixed(2)); *@
+@*         cartTotal = total; *@
+@*     } *@
+
+@*     /** *@
+@*      * Generate HTML for a single cart item *@
+@*      * @@param {Object} item - Cart item object *@
+@*      * @@param {number} itemTotal - Item total price *@
+@*      * @@returns {string} HTML string for cart item *@
+@*      */ *@
+@*     function generateCartItemHTML(item, itemTotal) { *@
+@*         return ` *@
+@*             <div class="cart-item border rounded p-2 mb-2 bg-white shadow-sm"> *@
+@*                 <div class="row align-items-center g-2"> *@
+@*                     <!-- Product Image Column --> *@
+@*                     <div class="col-3 col-md-2"> *@
+@*                         <img src="${item.image}" *@
+@*                              class="cart-item-img img-fluid rounded" *@
+@*                              alt="${item.name}"> *@
+@*                     </div> *@
+
+@*                     <!-- Product Info and Quantity Controls --> *@
+@*                     <div class="col-6 col-md-7"> *@
+@*                         <h6 class="cart-item-name mb-2 text-truncate fw-semibold">${item.name}</h6> *@
+@*                         <div class="d-flex justify-content-center align-items-center gap-2"> *@
+@*                             <button type="button" *@
+@*                                     class="cart-qty-btn btn btn-outline-secondary btn-sm" *@
+@*                                     onclick="updateQuantity(${item.id}, -1)"> *@
+@*                                 <i class="fas fa-minus" style="margin: unset;"></i> *@
+@*                             </button> *@
+@*                             <input type="hidden" asp-for="Items.ProductId" value="${item.id}"/> *@
+@*                             <input type="hidden" asp-for="Items.Quantity" value="${item.quantity}"/> *@
+@*                             <span class="cart-qty-display px-3 py-1 border rounded">${item.quantity}</span> *@
+@*                             <button type="button" *@
+@*                                     class="cart-qty-btn btn btn-outline-secondary btn-sm" *@
+@*                                     onclick="updateQuantity(${item.id}, 1)"> *@
+@*                                 <i class="fas fa-plus" style="margin: unset;"></i> *@
+@*                             </button> *@
+@*                         </div> *@
+@*                     </div> *@
+
+@*                     <!-- Price and Delete Column --> *@
+@*                     <div class="col-3 col-md-3"> *@
+@*                         <div class="mb-2"> *@
+@*                             <strong class="cart-item-price text-success fs-5">${itemTotal.toFixed(2)} ج.م</strong> *@
+@*                         </div> *@
+@*                         <button type="button" *@
+@*                                 class="cart-delete-btn btn btn-outline-danger btn-sm" *@
+@*                                 onclick="removeFromCart(${item.id})"> *@
+@*                             <i class="fas fa-trash" style="margin: unset;"></i> *@
+@*                         </button> *@
+@*                     </div> *@
+@*                 </div> *@
+@*             </div> *@
+@*         `; *@
+@*     } *@
+
+@*     /** *@
+@*      * Update hidden inputs for invoice items *@
+@*      */ *@
+@*     function updateInvoiceItemsInputs() { *@
+@*         const container = $('#invoiceItemsInputs'); *@
+@*         container.empty(); *@
+
+@*         cart.forEach((item, index) => { *@
+@*             const inputs = ` *@
+@*                 <input type="hidden" name="Items[${index}].ProductId" value="${item.id}" /> *@
+@*                 <input type="hidden" name="Items[${index}].ProductName" value="${item.name}" /> *@
+@*                 <input type="hidden" name="Items[${index}].Quantity" value="${item.quantity}" /> *@
+@*                 <input type="hidden" name="Items[${index}].UnitPrice" value="${item.price}" /> *@
+@*                 <input type="hidden" name="Items[${index}].Total" value="${(item.price * item.quantity).toFixed(2)}" /> *@
+@*             `; *@
+@*             container.append(inputs); *@
+@*         }); *@
+@*     } *@
+
+@*     // ======================================== *@
+@*     // PRODUCT FILTERING AND SEARCH *@
+@*     // ======================================== *@
+
+@*     /** *@
+@*      * Filter products by category *@
+@*      * @@param {string} categoryName - Category name or 'all' for all products *@
+@*      * @@param {HTMLElement} clickedElement - The clicked category button *@
+@*      */ *@
+@*     function filterProducts(categoryName, clickedElement) { *@
+@*         debugger; *@
+@*         const products = $('.product-grid-item'); *@
+@*         const categoryPills = $('.category-pill'); *@
+
+@*         // Update active pill *@
+@*         categoryPills.removeClass('active'); *@
+@*         $(clickedElement).addClass('active'); *@
+
+@*         if (categoryName === 'all') { *@
+@*             products.show(); *@
+@*         } else { *@
+@*             products.each(function() { *@
+@*                 const productCategory = $(this).attr('data-category'); *@
+@*                 if (productCategory === categoryName) { *@
+@*                     $(this).show(); *@
+@*                 } else { *@
+@*                     $(this).hide(); *@
+@*                 } *@
+@*             }); *@
+@*         } *@
+@*     } *@
+
+@*     // ======================================== *@
+@*     // UTILITY FUNCTIONS *@
+@*     // ======================================== *@
+
+@*     /** *@
+@*      * Show add to cart animation *@
+@*      */ *@
+@*     function showAddToCartAnimation() { *@
+@*         const cartIcon = $('.cart-header i'); *@
+@*         if (cartIcon.length) { *@
+@*             cartIcon.addClass('fa-bounce'); *@
+@*             setTimeout(() => cartIcon.removeClass('fa-bounce'), 1000); *@
+@*         } *@
+@*     } *@
+
+@*     /** *@
+@*      * Subtract cart quantities from product stock (for return invoices) *@
+@*      */ *@
+@*     function subtractCartFromProductStock() { *@
+@*         cart.forEach(item => { *@
+@*             const productCard = $(`.product-card[onclick*="${item.id}"]`); *@
+@*             const stockDisplay = productCard.find('.product-price:contains("متبقي")'); *@
+
+@*             if (productCard.length && stockDisplay.length) { *@
+@*                 const currentStock = parseInt(stockDisplay.text().match(/\d+/)[0]); *@
+@*                 const newStock = currentStock - item.quantity; *@
+@*                 stockDisplay.text(stockDisplay.text().replace(/\d+/, Math.max(0, newStock))); *@
+
+@*                 // Update button state based on new stock *@
+@*                 const addButton = productCard.find('.add-to-cart-btn'); *@
+@*                 if (newStock <= 0) { *@
+@*                     addButton.prop('disabled', true) *@
+@*                              .html('<i class="fas fa-times me-1"></i> غير متوفر'); *@
+@*                 } *@
+@*             } *@
+@*         }); *@
+@*     } *@
+
+@*     /** *@
+@*      * Update product buttons based on invoice type *@
+@*      * @@param {string} invoiceType - The selected invoice type value *@
+@*      */ *@
+@*     function updateProductButtonsForInvoiceType(invoiceType) { *@
+@*         const isReturn = (invoiceType === "3") || (invoiceType === "4"); // Cash Return or Credit Return *@
+
+@*         $('.product-card').each(function() { *@
+@*             const productCard = $(this); *@
+@*             const stockDisplay = productCard.find('.product-price:contains("متبقي")'); *@
+@*             const addButton = productCard.find('.add-to-cart-btn'); *@
+
+@*             if (stockDisplay.length) { *@
+@*                 const stock = parseInt(stockDisplay.text().match(/\d+/)[0]); *@
+
+@*                 if (isReturn) { *@
+@*                     // For returns, enable all buttons regardless of stock *@
+@*                     addButton.prop('disabled', false) *@
+@*                              .html('<i class="fas fa-cart-plus me-1"></i> إضافة للسلة'); *@
+@*                 } else { *@
+@*                     // For sales, disable if stock is zero *@
+@*                     if (stock <= 0) { *@
+@*                         addButton.prop('disabled', true) *@
+@*                                  .html('<i class="fas fa-times me-1"></i> غير متوفر'); *@
+@*                     } else { *@
+@*                         addButton.prop('disabled', false) *@
+@*                                  .html('<i class="fas fa-cart-plus me-1"></i> إضافة للسلة'); *@
+@*                     } *@
+@*                 } *@
+@*             } *@
+@*         }); *@
+@*     } *@
+
+@*     /** *@
+@*      * Initialize product buttons based on stock availability *@
+@*      */ *@
+@*     function initializeProductButtons() { *@
+@*         $('.product-card').each(function() { *@
+@*             const productCard = $(this); *@
+@*             const stockDisplay = productCard.find('.product-price:contains("متبقي")'); *@
+@*             const addButton = productCard.find('.add-to-cart-btn'); *@
+
+@*             if (stockDisplay.length) { *@
+@*                 const stock = parseInt(stockDisplay.text().match(/\d+/)[0]); *@
+@*                 if (stock <= 0) { *@
+@*                     addButton.prop('disabled', true) *@
+@*                              .html('<i class="fas fa-times me-1"></i> غير متوفر'); *@
+@*                 } *@
+@*             } *@
+@*         }); *@
+@*     } *@
+
+@*     /** *@
+@*      * Update current time display *@
+@*      */ *@
+@*     function updateTime() { *@
+@*         const now = new Date(); *@
+@*         const timeString = now.toLocaleTimeString('ar-SA', { *@
+@*             hour: '2-digit', *@
+@*             minute: '2-digit' *@
+@*         }); *@
+@*         const timeElement = $('#currentTime'); *@
+@*         if (timeElement.length) { *@
+@*             timeElement.text(timeString); *@
+@*         } *@
+@*     } *@
+
+@*     // ======================================== *@
+@*     // EVENT HANDLERS AND INITIALIZATION *@
+@*     // ======================================== *@
+
+@*     $(document).ready(function() { *@
+@*         // Initialize barcode scan focus *@
+@*         FocusBarcodeScan(); *@
+
+@*         // Show alert modal if model state is invalid *@
+@*     @if (!ViewData.ModelState.IsValid) *@
+@*     { *@
+@*         <text>$('#alertModal').modal('show');</text> *@
+@*     } *@
+
+@*         // Initialize time display *@
+@*         updateTime(); *@
+@*         setInterval(updateTime, 60000); // Update every minute *@
+
+@*         // Initialize category filter - set "الكل" as active *@
+@*         $('.category-pill').first().addClass('active'); *@
+
+@*         // Enhanced mobile touch events *@
+@*         if ('ontouchstart' in window) { *@
+@*             $(document).on('touchstart', function() {}, {passive: true}); *@
+@*         } *@
+
+@*         // Initialize product buttons based on stock *@
+@*         initializeProductButtons(); *@
+
+@*         // ======================================== *@
+@*         // FORM SUBMISSION HANDLERS *@
+@*         // ======================================== *@
+
+@*         // Handle main form submission with validation *@
+@*         $('form').submit(function(e) { *@
+@*             debugger; *@
+@*             if (cart.length === 0) { *@
+@*                 e.preventDefault(); *@
+@*                 e.stopImmediatePropagation(); *@
+@*                 showAlert('تنبيه', 'لا يمكن تقديم الفاتورة بدون أي منتجات في السلة', 'warning'); *@
+@*                 return false; *@
+@*             } *@
+
+@*             // Validate customer selection for credit invoices and credit returns *@
+@*             if (($('#InvoiceTypeSelect').val() === "1" || $('#InvoiceTypeSelect').val() === "4") && $('#customerSelectV').val() === '') { *@
+@*                 e.preventDefault(); *@
+@*                 e.stopImmediatePropagation(); *@
+@*                 showAlert('تنبيه', 'برجاء اختيار العميل', 'warning'); *@
+@*                 return false; *@
+@*             } *@
+@*         }); *@
+
+@*         // Handle invoice form AJAX submission *@
+@*         $('#invoiceForm').on('submit', function(e) { *@
+@*             e.preventDefault(); *@
+@*             const form = $(this); *@
+@*             const formData = form.serialize() + '&dist=pos'; *@
+
+@*             // Show loading spinner *@
+@*             Swal.fire({ *@
+@*                 title: 'جاري المعالجة...', *@
+@*                 text: 'يرجى الانتظار حتى يتم حفظ الفاتورة', *@
+@*                 allowOutsideClick: false, *@
+@*                 allowEscapeKey: false, *@
+@*                 didOpen: () => Swal.showLoading() *@
+@*             }); *@
+
+@*             $.ajax({ *@
+@*                 url: form.attr('action'), *@
+@*                 type: 'POST', *@
+@*                 data: formData, *@
+@*                 headers: { *@
+@*                     'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() *@
+@*                 }, *@
+@*                 success: function(response) { *@
+@*                     if (response.success) { *@
+@*                         // For return invoices, subtract cart quantities from product stock *@
+@*                         const invoiceType = $('#InvoiceTypeSelect').val(); *@
+@*                         const isReturn = (invoiceType === "3") || (invoiceType === "4"); *@
+
+@*                         if (isReturn) { *@
+@*                             subtractCartFromProductStock(); *@
+@*                         } *@
+
+@*                         Swal.fire({ *@
+@*                             icon: 'success', *@
+@*                             title: 'نجاح', *@
+@*                             text: response.message, *@
+@*                             timer: 2000, *@
+@*                             showConfirmButton: false *@
+@*                         }).then(() => { *@
+@*                             location.reload(); *@
+@*                         }); *@
+@*                     } else { *@
+@*                         Swal.fire({ *@
+@*                             icon: 'error', *@
+@*                             title: 'خطأ', *@
+@*                             text: response.message.split('.')[0] *@
+@*                         }); *@
+@*                     } *@
+@*                 }, *@
+@*                 error: function() { *@
+@*                     Swal.fire({ *@
+@*                         icon: 'error', *@
+@*                         title: 'خطأ', *@
+@*                         text: 'حدث خطأ غير متوقع.' *@
+@*                     }); *@
+@*                 } *@
+@*             }); *@
+@*         }); *@
+
+@*         // ======================================== *@
+@*         // UI EVENT HANDLERS *@
+@*         // ======================================== *@
+
+@*         // Handle invoice type change *@
+@*         $('#InvoiceTypeSelect').change(function() { *@
+@*             const selectedValue = $(this).val(); *@
+@*             // Show customer select for credit invoices (1) and credit returns (4) *@
+@*             if (selectedValue === "1" || selectedValue === "4") { *@
+@*                 $('#customerSelect').show(); *@
+@*             } else { *@
+@*                 $('#customerSelect').hide(); *@
+@*                 $('#customerSelectV').val(''); *@
+@*             } *@
+
+@*             // Update product buttons based on invoice type *@
+@*             updateProductButtonsForInvoiceType(selectedValue); *@
+@*         }).trigger('change'); // Trigger on page load *@
+
+@*         // Handle search functionality *@
+@*         $('#searchInput').on('input', function() { *@
+@*             debugger; *@
+@*             const searchTerm = $(this).val().toLowerCase(); *@
+@*             const products = $('.product-grid-item'); *@
+
+@*             products.each(function() { *@
+@*                 const title = $(this).find('.product-title').text().toLowerCase(); *@
+@*                 const productContainer = $(this).closest('[data-category]').closest('.product-grid-item'); *@
+
+@*                 if (title.includes(searchTerm)) { *@
+@*                     productContainer.show(); *@
+@*                 } else { *@
+@*                     productContainer.hide(); *@
+@*                 } *@
+@*             }); *@
+
+@*             // Reapply category filter if search is cleared *@
+@*             if (searchTerm === '') { *@
+@*                 const activeCategory = $('.category-pill.active'); *@
+@*                 if (activeCategory.length) { *@
+@*                     const categoryText = activeCategory.text().trim(); *@
+@*                     if (categoryText === 'الكل') { *@
+@*                         filterProducts('all', activeCategory[0]); *@
+@*                     } else { *@
+@*                         const categoryName = categoryText.replace(/^\s*[\w\s]*\s+/, '').trim(); *@
+@*                         filterProductsByName(categoryName, activeCategory[0]); *@
+@*                     } *@
+@*                 } *@
+@*             } *@
+@*         }); *@
+
+@*         // Prevent form submission when clicking product cards *@
+@*         $(document).on('click', function(e) { *@
+@*             if ($(e.target).closest('.product-card').length && *@
+@*                 !$(e.target).closest('.add-to-cart-btn').length) { *@
+@*                 e.preventDefault(); *@
+@*             } *@
+@*         }); *@
+@*     }); *@
+@* </script> *@
