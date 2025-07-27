@@ -7,6 +7,7 @@ namespace KAFO.Domain.Products
     public class Product : Base, ISoftDelete
     {
         public int Id { set; get; }
+        public string? Barcode { set; get; }
         public string Name { set; get; }
         public string? ImageUrl { set; get; }
 
@@ -29,7 +30,7 @@ namespace KAFO.Domain.Products
         {
 
         }
-        public Product(string name, decimal purchasingPrice, decimal sellingPrice, int initQuantity = 0, string? imageUrl = null, Category? category = null)
+        public Product(string name, decimal purchasingPrice, decimal sellingPrice, int initQuantity = 0, string? imageUrl = null, string? barcode = null, Category? category = null)
         {
             Name = name;
             ImageUrl = imageUrl;
@@ -38,6 +39,7 @@ namespace KAFO.Domain.Products
             StockQuantity = initQuantity;
             SellingPrice = sellingPrice;
             Category = category;
+            Barcode = barcode;
         }
 
         public void IncreaseStockQuantity(decimal quantity)

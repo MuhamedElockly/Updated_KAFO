@@ -21,9 +21,13 @@
                         {
                             <input type="hidden" asp-for="Id" />
                         }
-                        @if (Context.Request.Query["from"] == "seller")
+                        @if (User.IsInRole("seller"))  // Check if user is in Seller role
                         {
                             <input type="hidden" name="from" value="seller" />
+                        }
+                        else
+                        {
+                            <input type="hidden" name="from" value="sami" />
                         }
                         <style>
                             [dir="rtl"] input::placeholder,

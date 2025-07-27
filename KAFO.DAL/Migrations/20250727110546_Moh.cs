@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace KAFO.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class addNewCreditWithdrawInvoice : Migration
+    public partial class Moh : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
