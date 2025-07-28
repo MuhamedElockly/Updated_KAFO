@@ -39,23 +39,40 @@ window.setInvoiceType = function(type) {
     currentInvoiceType = type;
     currentPage = 1;
     
-    // Update button states
-    document.querySelectorAll('.invoice-type-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    document.querySelector(`[data-invoice-type="${type}"]`).classList.add('active');
+    // Update button states - check if elements exist first
+    const invoiceTypeButtons = document.querySelectorAll('.invoice-type-btn');
+    if (invoiceTypeButtons.length > 0) {
+        invoiceTypeButtons.forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        const activeButton = document.querySelector(`[data-invoice-type="${type}"]`);
+        if (activeButton) {
+            activeButton.classList.add('active');
+        }
+    }
     
-    // Update title
-    let title = '';
-    if (type === 'sell') title = 'فواتير البيع';
-    else if (type === 'purchase') title = 'فواتير الشراء';
-    else if (type === 'return') title = 'مرتجعات';
-    else title = 'الفواتير';
-    document.getElementById('invoice-title').textContent = title;
+    // Update title - check if element exists
+    const titleElement = document.getElementById('invoice-title');
+    if (titleElement) {
+        let title = '';
+        if (type === 'sell') title = 'فواتير البيع';
+        else if (type === 'purchase') title = 'فواتير الشراء';
+        else if (type === 'return') title = 'مرتجعات';
+        else title = 'الفواتير';
+        titleElement.textContent = title;
+    }
     
-    // Clear table
-    document.getElementById('invoices-table-body').innerHTML = '';
-    document.getElementById('invoices-pagination').innerHTML = '';
+    // Clear table - check if elements exist
+    const tableBody = document.getElementById('invoices-table-body');
+    if (tableBody) {
+        tableBody.innerHTML = '';
+    }
+    
+    const pagination = document.getElementById('invoices-pagination');
+    if (pagination) {
+        pagination.innerHTML = '';
+    }
 };
 
 window.showInvoices = function() {
@@ -337,15 +354,22 @@ window.printInvoice = function(invoiceId) {
 
 // Helper functions
 function setDefaultDates() {
-    const today = new Date();
-    const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+    const startDateElement = document.getElementById('invoiceStartDate');
+    const endDateElement = document.getElementById('invoiceEndDate');
     
-    document.getElementById('invoiceStartDate').value = thirtyDaysAgo.toISOString().split('T')[0];
-    document.getElementById('invoiceEndDate').value = today.toISOString().split('T')[0];
+    if (startDateElement && endDateElement) {
+        const today = new Date();
+        const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+        
+        startDateElement.value = thirtyDaysAgo.toISOString().split('T')[0];
+        endDateElement.value = today.toISOString().split('T')[0];
+    }
 }
 
 function renderTable() {
     const tbody = document.getElementById('invoices-table-body');
+    if (!tbody) return; // Exit if table body doesn't exist
+    
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const pageInvoices = allInvoices.slice(startIndex, endIndex);
@@ -378,8 +402,10 @@ function renderTable() {
 }
 
 function renderPagination() {
-    const totalPages = Math.ceil(allInvoices.length / itemsPerPage);
     const pagination = document.getElementById('invoices-pagination');
+    if (!pagination) return; // Exit if pagination element doesn't exist
+    
+    const totalPages = Math.ceil(allInvoices.length / itemsPerPage);
     
     if (totalPages <= 1) {
         pagination.innerHTML = '';
@@ -714,15 +740,21 @@ function getInvoiceTypeText(type) {
 
 // Initialize when document is ready
 $(document).ready(function() {
-    // Initialize
-    setInvoiceType('sell');
-    setDefaultDates();
+    // Only initialize invoice functionality if we're on the invoices page
+    const invoiceContainer = document.getElementById('invoices-table-body');
+    if (invoiceContainer) {
+        // Initialize
+        setInvoiceType('sell');
+        setDefaultDates();
+    }
     
     // Close modal when clicking outside
     window.onclick = function(event) {
         const modal = document.getElementById('invoiceModal');
-        if (event.target === modal) {
-            closeInvoiceModal();
+        if (modal) { // Check if modal exists
+            if (event.target === modal) {
+                closeInvoiceModal();
+            }
         }
     }
 }); 

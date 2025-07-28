@@ -14,6 +14,7 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 	<link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet" />
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 	<style>
 		body {
 			display: flex;
@@ -116,6 +117,14 @@
 	</style>
 </head>
 <body>
+	<!-- Mobile Sidebar Toggle Button -->
+	<button class="mobile-sidebar-toggle d-md-none" id="mobileSidebarToggle">
+		<i class="fas fa-bars"></i>
+	</button>
+
+	<!-- Mobile Sidebar Overlay -->
+	<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 	<div id="sidebar">
 		<div class="sidebar-header">
 			<h3>اسم المسؤول</h3>

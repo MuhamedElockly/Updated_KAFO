@@ -12,15 +12,23 @@ namespace KAFO.ASPMVC
         {
             var builder = WebApplication.CreateBuilder(args);
 
-
+            // Add services to the container
             builder.Services.AddControllersWithViews();
 
-            // DbContext
-            builder.Services.AddDbContext<AppDBContext>(
-                            options => options.UseSqlServer(
-                                builder.Configuration
-                                .GetConnectionString("RemoteConnection"))
-                            );
+            // Configure DbContext with production-ready settings
+            builder.Services.AddDbContext<AppDBContext>(options =>
+            {
+                options.UseSqlServer(
+                    builder.Configuration.GetConnectionString("RemoteConnection"),
+                    sqlServerOptionsAction: sqlOptions =>
+                    {
+                        sqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 3,
+                            maxRetryDelay: TimeSpan.FromSeconds(30),
+                            errorNumbersToAdd: null);
+                    }
+                );
+            });
 
             // Repositories
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -33,30 +41,62 @@ namespace KAFO.ASPMVC
             builder.Services.AddScoped<InventoryManager>();
             builder.Services.AddScoped<CreditCustomerManager>();
 
-            // Identity
+            // Identity Configuration
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = "CustomIdentity";
-
-			})
-			.AddCookie("CustomIdentity", options =>
-			{
-				options.ExpireTimeSpan = TimeSpan.FromDays(30);
-				options.SlidingExpiration = true;
-				options.LoginPath = "/Identity/Identity/Login";
-				options.LogoutPath = "/Identity/Identity/Logout";
-				options.AccessDeniedPath = "/Identity/Identity/AccessDenied";
-
+            })
+            .AddCookie("CustomIdentity", options =>
+            {
+                options.ExpireTimeSpan = TimeSpan.FromDays(30);
+                options.SlidingExpiration = true;
+                options.LoginPath = "/Identity/Identity/Login";
+                options.LogoutPath = "/Identity/Identity/Logout";
+                options.AccessDeniedPath = "/Identity/Identity/AccessDenied";
+                
+                // Production security settings
+                if (!builder.Environment.IsDevelopment())
+                {
+                    options.Cookie.HttpOnly = true;
+                    options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
+                    options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
+                }
             });
+
+            // Configure HTTPS and security for production
+            if (!builder.Environment.IsDevelopment())
+            {
+                builder.Services.AddHttpsRedirection(options =>
+                {
+                    options.RedirectStatusCode = Microsoft.AspNetCore.Http.StatusCodes.Status301MovedPermanently;
+                    options.HttpsPort = 443;
+                });
+
+                builder.Services.AddHsts(options =>
+                {
+                    options.MaxAge = TimeSpan.FromDays(365);
+                    options.IncludeSubDomains = true;
+                    options.Preload = true;
+                });
+            }
 
             var app = builder.Build();
 
+            // Configure the HTTP request pipeline
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
+                app.UseHttpsRedirection();
             }
+
             app.UseStaticFiles();
+            app.UseRouting();
+
             app.UseAuthentication();
+            app.UseAuthorization();
+
+            // Custom middleware for role-based routing
             app.Use(async (context, next) =>
             {
                 if (context.Request.Path == "/" && context.User.Identity.IsAuthenticated)
@@ -75,17 +115,11 @@ namespace KAFO.ASPMVC
                 }
                 await next();
             });
-            app.UseRouting();
-
-            app.UseAuthorization();
-
-
 
             app.MapControllerRoute(
                 name: "default",
-        //pattern: "{Area=admin}/{controller=admin}/{action=Index}/{id?}");
+                pattern: "{Area=Identity}/{controller=Identity}/{action=Login}/{id?}");
 
-        pattern: "{Area=Identity}/{controller=Identity}/{action=Login}/{id?}");
             app.Run();
         }
     }

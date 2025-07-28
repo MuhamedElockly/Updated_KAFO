@@ -43,6 +43,10 @@ function loadAdminContent(action, pageNumber) {
 
 // Handle sidebar navigation
 $(document).ready(function () {
+    // Check if we're on a mobile device and if the sidebar exists
+    const isMobile = $(window).width() <= 768;
+    const sidebarExists = $('#sidebar').length > 0;
+    
     $('.sidebar-link').on('click', function (e) {
         e.preventDefault();
 
@@ -53,7 +57,370 @@ $(document).ready(function () {
 
         const action = $(this).data('action');
         loadAdminContent(action, 1);
+
+        // Close mobile sidebar after navigation
+        if (isMobile && sidebarExists) {
+            closeMobileSidebar();
+        }
     });
+
+    // Mobile sidebar functionality - only initialize if sidebar exists
+    function initMobileSidebar() {
+        const sidebar = $('#sidebar');
+        const overlay = $('#sidebarOverlay');
+        const toggleBtn = $('#mobileSidebarToggle');
+
+        // Only initialize if elements exist
+        if (!sidebar.length || !overlay.length || !toggleBtn.length) {
+            return;
+        }
+
+        // Toggle sidebar with enhanced animations
+        toggleBtn.on('click', function() {
+            try {
+                const isOpen = sidebar.hasClass('sidebar-open');
+                
+                if (!isOpen) {
+                    // Opening animation
+                    sidebar.addClass('sidebar-open');
+                    overlay.addClass('active');
+                    
+                    // Animate toggle button
+                    $(this).addClass('rotating');
+                    
+                    // Change icon with smooth transition
+                    const icon = $(this).find('i');
+                    icon.fadeOut(150, function() {
+                        icon.removeClass('fa-bars').addClass('fa-times').fadeIn(150);
+                    });
+                    
+                    // Add entrance animation to sidebar items
+                    setTimeout(() => {
+                        sidebar.find('li').each(function(index) {
+                            $(this).css({
+                                'opacity': '0',
+                                'transform': 'translateX(20px)'
+                            }).delay(index * 50).animate({
+                                'opacity': '1',
+                                'transform': 'translateX(0)'
+                            }, 300);
+                        });
+                    }, 200);
+                    
+                } else {
+                    // Closing animation
+                    sidebar.removeClass('sidebar-open');
+                    overlay.removeClass('active');
+                    
+                    // Animate toggle button
+                    $(this).removeClass('rotating');
+                    
+                    // Change icon with smooth transition
+                    const icon = $(this).find('i');
+                    icon.fadeOut(150, function() {
+                        icon.removeClass('fa-times').addClass('fa-bars').fadeIn(150);
+                    });
+                }
+            } catch (error) {
+                console.warn('Sidebar toggle error:', error);
+            }
+        });
+
+        // Close sidebar when clicking overlay with enhanced feedback
+        overlay.on('click', function() {
+            try {
+                closeMobileSidebar();
+                
+                // Add ripple effect to overlay
+                const ripple = $('<div class="ripple-effect"></div>');
+                $(this).append(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            } catch (error) {
+                console.warn('Overlay click error:', error);
+            }
+        });
+
+        // Enhanced keyboard navigation
+        $(document).on('keydown', function(e) {
+            try {
+                if (e.key === 'Escape' && sidebar.hasClass('sidebar-open')) {
+                    closeMobileSidebar();
+                }
+            } catch (error) {
+                console.warn('Keyboard navigation error:', error);
+            }
+        });
+
+        // Close sidebar when clicking outside with improved detection
+        $(document).on('click', function(e) {
+            try {
+                if ($(window).width() <= 768 && 
+                    !sidebar.is(e.target) && 
+                    sidebar.has(e.target).length === 0 && 
+                    !toggleBtn.is(e.target) && 
+                    toggleBtn.has(e.target).length === 0 &&
+                    !overlay.is(e.target)) {
+                    closeMobileSidebar();
+                }
+            } catch (error) {
+                console.warn('Outside click error:', error);
+            }
+        });
+
+        function closeMobileSidebar() {
+            try {
+                sidebar.removeClass('sidebar-open');
+                overlay.removeClass('active');
+                toggleBtn.removeClass('rotating');
+                toggleBtn.find('i').removeClass('fa-times').addClass('fa-bars');
+                
+                // Reset sidebar items
+                sidebar.find('li').css({
+                    'opacity': '1',
+                    'transform': 'translateX(0)'
+                });
+            } catch (error) {
+                console.warn('Close sidebar error:', error);
+            }
+        }
+
+        // Enhanced window resize handling
+        $(window).on('resize', function() {
+            try {
+                if ($(window).width() > 768) {
+                    closeMobileSidebar();
+                }
+            } catch (error) {
+                console.warn('Resize error:', error);
+            }
+        });
+    }
+
+    // Initialize mobile sidebar only if needed
+    if (isMobile && sidebarExists) {
+        initMobileSidebar();
+    }
+
+    // Add swipe gesture support for mobile with enhanced sensitivity
+    function initSwipeGestures() {
+        // Only initialize on mobile devices and if sidebar exists
+        if ($(window).width() > 768 || !$('#sidebar').length) return;
+        
+        let startX = 0;
+        let startY = 0;
+        let isDragging = false;
+        let touchStartTime = 0;
+
+        // Touch start with enhanced detection
+        document.addEventListener('touchstart', function(e) {
+            try {
+                if (e.touches && e.touches.length > 0) {
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                    isDragging = false;
+                    touchStartTime = Date.now();
+                }
+            } catch (error) {
+                console.warn('Touch start error:', error);
+            }
+        }, { passive: true });
+
+        // Touch move with improved gesture detection
+        document.addEventListener('touchmove', function(e) {
+            try {
+                if (!isDragging && e.touches && e.touches.length > 0) {
+                    const deltaX = Math.abs(e.touches[0].clientX - startX);
+                    const deltaY = Math.abs(e.touches[0].clientY - startY);
+                    
+                    if (deltaX > 8 && deltaX > deltaY * 1.5) {
+                        isDragging = true;
+                    }
+                }
+            } catch (error) {
+                console.warn('Touch move error:', error);
+            }
+        }, { passive: true });
+
+        // Touch end with enhanced gesture recognition
+        document.addEventListener('touchend', function(e) {
+            try {
+                if (isDragging && $(window).width() <= 768 && e.changedTouches && e.changedTouches.length > 0) {
+                    const endX = e.changedTouches[0].clientX;
+                    const deltaX = endX - startX;
+                    const touchDuration = Date.now() - touchStartTime;
+                    
+                    // Swipe right to open sidebar (more sensitive)
+                    if (deltaX > 40 && endX < 120 && touchDuration < 500) {
+                        const sidebar = $('#sidebar');
+                        const overlay = $('#sidebarOverlay');
+                        const toggleBtn = $('#mobileSidebarToggle');
+                        
+                        if (sidebar.length && !sidebar.hasClass('sidebar-open')) {
+                            // Add haptic feedback safely
+                            try {
+                                if ('vibrate' in navigator && navigator.vibrate) {
+                                    navigator.vibrate([50, 25, 50]);
+                                }
+                            } catch (vibrateError) {
+                                console.warn('Vibration not supported:', vibrateError);
+                            }
+                            
+                            sidebar.addClass('sidebar-open');
+                            overlay.addClass('active');
+                            toggleBtn.find('i').removeClass('fa-bars').addClass('fa-times');
+                        }
+                    }
+                    // Swipe left to close sidebar (more sensitive)
+                    else if (deltaX < -40 && touchDuration < 500) {
+                        closeMobileSidebar();
+                        
+                        // Add haptic feedback safely
+                        try {
+                            if ('vibrate' in navigator && navigator.vibrate) {
+                                navigator.vibrate(25);
+                            }
+                        } catch (vibrateError) {
+                            console.warn('Vibration not supported:', vibrateError);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('Touch end error:', error);
+            }
+        }, { passive: true });
+    }
+
+    // Initialize swipe gestures only on mobile
+    if (isMobile && sidebarExists) {
+        initSwipeGestures();
+    }
+
+    // Add haptic feedback for mobile devices with enhanced patterns
+    function addHapticFeedback() {
+        // Only add haptic feedback on mobile devices
+        if ($(window).width() > 768) return;
+        
+        try {
+            if ('vibrate' in navigator && navigator.vibrate) {
+                $('.sidebar-link').on('click', function() {
+                    try {
+                        navigator.vibrate([30, 20, 30]);
+                    } catch (error) {
+                        console.warn('Vibration error on sidebar link:', error);
+                    }
+                });
+                
+                $('.mobile-sidebar-toggle').on('click', function() {
+                    try {
+                        const isOpen = $('#sidebar').hasClass('sidebar-open');
+                        navigator.vibrate(isOpen ? [50, 25] : [25, 50]);
+                    } catch (error) {
+                        console.warn('Vibration error on toggle button:', error);
+                    }
+                });
+            }
+        } catch (error) {
+            console.warn('Haptic feedback initialization error:', error);
+        }
+    }
+
+    // Initialize haptic feedback only on mobile
+    if (isMobile && sidebarExists) {
+        addHapticFeedback();
+    }
+
+    // Performance optimization: Debounce resize events with enhanced timing
+    let resizeTimeout;
+    $(window).on('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(function() {
+            if ($(window).width() > 768) {
+                closeMobileSidebar();
+            }
+        }, 300);
+    });
+
+    // Enhanced keyboard navigation with focus management
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Tab' && $('#sidebar').hasClass('sidebar-open')) {
+            // Keep focus within sidebar when open
+            const sidebarLinks = $('#sidebar .sidebar-link');
+            const firstLink = sidebarLinks.first();
+            const lastLink = sidebarLinks.last();
+            
+            if (e.shiftKey && document.activeElement === firstLink[0]) {
+                e.preventDefault();
+                lastLink.focus();
+            } else if (!e.shiftKey && document.activeElement === lastLink[0]) {
+                e.preventDefault();
+                firstLink.focus();
+            }
+        }
+    });
+
+    // Add loading states and visual feedback
+    $('.sidebar-link').on('click', function() {
+        const $this = $(this);
+        const originalText = $this.text();
+        
+        // Add loading state
+        $this.addClass('loading');
+        $this.find('i').addClass('fa-spin');
+        
+        // Remove loading state after content loads
+        setTimeout(() => {
+            $this.removeClass('loading');
+            $this.find('i').removeClass('fa-spin');
+        }, 1000);
+    });
+
+    // Add CSS for new animations
+    $('<style>')
+        .prop('type', 'text/css')
+        .html(`
+            .mobile-sidebar-toggle.rotating {
+                animation: rotate 0.3s ease-in-out;
+            }
+            
+            @keyframes rotate {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(180deg); }
+            }
+            
+            .ripple-effect {
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.3);
+                transform: scale(0);
+                animation: ripple 0.6s linear;
+                pointer-events: none;
+            }
+            
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+            
+            .sidebar-link.loading {
+                opacity: 0.7;
+                pointer-events: none;
+            }
+            
+            .fa-spin {
+                animation: fa-spin 1s infinite linear;
+            }
+            
+            @keyframes fa-spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `)
+        .appendTo('head');
 });
 
 function toggleSpinner(show, message = '', options = {}) {
