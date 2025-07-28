@@ -107,12 +107,12 @@ function generateReport() {
     if (
         currentReportType !== 'stock_money' &&
         currentReportType !== 'expected_profits' &&
-        new Date(endDate) <= new Date(startDate)
+        new Date(endDate) < new Date(startDate)
     ) {
         Swal.fire({
             icon: 'error',
             title: 'خطأ في التواريخ',
-            text: 'تاريخ الانتهاء يجب أن يكون أكبر من تاريخ البدء',
+            text: 'تاريخ الانتهاء يجب أن يكون أكبر من أو يساوي تاريخ البدء',
             confirmButtonText: 'حسناً'
         });
         return;

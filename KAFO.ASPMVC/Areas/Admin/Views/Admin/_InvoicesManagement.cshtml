@@ -477,6 +477,13 @@
         color: white;
     }
 
+    .invoice-type-btn[data-invoice-type="return"] {
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    }
+    .invoice-type-btn[data-invoice-type="return"]:hover {
+        background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
+    }
+
     /* Print styles */
     @@media print {
         .invoice-modal {
@@ -518,6 +525,7 @@
             <div class="d-flex flex-wrap gap-2">
                 <button class="btn invoice-type-btn" data-invoice-type="sell" onclick="setInvoiceType('sell');">فواتير البيع</button>
                 <button class="btn invoice-type-btn" data-invoice-type="purchase" onclick="setInvoiceType('purchase');">فواتير الشراء</button>
+                <button class="btn invoice-type-btn" data-invoice-type="return" onclick="setInvoiceType('return');">مرتجعات</button>
             </div>
         </div>
         <div id="invoice-details-section" class="invoice-details-section" style="background: white; border-radius: 0.5rem; padding: 1.5rem; margin: 1rem; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); border: 1px solid #e9ecef;">
@@ -591,3 +599,4 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script src="/wwwroot/js/admin/invoices.js"></script> 
+<div id="invoicePrintArea" style="display:none"></div> 

@@ -146,6 +146,79 @@ namespace KAFO.BLL.Managers
                         });
                     }
                 }
+                else if (invoiceType == "return")
+                {
+                    var cashReturnInvoices = query.Where(i => i.Type == InvoiceType.CashReturn);
+                    var creditReturnInvoices = query.Where(i => i.Type == InvoiceType.CreditReturn);
+                    var purchasingReturnInvoices = query.Where(i => i.Type == InvoiceType.PurchasingReturn);
+
+                    cashReturnInvoices = cashReturnInvoices.Where(i => i.CreatedAt >= startDate.Value.Date && i.CreatedAt <= inclusiveEndDate);
+                    creditReturnInvoices = creditReturnInvoices.Where(i => i.CreatedAt >= startDate.Value.Date && i.CreatedAt <= inclusiveEndDate);
+                    purchasingReturnInvoices = purchasingReturnInvoices.Where(i => i.CreatedAt >= startDate.Value.Date && i.CreatedAt <= inclusiveEndDate);
+
+                    foreach (var invoice in cashReturnInvoices)
+                    {
+                        invoices.Add(new
+                        {
+                            id = invoice.Id,
+                            createdAt = invoice.CreatedAt,
+                            userName = invoice.User?.Name ?? "غير محدد",
+                            total = invoice.TotalInvoice,
+                            type = "CashReturn",
+                            customerName = "-",
+                            itemsCount = invoice.Items?.Count ?? 0,
+                            items = invoice.Items?.Select(item => new
+                            {
+                                productName = item.Product?.Name ?? "غير محدد",
+                                quantity = item.Quantity,
+                                unitPrice = item.UnitSellingPrice,
+                                totalPrice = item.UnitSellingPrice * item.Quantity
+                            }).Cast<object>().ToList() ?? new List<object>()
+                        });
+                    }
+
+                    foreach (var invoice in creditReturnInvoices)
+                    {
+                        invoices.Add(new
+                        {
+                            id = invoice.Id,
+                            createdAt = invoice.CreatedAt,
+                            userName = invoice.User?.Name ?? "غير محدد",
+                            total = invoice.TotalInvoice,
+                            type = "CreditReturn",
+                            customerName = invoice.CustomerAccount?.CustomerName ?? "غير محدد",
+                            itemsCount = invoice.Items?.Count ?? 0,
+                            items = invoice.Items?.Select(item => new
+                            {
+                                productName = item.Product?.Name ?? "غير محدد",
+                                quantity = item.Quantity,
+                                unitPrice = item.UnitSellingPrice,
+                                totalPrice = item.UnitSellingPrice * item.Quantity
+                            }).Cast<object>().ToList() ?? new List<object>()
+                        });
+                    }
+
+                    foreach (var invoice in purchasingReturnInvoices)
+                    {
+                        invoices.Add(new
+                        {
+                            id = invoice.Id,
+                            createdAt = invoice.CreatedAt,
+                            userName = invoice.User?.Name ?? "غير محدد",
+                            total = invoice.TotalInvoice,
+                            type = "PurchasingReturn",
+                            customerName = "-",
+                            itemsCount = invoice.Items?.Count ?? 0,
+                            items = invoice.Items?.Select(item => new
+                            {
+                                productName = item.Product?.Name ?? "غير محدد",
+                                quantity = item.Quantity,
+                                unitPrice = item.UnitSellingPrice,
+                                totalPrice = item.UnitSellingPrice * item.Quantity
+                            }).Cast<object>().ToList() ?? new List<object>()
+                        });
+                    }
+                }
 
 
             }

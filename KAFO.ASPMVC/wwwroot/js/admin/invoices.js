@@ -46,7 +46,11 @@ window.setInvoiceType = function(type) {
     document.querySelector(`[data-invoice-type="${type}"]`).classList.add('active');
     
     // Update title
-    const title = type === 'sell' ? 'فواتير البيع' : 'فواتير الشراء';
+    let title = '';
+    if (type === 'sell') title = 'فواتير البيع';
+    else if (type === 'purchase') title = 'فواتير الشراء';
+    else if (type === 'return') title = 'مرتجعات';
+    else title = 'الفواتير';
     document.getElementById('invoice-title').textContent = title;
     
     // Clear table
@@ -181,30 +185,120 @@ window.downloadInvoicePDF = function(invoiceId) {
         showConfirmButton: false
     });
 
-    // Create PDF content
-    const pdfContent = createInvoicePDFContent(invoice);
+    // Create a temporary container for PDF generation
+    const pdfContainer = document.createElement('div');
+    pdfContainer.style.cssText = `
+        direction: rtl;
+        text-align: right;
+        font-family: 'Arial', sans-serif;
+        padding: 20px;
+        background: white;
+        color: black;
+        max-width: 100%;
+    `;
 
-        const opt = {
-            margin: 1,
+    // Add invoice header
+    let pdfContent = `
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px;">
+            <h1 style="color: #17a2b8; margin-bottom: 10px;">كافو</h1>
+            <h2 style="color: #333; margin-bottom: 10px;">فاتورة ${getInvoiceTypeText(invoice.type)} رقم #${invoice.id}</h2>
+            <p style="color: #666; margin: 0;">التاريخ: <strong>${formatDate(invoice.createdAt)}</strong></p>
+        </div>
+    `;
+
+    // Invoice and customer info
+    pdfContent += `
+        <div style="margin-bottom: 24px; display: flex; gap: 32px;">
+            <div style="flex:1; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                <h4 style="margin: 0 0 10px 0; color: #6f42c1;">معلومات الفاتورة</h4>
+                <p><strong>رقم الفاتورة:</strong> #${invoice.id}</p>
+                <p><strong>التاريخ:</strong> ${formatDate(invoice.createdAt)}</p>
+                <p><strong>نوع الفاتورة:</strong> ${getInvoiceTypeText(invoice.type)}</p>
+            </div>
+            <div style="flex:1; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                <h4 style="margin: 0 0 10px 0; color: #6f42c1;">معلومات العميل</h4>
+                <p><strong>المستخدم:</strong> ${invoice.userName || 'غير محدد'}</p>
+                <p><strong>العميل:</strong> ${invoice.customerName || 'غير محدد'}</p>
+                <p><strong>عدد العناصر:</strong> ${invoice.itemsCount || 0}</p>
+            </div>
+        </div>
+    `;
+
+    // Table
+    pdfContent += `
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px;">
+            <thead>
+                <tr>
+                    <th style="background: #343a40; color: white; padding: 12px; text-align: center; border: 1px solid #ddd; font-weight: bold;">المنتج</th>
+                    <th style="background: #343a40; color: white; padding: 12px; text-align: center; border: 1px solid #ddd; font-weight: bold;">الكمية</th>
+                    <th style="background: #343a40; color: white; padding: 12px; text-align: center; border: 1px solid #ddd; font-weight: bold;">السعر</th>
+                    <th style="background: #343a40; color: white; padding: 12px; text-align: center; border: 1px solid #ddd; font-weight: bold;">الإجمالي</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${(invoice.items || []).map((item, idx) => `
+                    <tr style="${idx % 2 === 1 ? 'background-color: #f8f9fa;' : ''}">
+                        <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">${item.productName || 'غير محدد'}</td>
+                        <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">${item.quantity}</td>
+                        <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">${formatCurrency(item.unitPrice)}</td>
+                        <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">${formatCurrency(item.totalPrice)}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+
+    // Total
+    pdfContent += `
+        <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 20px; font-weight: bold; color: #6f42c1; text-align: left;">
+            المجموع الكلي للفاتورة: ${formatCurrency(invoice.total)}
+        </div>
+    `;
+
+    // Footer
+    pdfContent += `
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666; font-size: 12px;">
+            <p>تم إنشاء هذه الفاتورة في: ${new Date().toLocaleDateString('ar-EG')}</p>
+        </div>
+    `;
+
+    pdfContainer.innerHTML = pdfContent;
+
+    const opt = {
+        margin: [0.5, 0.5, 0.5, 0.5],
         filename: `invoice_${invoice.id}_${invoice.type}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-        };
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            scrollY: 0,
+            scrollX: 0
+        },
+        jsPDF: { 
+            unit: 'in', 
+            format: 'a4', 
+            orientation: 'portrait',
+            compress: true
+        }
+    };
 
-    html2pdf().set(opt).from(pdfContent).save().then(() => {
-            Swal.fire({
-                icon: 'success',
-                title: 'تم التحميل بنجاح!',
+    document.body.appendChild(pdfContainer);
+    html2pdf().set(opt).from(pdfContainer).save().then(() => {
+        document.body.removeChild(pdfContainer);
+        Swal.fire({
+            icon: 'success',
+            title: 'تم التحميل بنجاح!',
             text: `تم تحميل فاتورة رقم #${invoice.id} كملف PDF`,
-                timer: 2000,
-                showConfirmButton: false
-            });
-        }).catch(error => {
-            Swal.fire({
-                icon: 'error',
-                title: 'خطأ في التحميل',
-                text: 'حدث خطأ أثناء تحميل ملف PDF',
+            timer: 2000,
+            showConfirmButton: false
+        });
+    }).catch(error => {
+        document.body.removeChild(pdfContainer);
+        Swal.fire({
+            icon: 'error',
+            title: 'خطأ في التحميل',
+            text: 'حدث خطأ أثناء تحميل ملف PDF',
             confirmButtonText: 'حسناً',
             confirmButtonColor: '#dc3545'
         });
@@ -610,6 +704,9 @@ function getInvoiceTypeText(type) {
         'Cash': 'نقدي',
         'Credit': 'آجل',
         'Purchase': 'شراء',
+        'CashReturn': 'مرتجع نقدي',
+        'CreditReturn': 'مرتجع آجل',
+        'PurchasingReturn': 'مرتجع شراء',
         'Return': 'مرتجع'
     };
     return typeMap[type] || type;

@@ -97,14 +97,8 @@ namespace KAFO.BLL.Managers
         public Dictionary<string, string> AddCashInvoice(Invoice invoice)
         {
             var dic = new Dictionary<string, string>();
-            //foreach (var item in invoice.Items)
-            //{
-            //    item.UnitPurchasingPrice = item.UnitPurchasingPrice == item.Product.AveragePurchasePrice ? item.Product.AveragePurchasePrice : item.UnitPurchasingPrice;
-            //    item.UnitSellingPrice = item.UnitSellingPrice == item.Product.SellingPrice ? item.Product.SellingPrice : item.UnitSellingPrice;
-            //}
-
+            // No modification to item.UnitSellingPrice; return invoice as is
             return dic;
-
         }
 
         private Dictionary<string, string> AddPurchasingReturnInvoice(Invoice invoice)
@@ -156,6 +150,7 @@ namespace KAFO.BLL.Managers
         private Dictionary<string, string> AddCreditInvoice(Invoice invoice)
         {
             var dic = new Dictionary<string, string>();
+            // No modification to item.UnitSellingPrice; return invoice as is
             return dic;
         }
         #endregion
