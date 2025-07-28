@@ -80,7 +80,7 @@
                                 @foreach (var product in ViewBag.Products)
                                 {
                                     <div class="product-grid-item" data-category="@product.Category.Name">
-                                        <div class="product-card position-relative" onclick="addToCart(@product.Id, '@product.Name', @product.SellingPrice, '@product.ImageUrl')">
+                                        <div class="product-card position-relative" data-product-id="@product.Id" onclick="addToCart(@product.Id, '@product.Name', @product.SellingPrice, '@product.ImageUrl')">
                                             <div class="ImgContainer">
                                                 <img src="@product.ImageUrl" class="product-image" alt="@product.Name">
                                             </div>

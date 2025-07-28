@@ -33,7 +33,7 @@
      * @@param {string} barcode - The scanned barcode
      */
     function handleBarcodeScan(barcode) {
-        debugger;
+        // debugger;
 
         // Initialize products map if not exists
         if (!window.allProductsByBarcode) {
@@ -160,7 +160,7 @@
      * @@param {number} change - Quantity change (+/-)
      */
     function updateQuantity(id, change) {
-        debugger;
+        // debugger;
         const item = cart.find(item => item.id === id);
 
         if (item) {
@@ -185,7 +185,7 @@
      */
     function addToCart(id, name, price, image, quantity = 1) {
         // Get product stock information
-        const productCard = $(`.product-card[onclick*="${id}"]`);
+        const productCard = $(`.product-card[data-product-id="${id}"]`);
         const stockDisplay = productCard.find('.product-price:contains("متبقي")');
         let availableStock = 0;
 
@@ -264,7 +264,7 @@
     function removeFromCart(id) {
         const itemToRemove = cart.find(item => item.id === id);
         if (itemToRemove) {
-            const productCard = $(`.product-card[onclick*="${id}"]`);
+            const productCard = $(`.product-card[data-product-id="${id}"]`);
             const stockDisplay = productCard.find('.product-price:contains("متبقي")');
 
             if (productCard.length && stockDisplay.length) {
@@ -471,7 +471,7 @@
      * @@param {HTMLElement} clickedElement - The clicked category button
      */
     function filterProducts(categoryName, clickedElement) {
-        debugger;
+        // debugger;
         const products = $('.product-grid-item');
         const categoryPills = $('.category-pill');
 
@@ -513,7 +513,7 @@
      */
     function subtractCartFromProductStock() {
         cart.forEach(item => {
-            const productCard = $(`.product-card[onclick*="${item.id}"]`);
+            const productCard = $(`.product-card[data-product-id="${item.id}"]`);
             const stockDisplay = productCard.find('.product-price:contains("متبقي")');
 
             if (productCard.length && stockDisplay.length) {
@@ -633,7 +633,7 @@
 
         // Handle main form submission with validation
         $('form').submit(function(e) {
-            debugger;
+            // debugger;
             if (cart.length === 0) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
@@ -730,7 +730,7 @@
 
         // Handle search functionality
         $('#searchInput').on('input', function() {
-            debugger;
+            // debugger;
             const searchTerm = $(this).val().toLowerCase();
             const products = $('.product-grid-item');
 
@@ -982,7 +982,7 @@
 @*      */ *@
 @*     function addToCart(id, name, price, image, quantity = 1) { *@
 @*         // Get product stock information *@
-@*         const productCard = $(`.product-card[onclick*="${id}"]`); *@
+@*         const productCard = $(`.product-card[data-product-id="${id}"]`); *@
 @*         const stockDisplay = productCard.find('.product-price:contains("متبقي")'); *@
 @*         let availableStock = 0; *@
 
@@ -1062,7 +1062,7 @@
 @*         const itemToRemove = cart.find(item => item.id === id); *@
 @*         if (itemToRemove) { *@
 @*             // Return quantity to product stock display *@
-@*             const productCard = $(`.product-card[onclick*="${id}"]`); *@
+@*             const productCard = $(`.product-card[data-product-id="${id}"]`); *@
 @*             const stockDisplay = productCard.find('.product-price:contains("متبقي")'); *@
 
 @*             if (productCard.length && stockDisplay.length) { *@
@@ -1297,7 +1297,7 @@
 @*      */ *@
 @*     function subtractCartFromProductStock() { *@
 @*         cart.forEach(item => { *@
-@*             const productCard = $(`.product-card[onclick*="${item.id}"]`); *@
+@*             const productCard = $(`.product-card[data-product-id="${item.id}"]`); *@
 @*             const stockDisplay = productCard.find('.product-price:contains("متبقي")'); *@
 
 @*             if (productCard.length && stockDisplay.length) { *@

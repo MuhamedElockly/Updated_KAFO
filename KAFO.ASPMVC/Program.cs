@@ -19,7 +19,7 @@ namespace KAFO.ASPMVC
             builder.Services.AddDbContext<AppDBContext>(
                             options => options.UseSqlServer(
                                 builder.Configuration
-                                .GetConnectionString("DefaultConnection"))
+                                .GetConnectionString("RemoteConnection"))
                             );
 
             // Repositories
