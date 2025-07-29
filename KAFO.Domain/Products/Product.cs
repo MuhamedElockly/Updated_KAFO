@@ -66,6 +66,7 @@ namespace KAFO.Domain.Products
             else DecreaseStockQuantity(newQuantity * -1);
             SellingPrice = newSellingPrice;
             LastPurchasingPrice = newPurchasingPrice;
+            BoxPurchasePrice = Math.Round(BoxQuantity * newPurchasingPrice);
             // return the total Revenue if we sell the current stock
             return ( SellingPrice - AveragePurchasePrice ) * totalQuantity;
         }

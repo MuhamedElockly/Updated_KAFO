@@ -68,6 +68,8 @@ namespace KAFO.BLL.Managers
 
             // Filter out invalid items (no product selected or invalid product)
             var validItems = new List<InvoiceItem>();
+            //debug if purchasing
+            invoice.TotalInvoice = 0;
             foreach (var item in invoice.Items)
             {
                 if (item == null || item.ProductId == 0)
@@ -86,8 +88,13 @@ namespace KAFO.BLL.Managers
                 if (item.UnitSellingPrice == 0)
                     item.UnitSellingPrice = item.Product.SellingPrice;
                 validItems.Add(item);
-                invoice.TotalInvoice += item.UnitSellingPrice * item.Quantity;
+                if (invoice.Type == InvoiceType.Purchasing || invoice.Type == InvoiceType.PurchasingReturn)
+                    invoice.TotalInvoice += item.UnitPurchasingPrice * item.Quantity;
+                else
+                    invoice.TotalInvoice += item.UnitSellingPrice * item.Quantity;
             }
+            if (invoice.Type == InvoiceType.Purchasing || invoice.Type == InvoiceType.PurchasingReturn)
+                invoice.TotalInvoice = Math.Round(invoice.TotalInvoice);
             invoice.Items = validItems;
 
             if (invoice.Items == null || invoice.Items.Count == 0)

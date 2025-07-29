@@ -1,4 +1,4 @@
-using Kafo.DAL.Repository;
+﻿using Kafo.DAL.Repository;
 using KAFO.ASPMVC.Models;
 using KAFO.BLL.Managers;
 using KAFO.Domain.Invoices;
@@ -21,8 +21,12 @@ namespace KAFO.ASPMVC.Controllers
             _unitOfWork = unitOfWork;
             _invoiceManager = invoiceManager;
         }
+
         public IActionResult Index()
         {
+            // Fix: HttpResponse does not have ContentEncoding property. Use ContentType instead.
+            Response.ContentType = "text/html; charset=utf-8";
+
             // Get current user ID from claims
             var userIdClaim = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
@@ -31,38 +35,31 @@ namespace KAFO.ASPMVC.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            // Get today's date
+            // Rest of the code remains unchanged
             var today = DateTime.Today;
             var tomorrow = today.AddDays(1);
 
-            // get terminations for today
             var Terminations = _unitOfWork.CreditTerminateInvoice.GetAll()
                 .Where(t => t.CreatedAt >= today && t.CreatedAt < tomorrow);
 
-            // get withdrawals for today
             var Withdrawals = _unitOfWork.CreditWithdrawInvoices.GetAll()
                 .Where(w => w.CreatedAt >= today && w.CreatedAt < tomorrow);
 
-            //get all invoices for charts (not filtered by today)
             var allInvoices = _invoiceManager.GetInvoicesByUser(userId);
-
-            //get invoices for today only (for statistics cards)
             var todayInvoices = allInvoices.Where(i => i.CreatedAt >= today && i.CreatedAt < tomorrow).ToList();
 
-            ViewBag.Invoices = allInvoices; // For charts
-            ViewBag.TodayInvoices = todayInvoices; // For statistics cards
+            ViewBag.Invoices = allInvoices;
+            ViewBag.TodayInvoices = todayInvoices;
 
-            // get products
             ViewBag.Products = _unitOfWork.Products.GetAll(filter: p => p.IsActive && p.StockQuantity < 20);
 
-            // Calculate today's money
             var cashMoney = todayInvoices.Where(i => i.Type == InvoiceType.Cash).Where(t => t.CreatedAt >= today && t.CreatedAt < tomorrow).Sum(i => i.TotalInvoice);
             var returnMoney = todayInvoices.Where(i => i.Type == InvoiceType.CashReturn).Where(t => t.CreatedAt >= today && t.CreatedAt < tomorrow).Sum(i => i.TotalInvoice);
             var terminateMoney = Terminations.Sum(i => i.TotalInvoice);
             var withdrawMoney = Withdrawals.Sum(i => i.TotalInvoice);
             ViewBag.Money = cashMoney + terminateMoney - returnMoney - withdrawMoney;
+            ViewBag.MoneyDesc = $"بيع نقدي ({cashMoney}) - مرتجع نقدي ({returnMoney}) + ايداع عملاء اجلين ({terminateMoney}) - سحب عملاء اجلين ({withdrawMoney}) = {ViewBag.Money}";
 
-            // Calculate daily sales for the last 7 days
             var dailySales = new List<object>();
             for (int i = 6 ; i >= 0 ; i--)
             {
