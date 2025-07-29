@@ -19,7 +19,7 @@ namespace KAFO.ASPMVC
             builder.Services.AddDbContext<AppDBContext>(options =>
             {
                 options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("RemoteConnection"),
+                    builder.Configuration.GetConnectionString("DefaultConnection"),
                     sqlServerOptionsAction: sqlOptions =>
                     {
                         sqlOptions.EnableRetryOnFailure(
@@ -53,7 +53,7 @@ namespace KAFO.ASPMVC
                 options.LoginPath = "/Identity/Identity/Login";
                 options.LogoutPath = "/Identity/Identity/Logout";
                 options.AccessDeniedPath = "/Identity/Identity/AccessDenied";
-                
+
                 // Production security settings
                 if (!builder.Environment.IsDevelopment())
                 {
