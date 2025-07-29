@@ -288,8 +288,7 @@ namespace KAFO.BLL.Managers
 
         public List<Invoice> GetInvoicesByUser(int userId, DateTime? startDate = null, DateTime? endDate = null)
         {
-            var query = _unitOfWork.Invoices.GetAll("User,Items.Product")
-                .Where(i => i.UserId == userId);
+            var query = _unitOfWork.Invoices.GetAll("User,CustomerAccount,Items.Product", i => i.UserId == userId);
 
             if (startDate.HasValue && endDate.HasValue)
             {

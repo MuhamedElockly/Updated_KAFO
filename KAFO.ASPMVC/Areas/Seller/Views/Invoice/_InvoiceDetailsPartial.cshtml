@@ -40,14 +40,10 @@
                     <hr class="mt-1">
                     <div class="row">
                         <div class="col-6">
-                            <p class="mb-1"><strong>اسم العميل:</strong></p>
-                            @if (Model.Type == InvoiceType.Credit || Model.Type == InvoiceType.CreditReturn)
-                            {
-                                <p class="mb-1"><strong>رصيد العميل:</strong></p>
-                            }
+                            <p class="mb-1"><strong>اسم العميل الاجل:</strong></p>
                         </div>
                         <div class="col-6">
-                            <p class="mb-1">@(Model.CustomerAccount?.CustomerName ?? "نقدي")</p>
+                            <p class="mb-1">@(Model.CustomerAccount?.CustomerName ?? "-")</p>
                             @if (Model.Type == InvoiceType.Credit || Model.Type == InvoiceType.CreditReturn)
                             {
                                 <p class="mb-1">@(Model.CustomerAccount?.TotalOwed.ToString("N2") ?? "0.00") ج.م</p>

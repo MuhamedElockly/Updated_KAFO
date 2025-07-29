@@ -94,6 +94,10 @@ namespace KAFO.BLL.Managers
                 }
                 item.Invoice = invoice;
                 item.Product = product;
+                if (item.UnitPurchasingPrice == 0)
+                    item.UnitPurchasingPrice = item.Product.AveragePurchasePrice;
+                if (item.UnitSellingPrice == 0)
+                    item.UnitSellingPrice = item.Product.SellingPrice;
                 validItems.Add(item);
                 invoice.TotalInvoice += item.UnitPurchasingPrice * item.Quantity;
             }
