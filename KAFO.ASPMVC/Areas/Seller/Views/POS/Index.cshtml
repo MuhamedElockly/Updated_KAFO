@@ -116,8 +116,8 @@
                 <input type="text" id="barcodeScanInput" class="form-control barcode-scan-input" placeholder="امسح الباركود هنا..." autocomplete="off" autofocus onkeydown="if(event.key==='Enter'){ event.preventDefault(); if(this.value.trim()){ handleBarcodeScan(this.value); this.value=''; } this.focus(); }">
             </div>
             <!-- Barcode Scan Input (Mobile Only) -->
-            <div class="barcode-scan-container d-block d-lg-none mb-3">
-                <input type="text" id="barcodeScanInputMobile" class="form-control barcode-scan-input" placeholder="امسح الباركود هنا..." autocomplete="off" onkeydown="if(event.key==='Enter'){ event.preventDefault(); if(this.value.trim()){ handleBarcodeScan(this.value); this.value=''; } this.focus(); }">
+            <div class="barcode-scan-container d-block d-lg-none mb-3 mt-5">
+                <input type="text" id="barcodeScanInputMobile" class="form-control barcode-scan-input " placeholder="امسح الباركود هنا..." autocomplete="off" onkeydown="if(event.key==='Enter'){ event.preventDefault(); if(this.value.trim()){ handleBarcodeScan(this.value); this.value=''; } this.focus(); }">
             </div>
             <div class="cart-container flex-grow-1 d-flex flex-column">
                 <div class="cart-header">

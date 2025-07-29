@@ -22,6 +22,11 @@
 
     .products-grid-container {
         grid-auto-flow: column;
+        justify-content:start!important;
+    }
+
+    .cart-item-price {
+        font-size:unset!important;
     }
 
 }
