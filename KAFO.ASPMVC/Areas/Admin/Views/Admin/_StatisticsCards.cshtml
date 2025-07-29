@@ -1,43 +1,581 @@
 @using KAFO.ASPMVC.Areas.Admin.ViewModels
 @model AdminHomeVM
-<!DOCTYPE html>
 
-<html lang="en" dir="rtl">
-<body>
+<style>
+    .statistics-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        position: relative;
+        background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
+    }
+
+    .statistics-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .statistics-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+    }
+
+    .statistics-card:hover::before {
+        transform: translateX(100%);
+    }
+
+    .statistics-card .card-body {
+        padding: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .statistics-card .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        opacity: 0.9;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .statistics-card .card-text {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .statistics-card .card-icon {
+        font-size: 3.5rem;
+        opacity: 0.8;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .statistics-card:hover .card-icon {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+
+    /* Real-time indicator for icons */
+    .card-icon::after {
+        content: '';
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 12px;
+        height: 12px;
+        background: #4ade80;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        animation: realtimePulse 2s infinite;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .statistics-card:hover .card-icon::after {
+        opacity: 1;
+    }
+
+    /* Icon breathing animation */
+    .card-icon {
+        animation: iconBreathing 3s ease-in-out infinite;
+    }
+
+    /* Different breathing patterns for each card */
+    .profit-card .card-icon {
+        animation-delay: 0s;
+    }
+
+    .sales-card .card-icon {
+        animation-delay: 1s;
+    }
+
+    .products-card .card-icon {
+        animation-delay: 2s;
+    }
+
+    /* Icon floating animation */
+    .card-icon {
+        animation: iconBreathing 3s ease-in-out infinite, iconFloat 4s ease-in-out infinite;
+    }
+
+    /* Icon glow effect */
+    .card-icon {
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+        transition: all 0.3s ease;
+    }
+
+    .statistics-card:hover .card-icon {
+        filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.6));
+    }
+
+    /* Data update animation for icons */
+    .card-icon.updating {
+        animation: iconUpdate 0.8s ease-out;
+    }
+
+    .statistics-card.profit-card {
+        --card-gradient-start: #667eea;
+        --card-gradient-end: #764ba2;
+    }
+
+    .statistics-card.sales-card {
+        --card-gradient-start: #f093fb;
+        --card-gradient-end: #f5576c;
+    }
+
+    .statistics-card.products-card {
+        --card-gradient-start: #4facfe;
+        --card-gradient-end: #00f2fe;
+    }
+
+    .counter-animation {
+        animation: counterPulse 0.6s ease-out;
+    }
+
+    @@keyframes counterPulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.1);
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .update-indicator {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 8px;
+        height: 8px;
+        background: #fff;
+        border-radius: 50%;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .update-indicator.active {
+        opacity: 1;
+        animation: pulse 1s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+        }
+    }
+
+    .statistics-card .trend-indicator {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        font-size: 0.8rem;
+        opacity: 0.7;
+        animation: fadeInUp 0.5s ease;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 0.7;
+            transform: translateY(0);
+        }
+    }
+
+    /* Real-time pulse animation */
+    @@keyframes realtimePulse {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.2);
+            opacity: 0.7;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* Icon breathing animation */
+    @@keyframes iconBreathing {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    /* Icon floating animation */
+    @@keyframes iconFloat {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-3px);
+        }
+    }
+
+    /* Icon update animation */
+    @@keyframes iconUpdate {
+        0% {
+            transform: scale(1) rotate(0deg);
+        }
+        25% {
+            transform: scale(1.2) rotate(-5deg);
+        }
+        50% {
+            transform: scale(1.1) rotate(5deg);
+        }
+        75% {
+            transform: scale(1.15) rotate(-3deg);
+        }
+        100% {
+            transform: scale(1) rotate(0deg);
+        }
+    }
+
+    /* Data flow animation */
+    @@keyframes dataFlow {
+        0% {
+            transform: translateX(-20px) scale(0.8);
+            opacity: 0;
+        }
+        50% {
+            opacity: 1;
+        }
+        100% {
+            transform: translateX(20px) scale(1.2);
+            opacity: 0;
+        }
+    }
+
+    /* Live indicator dots */
+    .live-indicator {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        display: flex;
+        gap: 3px;
+    }
+
+    .live-dot {
+        width: 6px;
+        height: 6px;
+        background: #4ade80;
+        border-radius: 50%;
+        animation: liveDotPulse 1.5s infinite;
+    }
+
+    .live-dot:nth-child(1) { animation-delay: 0s; }
+    .live-dot:nth-child(2) { animation-delay: 0.3s; }
+    .live-dot:nth-child(3) { animation-delay: 0.6s; }
+
+    @@keyframes liveDotPulse {
+        0%, 100% {
+            opacity: 0.3;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+    }
+</style>
+
 	<div class="row mb-4">
 		<div class="col-md-4">
-			<div class="card bg-primary text-white">
+        <div class="card statistics-card profit-card text-white">
+            <div class="update-indicator"></div>
+            <div class="live-indicator">
+                <div class="live-dot"></div>
+                <div class="live-dot"></div>
+                <div class="live-dot"></div>
+            </div>
 				<div class="card-body d-flex justify-content-between align-items-center">
 					<div>
-						<h5 class="card-title">إجمالي الأرباح اليوم</h5>
-						<h2 class="card-text">@Model.TotalProfitToday جنيه</h2>
+                    <h5 class="card-title">💰 إجمالي الأرباح اليوم</h5>
+                    <h2 class="card-text" id="totalProfitToday">@Model.TotalProfitToday جنيه</h2>
+                    <div class="trend-indicator" id="profitTrend">📈</div>
 					</div>
-					<i class="fas fa-chart-line fa-3x"></i>
+                <i class="fas fa-chart-line card-icon" id="profitIcon"></i>
 				</div>
 			</div>
 		</div>
 		<div class="col-md-4">
-			<div class="card bg-success text-white">
+        <div class="card statistics-card sales-card text-white">
+            <div class="update-indicator"></div>
+            <div class="live-indicator">
+                <div class="live-dot"></div>
+                <div class="live-dot"></div>
+                <div class="live-dot"></div>
+            </div>
 				<div class="card-body d-flex justify-content-between align-items-center">
 					<div>
-						<h5 class="card-title">إجمالي المبيعات اليوم</h5>
-						<h2 class="card-text">@Model.TotalSellsToday جنيه</h2>
+                    <h5 class="card-title">🛒 إجمالي المبيعات اليوم</h5>
+                    <h2 class="card-text" id="totalSellsToday">@Model.TotalSellsToday جنيه</h2>
+                    <div class="trend-indicator" id="salesTrend">📊</div>
 					</div>
-					<i class="fas fa-shopping-cart fa-3x"></i>
+                <i class="fas fa-shopping-cart card-icon" id="salesIcon"></i>
 				</div>
 			</div>
 		</div>
 		<div class="col-md-4">
-			<div class="card bg-info text-white">
+        <div class="card statistics-card products-card text-white">
+            <div class="update-indicator"></div>
+            <div class="live-indicator">
+                <div class="live-dot"></div>
+                <div class="live-dot"></div>
+                <div class="live-dot"></div>
+            </div>
 				<div class="card-body d-flex justify-content-between align-items-center">
 					<div>
-						<h5 class="card-title">المنتجات المباعة اليوم</h5>
-						<h2 class="card-text">@Model.TotalProductSoldToday منتج</h2>
+                    <h5 class="card-title">📦 المنتجات المباعة اليوم</h5>
+                    <h2 class="card-text" id="totalProductSoldToday">@Model.TotalProductSoldToday منتج</h2>
+                    <div class="trend-indicator" id="productsTrend">📈</div>
 					</div>
-					<i class="fas fa-box fa-3x"></i>
+                <i class="fas fa-box card-icon" id="productsIcon"></i>
 				</div>
 			</div>
 		</div>
 	</div>
-</body>
-</html>
+
+<!-- SignalR Script for Statistics Cards -->
+<script>
+	$(document).ready(function() {
+		// Check if SignalR is available
+		if (typeof signalR === 'undefined') {
+			// Load SignalR dynamically if not available
+			var script = document.createElement('script');
+			script.src = '/lib/signalr.min.js';
+			script.onload = function() {
+				initializeSignalR();
+			};
+			script.onerror = function() {
+				console.error("Failed to load SignalR library!");
+			};
+			document.head.appendChild(script);
+		} else {
+			initializeSignalR();
+		}
+	});
+	
+	function initializeSignalR() {
+		var conn = new signalR.HubConnectionBuilder()
+					.withUrl("/statisticsHub")
+			.withAutomaticReconnect()
+				.build();
+		
+		// Connection event handlers
+		conn.onreconnecting((error) => {
+			// Silent reconnection
+		});
+		
+		conn.onreconnected((connectionId) => {
+			// Silent reconnection
+		});
+		
+		conn.onclose((error) => {
+			// Silent connection close
+		});
+		
+		conn.start().catch(function(err) {
+			console.error("SignalR Connection Error:", err);
+		});
+		
+				conn.on("ReceiveStatisticsUpdate", function (data) {
+			// Handle both uppercase and lowercase property names
+			var profitToday = data.TotalProfitToday || data.totalProfitToday;
+			var sellsToday = data.TotalSellsToday || data.totalSellsToday;
+			var productSoldToday = data.TotalProductSoldToday || data.totalProductSoldToday;
+			
+			// Update statistics with enhanced animations
+			updateStatisticWithCounter("#totalProfitToday", profitToday, " جنيه", ".profit-card");
+			updateStatisticWithCounter("#totalSellsToday", sellsToday, " جنيه", ".sales-card");
+			updateStatisticWithCounter("#totalProductSoldToday", productSoldToday, " منتج", ".products-card");
+		});
+	}
+	
+	function updateStatisticWithCounter(elementId, newValue, suffix, cardSelector) {
+		if (!newValue) return;
+		
+		var element = $(elementId);
+		var card = $(cardSelector);
+		var updateIndicator = card.find('.update-indicator');
+		var icon = card.find('.card-icon');
+		
+		// Show update indicator
+		updateIndicator.addClass('active');
+		
+		// Get current value (remove suffix and convert to number)
+		var currentText = element.text();
+		var currentValue = parseFloat(currentText.replace(/[^\d.-]/g, '')) || 0;
+		var targetValue = parseFloat(newValue) || 0;
+		
+		// Animate counter if values are different
+		if (currentValue !== targetValue) {
+			// Add counter animation class
+			element.addClass('counter-animation');
+			
+			// Animate the icon
+			animateIcon(icon);
+			
+			// Animate the counter
+			animateCounter(element, currentValue, targetValue, suffix, function() {
+				// Remove animation class after completion
+				setTimeout(function() {
+					element.removeClass('counter-animation');
+				}, 600);
+			});
+			
+			// Show trend indicator
+			showTrendIndicator(card, currentValue, targetValue);
+			
+			// Add data flow effect
+			addDataFlowEffect(card);
+		}
+		
+		// Hide update indicator after animation
+		setTimeout(function() {
+			updateIndicator.removeClass('active');
+		}, 2000);
+	}
+	
+	function animateCounter(element, startValue, endValue, suffix, callback) {
+		var duration = 1000; // 1 second
+		var startTime = null;
+		
+		function animate(currentTime) {
+			if (!startTime) startTime = currentTime;
+			var progress = Math.min((currentTime - startTime) / duration, 1);
+			
+			// Easing function for smooth animation
+			var easeOutQuart = 1 - Math.pow(1 - progress, 4);
+			var currentValue = startValue + (endValue - startValue) * easeOutQuart;
+			
+			// Format number with proper decimal places
+			var formattedValue = formatNumber(currentValue);
+			element.text(formattedValue + suffix);
+			
+			if (progress < 1) {
+				requestAnimationFrame(animate);
+			} else {
+				if (callback) callback();
+			}
+		}
+		
+		requestAnimationFrame(animate);
+	}
+	
+	function formatNumber(num) {
+		// Format number with 2 decimal places for currency, 0 for integers
+		if (num % 1 === 0) {
+			return num.toLocaleString();
+		} else {
+			return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+		}
+	}
+	
+	function showTrendIndicator(card, oldValue, newValue) {
+		var trendIndicator = card.find('.trend-indicator');
+		
+		if (newValue > oldValue) {
+			trendIndicator.text('📈').css('color', '#4ade80'); // Green for increase
+		} else if (newValue < oldValue) {
+			trendIndicator.text('📉').css('color', '#f87171'); // Red for decrease
+		} else {
+			trendIndicator.text('➡️').css('color', '#fbbf24'); // Yellow for no change
+		}
+		
+		// Animate trend indicator
+		trendIndicator.css('animation', 'none');
+		setTimeout(function() {
+			trendIndicator.css('animation', 'fadeInUp 0.5s ease');
+		}, 10);
+	}
+	
+	function animateIcon(icon) {
+		// Add updating class for animation
+		icon.addClass('updating');
+		
+		// Remove class after animation completes
+		setTimeout(function() {
+			icon.removeClass('updating');
+		}, 800);
+	}
+	
+	function addDataFlowEffect(card) {
+		// Create data flow particles
+		for (var i = 0; i < 3; i++) {
+			setTimeout(function() {
+				var particle = $('<div class="data-particle"></div>');
+				particle.css({
+					position: 'absolute',
+					width: '4px',
+					height: '4px',
+					background: 'rgba(255, 255, 255, 0.8)',
+					borderRadius: '50%',
+					top: '50%',
+					left: '20%',
+					zIndex: 10,
+					animation: 'dataFlow 1s ease-out forwards'
+				});
+				
+				card.append(particle);
+				
+				// Remove particle after animation
+				setTimeout(function() {
+					particle.remove();
+				}, 1000);
+			}, i * 200);
+		}
+	}
+	
+	// Add periodic icon breathing effect to show live data
+	function startLiveDataIndication() {
+		setInterval(function() {
+			// Subtle icon glow effect every 5 seconds
+			$('.card-icon').each(function() {
+				var icon = $(this);
+				setTimeout(function() {
+					icon.css('filter', 'drop-shadow(0 0 15px rgba(255, 255, 255, 0.8))');
+					setTimeout(function() {
+						icon.css('filter', 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))');
+					}, 500);
+				}, Math.random() * 2000);
+			});
+		}, 5000);
+	}
+	
+	// Start live data indication when page loads
+	$(document).ready(function() {
+		startLiveDataIndication();
+			});
+	</script>
