@@ -39,6 +39,12 @@ namespace KAFO.BLL.Managers
 			var allWithdrawInvoices = UOW.CreditWithdrawInvoices.GetAll("User")
 				.Where(i => !i.IsDeleted && i.CreatedAt.Date == today && i.User != null)
 				.ToList();
+			var allCashReturnInvoices = UOW.Invoices.GetAll("User")
+				.Where(i => !i.IsDeleted && i.CreatedAt.Date == today && i.Type == InvoiceType.CashReturn && i.User != null)
+				.ToList();
+			var allCreditReturnInvoices = UOW.Invoices.GetAll("User")
+				.Where(i => !i.IsDeleted && i.CreatedAt.Date == today && i.Type == InvoiceType.CreditReturn && i.User != null)
+				.ToList();
 			var sellerGroups = allInvoices.Where(i => i.User != null && i.User.PhoneNumber != null && i.User.Name != null && i.User.Role == "seller")
 				.GroupBy(i => new { i.User.Name, i.User.PhoneNumber });
 
@@ -47,14 +53,19 @@ namespace KAFO.BLL.Managers
 			{
 				var totalCash = group.Where(i => i.Type == InvoiceType.Cash).Sum(i => i.TotalInvoice);
 				var totalCredit = group.Where(i => i.Type == InvoiceType.Credit).Sum(i => i.TotalInvoice);
-
+				var totalCashReturn = allCashReturnInvoices
+					.Where(t => t.User.PhoneNumber == group.Key.PhoneNumber)
+					.Sum(t => t.TotalInvoice);
+				var totalCreditReturn = allCreditReturnInvoices
+				.Where(t => t.User.PhoneNumber == group.Key.PhoneNumber)
+					.Sum(t => t.TotalInvoice);
 				var totalTerminate = allTerminateInvoices
 					.Where(t => t.User.PhoneNumber == group.Key.PhoneNumber)
 					.Sum(t => t.TotalInvoice);
 				var totalWithdraw = allWithdrawInvoices
 					.Where(t => t.User.PhoneNumber == group.Key.PhoneNumber)
 					.Sum(t => t.TotalInvoice);
-				var totalSupply = totalCash + totalTerminate - totalWithdraw;
+				var totalSupply = totalCash + totalTerminate - totalWithdraw - totalCashReturn;
 
 				return new SellerInventoryVM
 				{
@@ -62,6 +73,8 @@ namespace KAFO.BLL.Managers
 					Phone = group.Key.PhoneNumber,
 					TotalCashPayment = totalCash,
 					TotalCreditPayment = totalCredit,
+					TotalCashReturn = totalCashReturn,
+					TotalCreditReturn = totalCreditReturn,
 					TotalRefundCredit = totalTerminate,
 					TotalSupplyMoney = totalSupply,
 					TotalWithdrawCredit = totalWithdraw
