@@ -2,6 +2,7 @@
 using Kafo.DAL.Repository;
 using KAFO.Domain.Invoices;
 using KAFO.Domain.Products;
+using KAFO.Domain.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace KAFO.BLL.Managers
@@ -10,15 +11,17 @@ namespace KAFO.BLL.Managers
     {
         readonly IUnitOfWork _unitOfWork;
         readonly AppDBContext _appDBContext;
+        readonly IStatisticsNotificationService _statisticsNotificationService;
 
-        public InvoicesManager(IUnitOfWork unitOfWork, AppDBContext appDBContext)
+        public InvoicesManager(IUnitOfWork unitOfWork, AppDBContext appDBContext, IStatisticsNotificationService statisticsNotificationService)
         {
             _unitOfWork = unitOfWork;
             _appDBContext = appDBContext;
+            _statisticsNotificationService = statisticsNotificationService;
         }
 
         #region Complete Invoices
-        public Dictionary<string, string> AddInvoice(Invoice invoice)
+        public async Task<Dictionary<string, string>> AddInvoice(Invoice invoice)
         {
             var Products = _unitOfWork.Products.GetAll(filter: p => p.IsActive);
             Dictionary<string, string> errorDic;
@@ -57,6 +60,16 @@ namespace KAFO.BLL.Managers
             invoice.CompleteInvoice();
             _unitOfWork.Invoices.Add(invoice);
             _unitOfWork.Save();
+
+         
+            try
+            {
+                await _statisticsNotificationService.SendStatisticsUpdateAsync();
+            }
+            catch (Exception ex)
+            {
+               
+            }
 
             return errorDic;
         }

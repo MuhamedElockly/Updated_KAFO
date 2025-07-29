@@ -131,7 +131,7 @@ namespace KAFO.ASPMVC.Areas.Seller.Controllers
 
             #region Add Invoice
             Dictionary<string, string> errorDic;
-            errorDic = _invoicesManager.AddInvoice(invoice);
+            errorDic = await _invoicesManager.AddInvoice(invoice);
             #endregion
 
             #region Respoonse
