@@ -61,14 +61,14 @@ namespace KAFO.BLL.Managers
             _unitOfWork.Invoices.Add(invoice);
             _unitOfWork.Save();
 
-         
+
             try
             {
                 await _statisticsNotificationService.SendStatisticsUpdateAsync();
             }
             catch (Exception ex)
             {
-               
+
             }
 
             return errorDic;
@@ -155,8 +155,8 @@ namespace KAFO.BLL.Managers
         {
             var dic = new Dictionary<string, string>();
             invoice.CustomerAccount = _unitOfWork.CustomerAccounts.Get(c => c.Id == invoice.CustomerAccountId);
-            if (invoice.CustomerAccount!.TotalOwed < invoice.TotalInvoice) // && invoice.CustomerAccount.TotalPaid < invoice.TotalInvoice
-                dic.Add("", "قيمة مديونية العميل اقل من قيمة الفاتورة");
+            //if (invoice.CustomerAccount!.TotalOwed < invoice.TotalInvoice) // && invoice.CustomerAccount.TotalPaid < invoice.TotalInvoice
+            //    dic.Add("", "قيمة مديونية العميل اقل من قيمة الفاتورة");
             return dic;
         }
 

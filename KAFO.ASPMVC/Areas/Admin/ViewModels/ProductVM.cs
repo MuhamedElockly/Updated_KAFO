@@ -5,6 +5,7 @@ namespace KAFO.ASPMVC.Areas.Admin.ViewModels
     public class ProductVM
     {
         public int? Id { set; get; }
+        public string? Barcode { set; get; }
         public string Name { set; get; }
         public string? ImageUrl { set; get; }
         public decimal SellingPrice { set; get; }
@@ -32,7 +33,8 @@ namespace KAFO.ASPMVC.Areas.Admin.ViewModels
                 BoxQuantity = productVM.BoxQuantity,
                 IsActive = productVM.IsActive,
                 CategoryId = productVM.CategoryId,
-                Category = productVM.Category
+                Category = productVM.Category,
+                Barcode = productVM.Barcode
             };
         }
         public static Product UpdateProduct(this ProductVM productVM, Product product)
@@ -47,6 +49,7 @@ namespace KAFO.ASPMVC.Areas.Admin.ViewModels
             product.IsActive = productVM.IsActive;
             product.CategoryId = productVM.CategoryId;
             product.Category = productVM.Category;
+            product.Barcode = productVM.Barcode;
             return product;
         }
 
@@ -64,7 +67,8 @@ namespace KAFO.ASPMVC.Areas.Admin.ViewModels
                 BoxQuantity = product.BoxQuantity,
                 IsActive = product.IsActive,
                 CategoryId = product.CategoryId,
-                Category = product.Category
+                Category = product.Category,
+                Barcode = product.Barcode
             };
         }
     }
