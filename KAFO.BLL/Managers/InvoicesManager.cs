@@ -86,7 +86,7 @@ namespace KAFO.BLL.Managers
                 if (item.UnitSellingPrice == 0)
                     item.UnitSellingPrice = item.Product.SellingPrice;
                 validItems.Add(item);
-                invoice.TotalInvoice += item.UnitPurchasingPrice * item.Quantity;
+                invoice.TotalInvoice += item.UnitSellingPrice * item.Quantity;
             }
             invoice.Items = validItems;
 

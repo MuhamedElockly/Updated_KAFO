@@ -39,7 +39,6 @@
     <None Include="Areas\Seller\Views\CustomerAccounts\Edit.cshtml" />
     <None Include="Areas\Seller\Views\CustomerAccounts\Index.cshtml" />
     <None Include="Areas\Seller\Views\Home\Index.cshtml" />
-    <None Include="Areas\Seller\Views\Home\Privacy.cshtml" />
     <None Include="Areas\Seller\Views\POS\Index.cshtml" />
     <None Include="Areas\Seller\Views\Shared\Error.cshtml" />
     <None Include="Areas\Seller\Views\Shared\_Layout.cshtml" />

@@ -1,8 +1,432 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "لوحة التحكم";
+    Layout = "_Layout";
+    var culture = new System.Globalization.CultureInfo("ar-EG");
+    culture.DateTimeFormat.Calendar = new System.Globalization.GregorianCalendar();
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+
+@using KAFO.Domain.Invoices
+@using KAFO.Domain.Products
+@using KAFO.ASPMVC.Models
+
+<!-- Dashboard Header -->
+<div class="container-fluid mb-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-tachometer-alt me-2"></i>
+                    لوحة التحكم
+                </h1>
+                <div class="text-muted">
+                    <i class="fas fa-calendar-alt me-1"></i>
+                    @DateTime.Now.ToString("D", culture)
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Money Summary Card -->
+<div class="container-fluid mb-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-left-primary shadow h-100 py-2 money-summary-card">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-white text-uppercase mb-1">
+                                إجمالي الأموال المجمعة اليوم
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-white">
+                                @ViewBag.Money.ToString("N2") ج.م
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-money-bill-wave fa-2x text-white-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="container-fluid mb-4">
+    <div class="row">
+        @{
+            var todayInvoices = ViewBag.TodayInvoices as List<Invoice> ?? new List<Invoice>();
+            var invoiceStats = todayInvoices.GroupBy(i => i.Type)
+                                        .Select(g => new { Type = g.Key, Count = g.Count(), Total = g.Sum(i => i.TotalInvoice) })
+                                        .ToList();
+        }
+        
+        @foreach (var stat in invoiceStats)
+        {
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-@(stat.Type == InvoiceType.Cash ? "success" : 
+                                               stat.Type == InvoiceType.Credit ? "info" : 
+                                               stat.Type == InvoiceType.Purchasing ? "warning" : 
+                                               stat.Type == InvoiceType.CashReturn ? "danger" : 
+                                               stat.Type == InvoiceType.CreditReturn ? "secondary" : "primary") shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-lg font-weight-bold text-@(stat.Type == InvoiceType.Cash ? "success" : 
+                                                                           stat.Type == InvoiceType.Credit ? "info" : 
+                                                                           stat.Type == InvoiceType.Purchasing ? "warning" : 
+                                                                           stat.Type == InvoiceType.CashReturn ? "danger" : 
+                                                                           stat.Type == InvoiceType.CreditReturn ? "secondary" : "primary") text-uppercase mb-1">
+                                    @stat.Type.GetDisplayName()
+                                </div>
+                                <div class="h4 mb-0 font-weight-bold text-gray-800">
+                                    @stat.Count فاتورة
+                                </div>
+                                <div class="text-lg text-gray-600">
+                                    @stat.Total.ToString("N2") ج.م
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-@(stat.Type == InvoiceType.Cash ? "money-bill" : 
+                                                   stat.Type == InvoiceType.Credit ? "credit-card" : 
+                                                   stat.Type == InvoiceType.Purchasing ? "shopping-cart" : 
+                                                   stat.Type == InvoiceType.CashReturn ? "undo" : 
+                                                   stat.Type == InvoiceType.CreditReturn ? "exchange-alt" : "file-invoice") fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="container-fluid mb-4">
+    <div class="row">
+        <!-- Invoice Types Chart -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold">إحصائيات الفواتير حسب النوع</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="invoiceTypesChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Sales Chart -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold">المبيعات اليومية</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="dailySalesChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Low Stock Products Table -->
+<div class="container-fluid mb-4">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                البضائع التي تحتاج إلى إعادة طلب
+            </h6>
+        </div>
+        <div class="card-body">
+            @{
+                var lowStockProducts = ViewBag.Products as List<Product> ?? new List<Product>();
+            }
+            
+            @if (lowStockProducts.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="lowStockTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>المنتج</th>
+                                <th>الفئة</th>
+                                <th>الكمية المتاحة</th>
+                                <th>سعر البيع</th>
+                                <th>سعر الشراء</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var product in lowStockProducts)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                            {
+                                                <img src="@product.ImageUrl" alt="@product.Name" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                            }
+                                            else
+                                            {
+                                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                                    <i class="fas fa-box text-muted"></i>
+                                                </div>
+                                            }
+                                            <div>
+                                                <div class="font-weight-bold">@product.Name</div>
+                                                @if (!string.IsNullOrEmpty(product.Barcode))
+                                                {
+                                                    <small class="text-muted">@product.Barcode</small>
+                                                }
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@product.Category?.Name</td>
+                                    <td>
+                                        <span class="badge @(product.StockQuantity <= 0 ? "bg-danger" : "bg-warning")">
+                                            @product.StockQuantity.ToString("N0")
+                                        </span>
+                                    </td>
+                                    <td>@product.SellingPrice.ToString("N2") ج.م</td>
+                                    <td>@product.AveragePurchasePrice.ToString("N2") ج.م</td>
+                                    <td>
+                                        @if (product.StockQuantity <= 0)
+                                        {
+                                            <span class="badge bg-danger">نفذت</span>
+                                        }
+                                        else if (product.StockQuantity <= 10)
+                                        {
+                                            <span class="badge bg-warning">منخفضة جداً</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-info">منخفضة</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4">
+                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                    <h5 class="text-success">ممتاز!</h5>
+                    <p class="text-muted">جميع المنتجات متوفرة بكميات كافية</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Recent Invoices -->
+<div class="container-fluid mb-4">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold">
+                <i class="fas fa-receipt me-2"></i>
+                آخر الفواتير
+            </h6>
+        </div>
+        <div class="card-body">
+            @{
+                var allInvoices = ViewBag.Invoices as List<Invoice> ?? new List<Invoice>();
+            }
+            @if (allInvoices.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>رقم الفاتورة</th>
+                                <th>النوع</th>
+                                <th>التاريخ</th>
+                                <th>العميل</th>
+                                <th>المبلغ</th>
+                                <th>المنتجات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var invoice in allInvoices.Take(10))
+                            {
+                                <tr>
+                                    <td>#@invoice.Id</td>
+                                    <td>
+                                        <span class="badge @(invoice.Type == InvoiceType.Cash ? "bg-success" :
+                                                           invoice.Type == InvoiceType.Credit ? "bg-info" :
+                                                           invoice.Type == InvoiceType.Purchasing ? "bg-warning" :
+                                                           invoice.Type == InvoiceType.CashReturn ? "bg-danger" :
+                                                           invoice.Type == InvoiceType.CreditReturn ? "bg-secondary" : "bg-primary")">
+                                            @invoice.Type.GetDisplayName()
+                                        </span>
+                                    </td>
+                                    <td>@invoice.CreatedAt.ToString("dd/MM/yyyy hh:mm tt")</td>
+                                    <td>@(invoice.CustomerAccount?.CustomerName ?? "-")</td>
+                                    <td>@invoice.TotalInvoice.ToString("N2") ج.م</td>
+                                    <td>@invoice.Items.Count منتج</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">لا توجد فواتير</h5>
+                    <p class="text-muted">لم يتم إنشاء أي فواتير بعد</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Invoice Types Chart
+        const invoiceTypesCtx = document.getElementById('invoiceTypesChart').getContext('2d');
+        const invoiceTypesChart = new Chart(invoiceTypesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    @{
+                        var allInvoicesForChart = ViewBag.Invoices as List<Invoice> ?? new List<Invoice>();
+                        var chartStats = allInvoicesForChart.GroupBy(i => i.Type)
+                                            .Select(g => new { Type = g.Key, Total = g.Sum(i => i.TotalInvoice) })
+                                            .ToList();
+                    }
+                    @foreach (var stat in chartStats)
+                    {
+                        <text>'@Html.Raw(stat.Type.GetDisplayName())',</text>
+                    }
+                ],
+                datasets: [{
+                    data: [
+                        @foreach (var stat in chartStats)
+                        {
+                            <text>@stat.Total,</text>
+                        }
+                    ],
+                    backgroundColor: [
+                        '#10B981', // Cash - Emerald Green
+                        '#3B82F6', // Credit - Blue
+                        '#F59E0B', // Purchasing - Amber
+                        '#EF4444', // CashReturn - Red
+                        '#6B7280', // CreditReturn - Gray
+                        '#8B5CF6'  // PurchasingReturn - Purple
+                    ],
+                    borderWidth: 3,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                size: 14,
+                                family: 'Arial, sans-serif'
+                            },
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Daily Sales Chart
+        const dailySalesCtx = document.getElementById('dailySalesChart').getContext('2d');
+        const dailySalesChart = new Chart(dailySalesCtx, {
+            type: 'line',
+            data: {
+                labels: [
+                    @{
+                        var dailySales = ViewBag.DailySales as List<object> ?? new List<object>();
+                    }
+                    @foreach (dynamic day in dailySales)
+                    {
+                        <text>'@day.Date',</text>
+                    }
+                ],
+                datasets: [{
+                    label: 'المبيعات اليومية',
+                    data: [
+                        @foreach (dynamic day in dailySales)
+                        {
+                            <text>@day.Total,</text>
+                        }
+                    ],
+                    borderColor: '#3B82F6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#3B82F6',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString() + ' ج.م';
+                            },
+                            font: {
+                                size: 12
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: {
+                                size: 12
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Initialize DataTable for low stock products
+        $(document).ready(function() {
+            $('#lowStockTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Arabic.json"
+                },
+                "pageLength": 10,
+                "order": [[2, "asc"]]
+            });
+        });
+    </script>
+}
