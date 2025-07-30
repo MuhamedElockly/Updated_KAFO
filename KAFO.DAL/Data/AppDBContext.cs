@@ -1,6 +1,7 @@
 ﻿using KAFO.Domain.Invoices;
 using KAFO.Domain.Products;
 using KAFO.Domain.Users;
+using KAFO.Utility.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kafo.DAL.Data
@@ -30,6 +31,39 @@ namespace Kafo.DAL.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDBContext).Assembly);
+
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = 1,
+                    Name = "Default Admin",
+                    Email = "admin@example.com",
+                    Password = GetPasswordHash("Admin123"),
+                    Role = "admin",
+                    Gender = "Male",
+                    PhoneNumber = "01029092093",
+                    IsDeleted = false
+                }
+            );
+
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = 2,
+                    Name = "Default Seller",
+                    Email = "seller@example.com",
+                    Password = GetPasswordHash("seller123"),
+                    Role = "seller",
+                    Gender = "Male",
+                    PhoneNumber = "01029092092",
+                    IsDeleted = false
+                }
+            );
+        }
+
+        private string GetPasswordHash(string v)
+        {
+            return PasswordHelper.HashPassword(v);
         }
     }
 }

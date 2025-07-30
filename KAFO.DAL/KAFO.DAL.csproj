@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\KAFO.Domain\KAFO.Domain.csproj" />
+    <ProjectReference Include="..\KAFO.Utility\KAFO.Utility.csproj" />
   </ItemGroup>
 
 </Project>

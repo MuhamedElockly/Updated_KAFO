@@ -1,4 +1,6 @@
 ﻿using KAFO.Domain.Products;
+using KAFO.Utility.ErrorMessages;
+using System.ComponentModel.DataAnnotations;
 
 namespace KAFO.ASPMVC.Areas.Admin.ViewModels
 {
@@ -6,14 +8,21 @@ namespace KAFO.ASPMVC.Areas.Admin.ViewModels
     {
         public int? Id { set; get; }
         public string? Barcode { set; get; }
+        [Required(ErrorMessage = StaticErrorMessages.RequiredField)]
+
         public string Name { set; get; }
         public string? ImageUrl { set; get; }
+        [Required(ErrorMessage = StaticErrorMessages.RequiredField)]
         public decimal SellingPrice { set; get; }
         public decimal StockQuantity { get; set; }
         public decimal AveragePurchasePrice { get; set; }
-        public decimal BoxPurchasePrice { set; get; }
+        [Required(ErrorMessage = StaticErrorMessages.RequiredField)]
+        public decimal BoxPurchasePrice { set; get; } = 0;
+        [Required(ErrorMessage = StaticErrorMessages.RequiredField)]
         public int BoxQuantity { set; get; }
         public bool IsActive { get; set; }
+
+        [Required(ErrorMessage = StaticErrorMessages.RequiredField)]
         public int CategoryId { get; set; }
         public virtual Category? Category { set; get; }
     }

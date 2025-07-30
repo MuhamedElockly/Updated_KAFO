@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KAFO.DAL.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20250624155831_UpdateInvoices3")]
-    partial class UpdateInvoices3
+    [Migration("20250730110806_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,70 @@ namespace KAFO.DAL.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("KAFO.Domain.Invoices.CreditTerminateInvoice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomerAccountId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("TotalInvoice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerAccountId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CreditTerminateInvoices");
+                });
+
+            modelBuilder.Entity("KAFO.Domain.Invoices.CreditWithdrawInvoice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomerAccountId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("TotalInvoice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerAccountId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CreditWithdrawInvoices");
+                });
 
             modelBuilder.Entity("KAFO.Domain.Invoices.Invoice", b =>
                 {
@@ -38,6 +102,9 @@ namespace KAFO.DAL.Migrations
 
                     b.Property<int?>("CustomerAccountId")
                         .HasColumnType("int");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -129,6 +196,9 @@ namespace KAFO.DAL.Migrations
                     b.Property<decimal>("AveragePurchasePrice")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("Barcode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("BoxPurchasePrice")
                         .HasColumnType("decimal(18,2)");
 
@@ -179,8 +249,19 @@ namespace KAFO.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalOwed")
                         .HasColumnType("decimal(18,2)");
@@ -229,6 +310,68 @@ namespace KAFO.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Email = "admin@example.com",
+                            Gender = "Male",
+                            IsDeleted = false,
+                            Name = "Default Admin",
+                            Password = "10000.r2fZ/MUSnrvIzWH6GfMFZw==.ahc5pyftONp6oOxdF5Q+JHYhne027hoZCeHBRmQFORA=",
+                            PhoneNumber = "01029092093",
+                            Role = "admin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Email = "seller@example.com",
+                            Gender = "Male",
+                            IsDeleted = false,
+                            Name = "Default Seller",
+                            Password = "10000.u3Si0FjJRDEd4ogNrIBSDA==.OSY1tmjxIGQXD1o6fKiCBdX6vW4E5wLKhNhbzANMuE8=",
+                            PhoneNumber = "01029092092",
+                            Role = "seller"
+                        });
+                });
+
+            modelBuilder.Entity("KAFO.Domain.Invoices.CreditTerminateInvoice", b =>
+                {
+                    b.HasOne("KAFO.Domain.Users.CustomerAccount", "CustomerAccount")
+                        .WithMany("Deposits")
+                        .HasForeignKey("CustomerAccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KAFO.Domain.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CustomerAccount");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("KAFO.Domain.Invoices.CreditWithdrawInvoice", b =>
+                {
+                    b.HasOne("KAFO.Domain.Users.CustomerAccount", "CustomerAccount")
+                        .WithMany("Withdraws")
+                        .HasForeignKey("CustomerAccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KAFO.Domain.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CustomerAccount");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("KAFO.Domain.Invoices.Invoice", b =>
@@ -290,7 +433,11 @@ namespace KAFO.DAL.Migrations
 
             modelBuilder.Entity("KAFO.Domain.Users.CustomerAccount", b =>
                 {
+                    b.Navigation("Deposits");
+
                     b.Navigation("Invoices");
+
+                    b.Navigation("Withdraws");
                 });
 #pragma warning restore 612, 618
         }

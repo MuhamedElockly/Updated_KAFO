@@ -4,16 +4,16 @@ namespace KAFO.Domain.Users
 {
     public class User : Base, ISoftDelete
     {
-        public int Id { private set; get; }
+        public int Id { set; get; }
         public string Name { set; get; }
         public string Password { set; get; }
-        public string Role { private set; get; }
+        public string Role { set; get; }
         public string Gender { set; get; }
         public string? Email { get; set; }
         public string? PhoneNumber { set; get; }
         public bool IsDeleted { set; get; }
 
-        protected User()
+        public User()
         {
 
         }

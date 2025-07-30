@@ -307,6 +307,30 @@ namespace KAFO.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Email = "admin@example.com",
+                            Gender = "Male",
+                            IsDeleted = false,
+                            Name = "Default Admin",
+                            Password = "10000.r2fZ/MUSnrvIzWH6GfMFZw==.ahc5pyftONp6oOxdF5Q+JHYhne027hoZCeHBRmQFORA=",
+                            PhoneNumber = "01029092093",
+                            Role = "admin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Email = "seller@example.com",
+                            Gender = "Male",
+                            IsDeleted = false,
+                            Name = "Default Seller",
+                            Password = "10000.u3Si0FjJRDEd4ogNrIBSDA==.OSY1tmjxIGQXD1o6fKiCBdX6vW4E5wLKhNhbzANMuE8=",
+                            PhoneNumber = "01029092092",
+                            Role = "seller"
+                        });
                 });
 
             modelBuilder.Entity("KAFO.Domain.Invoices.CreditTerminateInvoice", b =>
