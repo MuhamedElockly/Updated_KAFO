@@ -182,7 +182,7 @@
 				// Remove animation class after completion
 				setTimeout(function () {
 					element.removeClass('counter-animation');
-				}, 600);
+				}, 500);
 			});
 
 			// Show trend indicator
@@ -197,7 +197,7 @@
 	}
 
 	function animateCounter(element, startValue, endValue, suffix, callback) {
-		var duration = 1200; // 1.2 seconds for smoother animation
+		var duration = 1000; // 1 second for smoother animation
 		var startTime = null;
 
 		function animate(currentTime) {
@@ -228,11 +228,16 @@
 			return Math.round(num).toLocaleString();
 		}
 		
-		// For currency, use 2 decimal places
+		// For currency, limit to maximum 3 decimal places
 		if (num % 1 === 0) {
 			return num.toLocaleString();
 		} else {
-			return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+			// Round to maximum 3 decimal places
+			var roundedNum = Math.round(num * 1000) / 1000;
+			return roundedNum.toLocaleString(undefined, { 
+				minimumFractionDigits: 0, 
+				maximumFractionDigits: 3 
+			});
 		}
 	}
 
@@ -240,17 +245,17 @@
 		var trendIndicator = card.find('.trend-indicator');
 
 		if (newValue > oldValue) {
-			trendIndicator.text('📈').css('color', '#4ade80'); // Green for increase
+			trendIndicator.text('📈').css('color', '#10b981'); // Green for increase
 		} else if (newValue < oldValue) {
-			trendIndicator.text('📉').css('color', '#f87171'); // Red for decrease
+			trendIndicator.text('📉').css('color', '#ef4444'); // Red for decrease
 		} else {
-			trendIndicator.text('➡️').css('color', '#fbbf24'); // Yellow for no change
+			trendIndicator.text('➡️').css('color', '#f59e0b'); // Yellow for no change
 		}
 
 		// Enhanced trend indicator animation
 		trendIndicator.css('animation', 'none');
 		setTimeout(function () {
-			trendIndicator.css('animation', 'fadeInUp 0.6s ease');
+			trendIndicator.css('animation', 'fadeInUp 0.4s ease');
 		}, 10);
 	}
 
