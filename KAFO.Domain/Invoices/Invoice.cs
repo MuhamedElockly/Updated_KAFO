@@ -184,7 +184,17 @@ namespace KAFO.Domain.Invoices
             {
                 item.Product.IncreaseStockQuantity(item.Quantity);
             }
-            CustomerAccount!.TotalOwed -= TotalInvoice;
+            //    CustomerAccount!.TotalOwed -= TotalInvoice;
+            try
+            {
+                CustomerAccount!.AddPayment(TotalInvoice);
+            //   CustomerAccount!.SettleDebt(TotalInvoice);
+            }
+            catch (Exception ex)
+            {
+                // Handle exception if needed
+                throw new Exception("Error processing credit return invoice: " + ex.Message);
+            }
         }
 
         private void PurchasingReturnInvoiceCompleteInvoice()
@@ -198,7 +208,7 @@ namespace KAFO.Domain.Invoices
         public decimal CalculateTotalInvoice()
         {
             foreach (var item in Items)
-                TotalInvoice += ( item.UnitSellingPrice * item.Quantity );
+                TotalInvoice += (item.UnitSellingPrice * item.Quantity);
             return TotalInvoice;
         }
     }

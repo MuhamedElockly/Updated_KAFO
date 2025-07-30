@@ -446,9 +446,35 @@ body.sidebar-open {
 
 /* Enhanced mobile table responsiveness */
 @media (max-width: 768px) {
+    /* General table responsive improvements */
     .table-responsive {
         border-radius: 12px;
         overflow: hidden;
+        /* Ensure proper horizontal scrolling */
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        /* Set minimum width to prevent content squishing */
+        min-width: 100%;
+        /* Add smooth scrolling */
+        scroll-behavior: smooth;
+        /* Ensure proper touch scrolling on mobile */
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Ensure all tables have proper scrolling */
+    .table-responsive .table {
+        min-width: 800px; /* Minimum width to ensure all columns are visible */
+        width: 100%;
+        font-size: 14px;
+        /* Prevent table from shrinking */
+        table-layout: fixed;
+    }
+    
+    /* Force table to maintain minimum width for scrolling */
+    .table-responsive .table {
+        min-width: 800px; /* Minimum width to ensure all columns are visible */
+        width: 100%;
+        font-size: 14px;
     }
     
     .table {
@@ -458,11 +484,56 @@ body.sidebar-open {
     .table thead th {
         padding: 12px 8px;
         font-size: 13px;
+        white-space: nowrap; /* Prevent text wrapping in headers */
+        min-width: 100px; /* Minimum column width */
     }
     
     .table tbody td {
         padding: 10px 8px;
         font-size: 13px;
+        white-space: nowrap; /* Prevent text wrapping in cells */
+        min-width: 100px; /* Minimum column width */
+    }
+    
+    /* Specific column widths for better mobile display */
+    .table th:nth-child(1), .table td:nth-child(1) { /* Image column */
+        min-width: 80px;
+        width: 80px;
+    }
+    
+    .table th:nth-child(2), .table td:nth-child(2) { /* Name column */
+        min-width: 150px;
+        width: 150px;
+    }
+    
+    .table th:nth-child(3), .table td:nth-child(3) { /* Category column */
+        min-width: 120px;
+        width: 120px;
+    }
+    
+    .table th:nth-child(4), .table td:nth-child(4) { /* Stock column */
+        min-width: 100px;
+        width: 100px;
+    }
+    
+    .table th:nth-child(5), .table td:nth-child(5) { /* Purchase price column */
+        min-width: 130px;
+        width: 130px;
+    }
+    
+    .table th:nth-child(6), .table td:nth-child(6) { /* Selling price column */
+        min-width: 130px;
+        width: 130px;
+    }
+    
+    .table th:nth-child(7), .table td:nth-child(7) { /* Status column */
+        min-width: 100px;
+        width: 100px;
+    }
+    
+    .table th:nth-child(8), .table td:nth-child(8) { /* Actions column */
+        min-width: 150px;
+        width: 150px;
     }
     
     /* Better mobile button sizing */
@@ -485,6 +556,129 @@ body.sidebar-open {
     .form-select {
         font-size: 16px;
         padding: 12px 15px;
+    }
+    
+    /* Mobile-specific table improvements */
+    .products-table {
+        margin: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .products-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    /* Ensure action buttons don't wrap */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: nowrap;
+        min-width: 140px;
+    }
+    
+    .action-btn {
+        flex-shrink: 0; /* Prevent buttons from shrinking */
+    }
+    
+    /* Mobile scroll indicator */
+    .table-container::after {
+        content: "← →";
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 12px;
+        opacity: 0.8;
+        pointer-events: none;
+        z-index: 5;
+    }
+    
+    /* Enhanced scroll indicators */
+    .scroll-indicator {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        z-index: 10;
+    }
+    
+    .scroll-indicator.left {
+        left: 10px;
+    }
+    
+    .scroll-indicator.right {
+        right: 10px;
+    }
+    
+    /* Hide scroll indicators on larger screens */
+    @media (min-width: 769px) {
+        .table-container::after,
+        .scroll-indicator {
+            display: none;
+        }
+    }
+}
+
+/* Extra small devices (phones, 480px and down) */
+@media (max-width: 480px) {
+    .table-responsive .table {
+        min-width: 700px; /* Slightly smaller minimum width for very small screens */
+    }
+    
+    .table thead th,
+    .table tbody td {
+        padding: 8px 6px;
+        font-size: 12px;
+    }
+    
+    .action-buttons {
+        gap: 0.25rem;
+        min-width: 120px;
+    }
+    
+    .action-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 0.75rem;
+    }
+    
+    .product-image {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .no-image-placeholder {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+/* Landscape orientation on mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .table-responsive .table {
+        min-width: 900px; /* Slightly larger for landscape */
+    }
+    
+    .table thead th,
+    .table tbody td {
+        padding: 10px 8px;
+        font-size: 13px;
     }
 }
 

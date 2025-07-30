@@ -191,7 +191,8 @@ function generateReport() {
                         currentReportType === 'stock_money' ? data.totalStockMoney :
                         data.totalExpectedProfits;
 
-                    hasData = value > 0;
+                    //hasData = value > 0;
+                    hasData = true;
                 } else {
                     // For list reports, check if array has items
                     hasData = Array.isArray(data) ? data.length > 0 : (data && data.length > 0);

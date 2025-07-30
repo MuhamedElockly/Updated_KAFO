@@ -324,7 +324,133 @@
     }
 }
 
+/* Mobile Table Responsive Styles */
 @media (max-width: 768px) {
+    /* General table responsive improvements */
+    .table-responsive {
+        border-radius: 12px;
+        overflow: hidden;
+        /* Ensure proper horizontal scrolling */
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        /* Set minimum width to prevent content squishing */
+        min-width: 100%;
+        /* Add smooth scrolling */
+        scroll-behavior: smooth;
+        /* Ensure proper touch scrolling on mobile */
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Ensure all tables have proper scrolling */
+    .table-responsive .table {
+        min-width: 800px; /* Minimum width to ensure all columns are visible */
+        width: 100%;
+        font-size: 14px;
+        /* Prevent table from shrinking */
+        table-layout: fixed;
+    }
+    
+    .table thead th {
+        padding: 12px 8px;
+        font-size: 13px;
+        white-space: nowrap; /* Prevent text wrapping in headers */
+        min-width: 100px; /* Minimum column width */
+    }
+    
+    .table tbody td {
+        padding: 10px 8px;
+        font-size: 13px;
+        white-space: nowrap; /* Prevent text wrapping in cells */
+        min-width: 100px; /* Minimum column width */
+    }
+    
+    /* Specific column widths for daily inventory tables */
+    /* Sellers Inventory Table */
+    #sellers-inventory-table th:nth-child(1), #sellers-inventory-table td:nth-child(1) { /* اسم البائع */
+        min-width: 120px;
+        width: 120px;
+    }
+    #sellers-inventory-table th:nth-child(2), #sellers-inventory-table td:nth-child(2) { /* رقم الهاتف */
+        min-width: 100px;
+        width: 100px;
+    }
+    #sellers-inventory-table th:nth-child(3), #sellers-inventory-table td:nth-child(3) { /* إجمالي الدفع النقدي */
+        min-width: 120px;
+        width: 120px;
+    }
+    #sellers-inventory-table th:nth-child(4), #sellers-inventory-table td:nth-child(4) { /* إجمالي الدفع الآجل */
+        min-width: 120px;
+        width: 120px;
+    }
+    #sellers-inventory-table th:nth-child(5), #sellers-inventory-table td:nth-child(5) { /* إجمالي المرتجع النقدي */
+        min-width: 120px;
+        width: 120px;
+    }
+    #sellers-inventory-table th:nth-child(6), #sellers-inventory-table td:nth-child(6) { /* إجمالي المرتجع الآجل */
+        min-width: 120px;
+        width: 120px;
+    }
+    #sellers-inventory-table th:nth-child(7), #sellers-inventory-table td:nth-child(7) { /* إجمالي الإيداعات الآجلة */
+        min-width: 120px;
+        width: 120px;
+    }
+    #sellers-inventory-table th:nth-child(8), #sellers-inventory-table td:nth-child(8) { /* إجمالي السحب الاّجل */
+        min-width: 120px;
+        width: 120px;
+    }
+    #sellers-inventory-table th:nth-child(9), #sellers-inventory-table td:nth-child(9) { /* إجمالي التوريد */
+        min-width: 120px;
+        width: 120px;
+    }
+    
+    /* Products Remain Table */
+    #products-remain-table th:nth-child(1), #products-remain-table td:nth-child(1) { /* صورة المنتج */
+        min-width: 80px;
+        width: 80px;
+    }
+    #products-remain-table th:nth-child(2), #products-remain-table td:nth-child(2) { /* اسم المنتج */
+        min-width: 150px;
+        width: 150px;
+    }
+    #products-remain-table th:nth-child(3), #products-remain-table td:nth-child(3) { /* عدد القطع في الصندوق */
+        min-width: 120px;
+        width: 120px;
+    }
+    #products-remain-table th:nth-child(4), #products-remain-table td:nth-child(4) { /* المتبقي بالصناديق */
+        min-width: 120px;
+        width: 120px;
+    }
+    #products-remain-table th:nth-child(5), #products-remain-table td:nth-child(5) { /* المتبقي بالقطع */
+        min-width: 120px;
+        width: 120px;
+    }
+    #products-remain-table th:nth-child(6), #products-remain-table td:nth-child(6) { /* إجمالي المتبقي بالقطع */
+        min-width: 120px;
+        width: 120px;
+    }
+    
+    /* Mobile-specific table improvements */
+    .products-table {
+        margin: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .products-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    /* Ensure product images don't break layout */
+    .product-image {
+        width: 50px !important;
+        height: 50px !important;
+        object-fit: cover;
+        border-radius: 0.5rem;
+    }
+    
     .table-header-info h5 {
         font-size: 1.1rem;
     }
@@ -351,5 +477,37 @@
     .btn-lg.me-5 {
         margin-right: 0 !important;
         margin-bottom: 10px;
+    }
+}
+
+/* Enhanced scroll indicators for daily inventory tables */
+.scroll-indicator {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.scroll-indicator.left {
+    left: 10px;
+}
+
+.scroll-indicator.right {
+    right: 10px;
+}
+
+/* Hide scroll indicators on larger screens */
+@media (min-width: 769px) {
+    .table-container::after,
+    .scroll-indicator {
+        display: none;
     }
 } 

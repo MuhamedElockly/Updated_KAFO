@@ -97,6 +97,9 @@ function loadAdminContent(action, pageNumber) {
                     scrollTop: 0
                 }, 300);
             }
+            
+            // Initialize mobile table enhancements
+            initMobileTableEnhancements();
         },
         error: function (xhr, status, error) {
             let errorMessage = 'حدث خطأ أثناء تحميل المحتوى';
@@ -928,3 +931,134 @@ function viewCreditCustomer(id) {
         });
     });
 }
+
+// Mobile table enhancement functions
+function initMobileTableEnhancements() {
+    if ($(window).width() <= 768) {
+        enhanceTableScrolling();
+        addTableScrollIndicators();
+        improveTableTouchHandling();
+    }
+}
+
+function enhanceTableScrolling() {
+    $('.table-responsive').each(function() {
+        const $container = $(this);
+        const $table = $container.find('.table');
+        
+        // Ensure proper scrolling behavior
+        $container.css({
+            'overflow-x': 'auto',
+            '-webkit-overflow-scrolling': 'touch',
+            'scroll-behavior': 'smooth'
+        });
+        
+        // Add scroll event listeners for better UX
+        $container.on('scroll', function() {
+            const scrollLeft = $(this).scrollLeft();
+            const maxScroll = $(this)[0].scrollWidth - $(this).width();
+            
+            // Update scroll indicators
+            updateScrollIndicators($(this), scrollLeft, maxScroll);
+        });
+    });
+}
+
+function addTableScrollIndicators() {
+    $('.table-container').each(function() {
+        const $container = $(this);
+        const $tableResponsive = $container.find('.table-responsive');
+        
+        // Add scroll indicators
+        $container.append(`
+            <div class="scroll-indicator left" style="
+                position: absolute;
+                left: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: rgba(0,0,0,0.7);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
+                z-index: 10;
+            ">←</div>
+            <div class="scroll-indicator right" style="
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: rgba(0,0,0,0.7);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
+                z-index: 10;
+            ">→</div>
+        `);
+    });
+}
+
+function updateScrollIndicators($container, scrollLeft, maxScroll) {
+    const $leftIndicator = $container.closest('.table-container').find('.scroll-indicator.left');
+    const $rightIndicator = $container.closest('.table-container').find('.scroll-indicator.right');
+    
+    // Show/hide left indicator
+    if (scrollLeft > 0) {
+        $leftIndicator.css('opacity', '0.8');
+    } else {
+        $leftIndicator.css('opacity', '0');
+    }
+    
+    // Show/hide right indicator
+    if (scrollLeft < maxScroll - 1) {
+        $rightIndicator.css('opacity', '0.8');
+    } else {
+        $rightIndicator.css('opacity', '0');
+    }
+}
+
+function improveTableTouchHandling() {
+    $('.table-responsive').each(function() {
+        const $container = $(this);
+        let startX = 0;
+        let scrollLeft = 0;
+        
+        // Touch start
+        $container.on('touchstart', function(e) {
+            startX = e.touches[0].pageX - $container.offset().left;
+            scrollLeft = $container.scrollLeft();
+        });
+        
+        // Touch move
+        $container.on('touchmove', function(e) {
+            if (!startX) return;
+            
+            e.preventDefault();
+            const x = e.touches[0].pageX - $container.offset().left;
+            const walk = (startX - x) * 2; // Scroll speed multiplier
+            $container.scrollLeft(scrollLeft + walk);
+        });
+        
+        // Touch end
+        $container.on('touchend', function() {
+            startX = 0;
+        });
+    });
+}
+
+// Initialize mobile table enhancements when document is ready
+$(document).ready(function() {
+    initMobileTableEnhancements();
+    
+    // Re-initialize on window resize
+    $(window).on('resize', function() {
+        initMobileTableEnhancements();
+    });
+});
