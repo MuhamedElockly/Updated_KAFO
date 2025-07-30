@@ -1,5 +1,6 @@
 using KAFO.ASPMVC.Areas.Admin.ViewModels;
 using KAFO.BLL.Managers;
+using KAFO.Domain.Invoices;
 using KAFO.Domain.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -157,10 +158,17 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
                         CreatedAt = invoice.CreatedAt,
                         UserName = invoice.User?.Name ?? "غير محدد",
                         TotalInvoice = invoice.TotalInvoice,
-                        //     InvoiceType = invoice.Type.ToString(),
+                        InvoiceType = GetInvoiceTypeDisplayName(invoice.Type),
                         CustomerName = invoice.CustomerAccount?.CustomerName ?? "-",
                         ItemsCount = invoice.Items?.Count ?? 0,
-                        ImageUrl = invoice.ImageUrl
+                        ImageUrl = invoice.ImageUrl,
+                        Items = invoice.Items?.Select(item => new InvoiceItemVM
+                        {
+                            ProductName = item.Product?.Name ?? "غير محدد",
+                            Quantity = item.Quantity,
+                            UnitPrice = item.UnitSellingPrice,
+                            TotalPrice = item.UnitSellingPrice * item.Quantity
+                        }).ToList() ?? new List<InvoiceItemVM>()
                     }).ToList();
 
                 var vm = new CreditCustomerAccountVM
@@ -307,6 +315,20 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
                 TempData["Error"] = "حدث خطأ غير متوقع: " + ex.Message;
                 return View("Create", model);
             }
+        }
+
+        private string GetInvoiceTypeDisplayName(InvoiceType invoiceType)
+        {
+            return invoiceType switch
+            {
+                InvoiceType.Cash => "نقدي",
+                InvoiceType.Credit => "آجل",
+                InvoiceType.Purchasing => "شراء",
+                InvoiceType.CashReturn => "مرتجع نقدي",
+                InvoiceType.CreditReturn => "مرتجع آجل",
+                InvoiceType.PurchasingReturn => "مرتجع شراء",
+                _ => invoiceType.ToString()
+            };
         }
     }
 }

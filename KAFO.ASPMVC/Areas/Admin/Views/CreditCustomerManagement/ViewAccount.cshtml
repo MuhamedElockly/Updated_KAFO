@@ -212,9 +212,8 @@
 												<th>التاريخ</th>
 												<th>المستخدم</th>
 												<th>الإجمالي</th>
-												@* <th>النوع</th> *@
+												<th>النوع</th>
 												<th>عدد الأصناف</th>
-												@* <th>رابط الصورة</th> *@
 												<th>تفاصيل</th>
 											</tr>
 										</thead>
@@ -346,6 +345,11 @@
 								<td>${formatDate(invoice.CreatedAt)}</td>
 								<td>${invoice.UserName}</td>
 								<td>${parseFloat(invoice.TotalInvoice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م</td>
+								<td>
+									<span class="badge ${getInvoiceTypeBadgeClass(invoice.InvoiceType)}">
+										${invoice.InvoiceType}
+									</span>
+								</td>
 								<td>${invoice.ItemsCount}</td>
 								<td>
 									<button type="button"
@@ -398,6 +402,25 @@
 		return `${y}/${m}/${day} ${h}:${min}`;
 	}
 
+	function getInvoiceTypeBadgeClass(invoiceType) {
+		switch (invoiceType) {
+			case 'نقدي':
+				return 'bg-success';
+			case 'آجل':
+				return 'bg-primary';
+			case 'شراء':
+				return 'bg-info';
+			case 'مرتجع نقدي':
+				return 'bg-warning';
+			case 'مرتجع آجل':
+				return 'bg-secondary';
+			case 'مرتجع شراء':
+				return 'bg-dark';
+			default:
+				return 'bg-secondary';
+		}
+	}
+
 	Swal.fire({
 		title: 'جاري التحميل...',
 		allowOutsideClick: false,
@@ -438,22 +461,58 @@
 						style="filter: invert(1);"></button>
 			</div>
 			<div class="modal-body p-4">
-				<dl class="row mb-0">
-					<dt class="col-sm-4">رقم الفاتورة</dt>
-					<dd class="col-sm-8" id="modalInvoiceId"></dd>
-					<dt class="col-sm-4">التاريخ</dt>
-					<dd class="col-sm-8" id="modalInvoiceDate"></dd>
-					<dt class="col-sm-4">المستخدم</dt>
-					<dd class="col-sm-8" id="modalInvoiceUser"></dd>
-					<dt class="col-sm-4">الإجمالي</dt>
-					<dd class="col-sm-8" id="modalInvoiceTotal"></dd>
-					<dt class="col-sm-4">النوع</dt>
-					<dd class="col-sm-8" id="modalInvoiceType"></dd>
-					<dt class="col-sm-4">عدد الأصناف</dt>
-					<dd class="col-sm-8" id="modalInvoiceItems"></dd>
-					@* <dt class="col-sm-4">رابط الصورة</dt> *@
-					<dd class="col-sm-8" id="modalInvoiceImage"></dd>
-				</dl>
+				<div class="row mb-3">
+					<div class="col-md-6">
+						<dl class="row mb-0">
+							<dt class="col-sm-4">رقم الفاتورة</dt>
+							<dd class="col-sm-8" id="modalInvoiceId"></dd>
+							<dt class="col-sm-4">التاريخ</dt>
+							<dd class="col-sm-8" id="modalInvoiceDate"></dd>
+							<dt class="col-sm-4">المستخدم</dt>
+							<dd class="col-sm-8" id="modalInvoiceUser"></dd>
+						</dl>
+					</div>
+					<div class="col-md-6">
+						<dl class="row mb-0">
+							<dt class="col-sm-4">الإجمالي</dt>
+							<dd class="col-sm-8" id="modalInvoiceTotal"></dd>
+							<dt class="col-sm-4">النوع</dt>
+							<dd class="col-sm-8" id="modalInvoiceType"></dd>
+							<dt class="col-sm-4">عدد الأصناف</dt>
+							<dd class="col-sm-8" id="modalInvoiceItems"></dd>
+						</dl>
+					</div>
+				</div>
+				
+				<!-- Product Details Section -->
+				<div class="product-details-section mt-4">
+					<h6 class="mb-3" style="color: #4361ee; font-weight: 600;">
+						<i class="fas fa-boxes me-2"></i>تفاصيل المنتجات
+					</h6>
+					<div class="table-responsive">
+						<table class="table table-striped table-hover" id="modalInvoiceProductsTable">
+							<thead class="table-light">
+								<tr>
+									<th>المنتج</th>
+									<th>الكمية</th>
+									<th>سعر الوحدة</th>
+									<th>الإجمالي</th>
+								</tr>
+							</thead>
+							<tbody id="modalInvoiceProductsBody">
+								<!-- Product details will be populated here -->
+							</tbody>
+						</table>
+					</div>
+				</div>
+				
+				<!-- Image Section -->
+				<div class="image-section mt-3" id="modalInvoiceImageSection" style="display: none;">
+					<h6 class="mb-3" style="color: #4361ee; font-weight: 600;">
+						<i class="fas fa-image me-2"></i>صورة الفاتورة
+					</h6>
+					<div id="modalInvoiceImage"></div>
+				</div>
 			</div>
 			<div class="modal-footer" style="border-bottom-left-radius: 18px; border-bottom-right-radius: 18px;">
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
@@ -465,17 +524,45 @@
 	$(document).on('click', '.show-invoice-details', function () {
 		var invoice = $(this).data('invoice');
 		if (typeof invoice === 'string') invoice = JSON.parse(invoice);
+		
+		// Populate basic invoice details
 		$('#modalInvoiceId').text(invoice.Id);
 		$('#modalInvoiceDate').text(new Date(invoice.CreatedAt).toLocaleString('ar-EG'));
 		$('#modalInvoiceUser').text(invoice.UserName);
 		$('#modalInvoiceTotal').text(parseFloat(invoice.TotalInvoice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ج.م');
-		$('#modalInvoiceType').text(invoice.InvoiceType);
+		$('#modalInvoiceType').html('<span class="badge ' + getInvoiceTypeBadgeClass(invoice.InvoiceType) + '">' + invoice.InvoiceType + '</span>');
 		$('#modalInvoiceItems').text(invoice.ItemsCount);
-		if (invoice.ImageUrl) {
-			$('#modalInvoiceImage').html('<a href="' + invoice.ImageUrl + '" target="_blank">عرض الصورة</a>');
+		
+		// Populate product details
+		var productsBody = '';
+		if (invoice.Items && invoice.Items.length > 0) {
+			invoice.Items.forEach(function(item) {
+				productsBody += `<tr>
+					<td>${item.ProductName}</td>
+					<td>${item.Quantity}</td>
+					<td>${parseFloat(item.UnitPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م</td>
+					<td>${parseFloat(item.TotalPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م</td>
+				</tr>`;
+			});
 		} else {
-			$('#modalInvoiceImage').text('-');
+			productsBody = '<tr><td colspan="4" class="text-center text-muted">لا توجد منتجات</td></tr>';
 		}
+		$('#modalInvoiceProductsBody').html(productsBody);
+		
+		// Handle invoice image
+		if (invoice.ImageUrl) {
+			$('#modalInvoiceImageSection').show();
+			$('#modalInvoiceImage').html(`
+				<div class="text-center">
+					<a href="${invoice.ImageUrl}" target="_blank" class="btn btn-outline-primary btn-sm">
+						<i class="fas fa-external-link-alt me-2"></i>عرض صورة الفاتورة
+					</a>
+				</div>
+			`);
+		} else {
+			$('#modalInvoiceImageSection').hide();
+		}
+		
 		var modalEl = document.getElementById('invoiceDetailsModal');
 		if (modalEl) {
 			var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
