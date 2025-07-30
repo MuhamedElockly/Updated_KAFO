@@ -22,7 +22,7 @@
 								<p class="mb-0 opacity-75">عرض وإدارة حسابات العملاء على الآجل</p>
 							</div>
 						</div>
-						<a href="/Admin/CreditCustomerManagement/Create?from=seller" class="btn btn-primary btn-add-customer d-flex align-items-center" style="background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%); border: none; border-radius: 0.75rem; padding: 0.75rem 1.5rem; font-weight: 600; color: white; box-shadow: 0 2px 8px rgba(67, 206, 162, 0.3); font-size: 0.9rem; transition: all 0.3s ease;">
+						<a href="/Admin/CreditCustomerManagement/Create?from=seller" class="btn btn-primary btn-add-customer d-flex align-items-center" style="z-index:100000; background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%); border: none; border-radius: 0.75rem; padding: 0.75rem 1.5rem; font-weight: 600; color: white; box-shadow: 0 2px 8px rgba(67, 206, 162, 0.3); font-size: 0.9rem; transition: all 0.3s ease;">
 							<i class="fas fa-user-plus ms-2"></i>
 							إضافة عميل آجل جديد
 						</a>
@@ -392,107 +392,219 @@
 					});
 				});
 			});
-					$(document).ready(function() {
-			$('.delete-btn').on('click', function(e) {
-				e.preventDefault();
-				var button = $(this);
-				var form = button.closest('.delete-form');
-				var id = button.data('id');
+						$(document).ready(function() {
+		$('.delete-btn').on('click', function(e) {
+			e.preventDefault();
+			var button = $(this);
+			var form = button.closest('.delete-form');
+			var id = button.data('id');
 
-				// Show confirmation dialog
-				Swal.fire({
-					title: 'تأكيد الحذف',
-					text: 'هل أنت متأكد من رغبتك في حذف هذا العنصر؟',
-					icon: 'warning',
-					showCancelButton: true,
-					confirmButtonColor: '#d33',
-					cancelButtonColor: '#3085d6',
-					confirmButtonText: 'نعم، احذف',
-					cancelButtonText: 'إلغاء',
-					background: '#fff',
-					color: '#222',
-					showClass: { popup: 'animate__animated animate__fadeInDown' },
-					hideClass: { popup: 'animate__animated animate__fadeOutUp' }
-				}).then((result) => {
-					if (result.isConfirmed) {
-						// Show loading
+			// Show confirmation dialog
+			Swal.fire({
+				title: 'تأكيد الحذف',
+				text: 'هل أنت متأكد من رغبتك في حذف هذا العنصر؟',
+				icon: 'warning',
+				showCancelButton: true,
+				confirmButtonColor: '#d33',
+				cancelButtonColor: '#3085d6',
+				confirmButtonText: 'نعم، احذف',
+				cancelButtonText: 'إلغاء',
+				background: '#fff',
+				color: '#222',
+				// Removed problematic animation classes
+				backdrop: true,
+				allowOutsideClick: true,
+				allowEscapeKey: true,
+				focusConfirm: false,
+				reverseButtons: false
+			}).then((result) => {
+				if (result.isConfirmed) {
+					// Validate form exists
+					if (form.length === 0) {
 						Swal.fire({
-							title: 'جاري الحذف...',
-							html: `
-								<div class="text-center">
-									<div class="spinner-border text-primary mb-3" role="status">
-										<span class="visually-hidden">جاري التحميل...</span>
-									</div>
-									<p class="text-muted">يرجى الانتظار بينما يتم معالجة طلبك</p>
-								</div>
-							`,
-							allowOutsideClick: false,
-							showConfirmButton: false,
+							icon: 'error',
+							title: 'خطأ',
+							text: 'لم يتم العثور على النموذج المطلوب',
+							confirmButtonColor: '#ef4444',
 							background: '#fff',
-							color: '#222'
+							color: '#222',
+							allowOutsideClick: true,
+							allowEscapeKey: true
 						});
+						return;
+					}
 
-						// Prepare form data
-						var formData = new FormData(form[0]);
-						formData.append('__RequestVerificationToken', $('input[name="__RequestVerificationToken"]', form).val());
+					// Validate form action
+					var actionUrl = form.attr('action');
+					if (!actionUrl) {
+						Swal.fire({
+							icon: 'error',
+							title: 'خطأ',
+							text: 'رابط العملية غير محدد',
+							confirmButtonColor: '#ef4444',
+							background: '#fff',
+							color: '#222',
+							allowOutsideClick: true,
+							allowEscapeKey: true
+						});
+						return;
+					}
 
-						// AJAX request
-						$.ajax({
-							url: form.attr('action'),
-							type: 'POST',
-							data: formData,
-							processData: false,
-							contentType: false,
-							success: function(response) {
-								Swal.close();
+					// Show loading with timeout
+					const loadingDialog = Swal.fire({
+						title: 'جاري الحذف...',
+						html: `
+							<div class="text-center">
+								<div class="spinner-border text-primary mb-3" role="status">
+									<span class="visually-hidden">جاري التحميل...</span>
+								</div>
+								<p class="text-muted">يرجى الانتظار بينما يتم معالجة طلبك</p>
+							</div>
+						`,
+						allowOutsideClick: false,
+						allowEscapeKey: false,
+						showConfirmButton: false,
+						background: '#fff',
+						color: '#222',
+						timer: 30000, // 30 second timeout
+						timerProgressBar: true
+					});
 
-								if (response.success) {
-									// Success message
-									Swal.fire({
-										icon: 'success',
-										title: 'تم الحذف بنجاح!',
-										text: response.message || 'تم حذف العنصر بنجاح',
-										confirmButtonColor: '#10b981',
-										background: '#fff',
-										color: '#222'
-									}).then(() => {
+					// Prepare form data
+					var formData = new FormData(form[0]);
+
+					// Ensure CSRF token is included
+					var token = $('input[name="__RequestVerificationToken"]', form).val();
+					if (!token) {
+						token = $('input[name="__RequestVerificationToken"]').first().val();
+					}
+					if (token) {
+						formData.append('__RequestVerificationToken', token);
+					}
+
+					// Store AJAX request for potential abortion
+					var ajaxRequest = $.ajax({
+						url: actionUrl,
+						type: 'POST',
+						data: formData,
+						processData: false,
+						contentType: false,
+						timeout: 25000, // 25 second timeout
+						success: function(response) {
+							Swal.close();
+
+							if (response && response.success) {
+								// Success message
+								Swal.fire({
+									icon: 'success',
+									title: 'تم الحذف بنجاح!',
+									text: response.message || 'تم حذف العنصر بنجاح',
+									confirmButtonColor: '#10b981',
+									confirmButtonText: 'موافق',
+									background: '#fff',
+									color: '#222',
+									allowOutsideClick: true,
+									allowEscapeKey: true
+								}).then(() => {
+									// Check if callback is specified
+									if (response.redirect) {
+										window.location.href = response.redirect;
+									} else {
 										location.reload(); // Refresh page
-									});
-								} else {
-									// Error message
-									Swal.fire({
-										icon: 'error',
-										title: 'فشل في الحذف',
-										text: response.message || 'حدث خطأ أثناء محاولة الحذف',
-										confirmButtonColor: '#ef4444',
-										background: '#fff',
-										color: '#222'
-									});
-								}
-							},
-							error: function(xhr) {
-								Swal.close();
-								var errorMessage = 'حدث خطأ في الاتصال بالخادم';
+									}
+								});
+							} else {
+								// Error message
+								Swal.fire({
+									icon: 'error',
+									title: 'فشل في الحذف',
+									text: response.message || 'حدث خطأ أثناء محاولة الحذف',
+									confirmButtonColor: '#ef4444',
+									confirmButtonText: 'موافق',
+									background: '#fff',
+									color: '#222',
+									allowOutsideClick: true,
+									allowEscapeKey: true
+								});
+							}
+						},
+						error: function(xhr, status, error) {
+							Swal.close();
 
+							var errorMessage = 'حدث خطأ في الاتصال بالخادم';
+
+							// Handle different error types
+							if (status === 'timeout') {
+								errorMessage = 'انتهت مهلة الاتصال. يرجى المحاولة مرة أخرى.';
+							} else if (xhr.responseJSON && xhr.responseJSON.message) {
+								errorMessage = xhr.responseJSON.message;
+							} else if (xhr.responseText) {
 								try {
 									var jsonResponse = JSON.parse(xhr.responseText);
 									errorMessage = jsonResponse.message || errorMessage;
-								} catch(e) {}
-
-								Swal.fire({
-									icon: 'error',
-									title: 'خطأ',
-									text: errorMessage,
-									confirmButtonColor: '#ef4444',
-									background: '#fff',
-									color: '#222'
-								});
+								} catch(e) {
+									// Keep default error message
+								}
 							}
-						});
-					}
+
+							Swal.fire({
+								icon: 'error',
+								title: 'خطأ',
+								text: errorMessage,
+								confirmButtonColor: '#ef4444',
+								confirmButtonText: 'موافق',
+								background: '#fff',
+								color: '#222',
+								allowOutsideClick: true,
+								allowEscapeKey: true
+							});
+						},
+						complete: function() {
+							// Cleanup - runs regardless of success or error
+							console.log('Delete request completed');
+						}
+					});
+
+					// Handle loading dialog timeout
+					loadingDialog.then((result) => {
+						if (result.dismiss === Swal.DismissReason.timer) {
+							// Dialog timed out, abort AJAX request
+							if (ajaxRequest && ajaxRequest.readyState !== 4) {
+								ajaxRequest.abort();
+							}
+
+							Swal.fire({
+								icon: 'warning',
+								title: 'انتهت المهلة الزمنية!',
+								text: 'العملية تستغرق وقتاً أطول من المتوقع',
+								confirmButtonColor: '#f59e0b',
+								confirmButtonText: 'موافق',
+								background: '#fff',
+								color: '#222',
+								allowOutsideClick: true,
+								allowEscapeKey: true
+							});
+						}
+					});
+				}
+				// If canceled or dismissed, do nothing - prevents freezing
+			}).catch((error) => {
+				// Handle any unexpected errors in the promise chain
+				console.error('Error in delete confirmation:', error);
+				Swal.fire({
+					icon: 'error',
+					title: 'خطأ!',
+					text: 'حدث خطأ غير متوقع',
+					confirmButtonColor: '#ef4444',
+					confirmButtonText: 'موافق',
+					background: '#fff',
+					color: '#222',
+					allowOutsideClick: true,
+					allowEscapeKey: true
 				});
 			});
 		});
+	});
 			// AJAX Form submission with SweetAlert
 			$('#settleAccountForm').on('submit', function (e) {
 				e.preventDefault();
