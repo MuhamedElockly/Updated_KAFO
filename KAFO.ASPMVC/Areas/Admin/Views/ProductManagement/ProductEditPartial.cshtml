@@ -41,7 +41,14 @@
 						<label asp-for="BoxPurchasePrice" class="form-label">سعر العلبة</label>
 						<div class="input-group">
 							<span class="input-group-text">ج.م.</span>
-							<input asp-for="BoxPurchasePrice" class="form-control" placeholder="0.00" id="boxPriceInput" >
+                            @if (ViewBag.Mode == "E")
+                            {
+                                <input asp-for="BoxPurchasePrice" class="form-control" placeholder="0.00" id="boxPriceInput" readonly>
+                            }
+                            else
+                            {
+                                <input class="form-control" placeholder="0.00" id="boxPriceInput">
+                            }
 						</div>
 						<span asp-validation-for="BoxPurchasePrice" class="text-danger small"></span>
 					</div>
@@ -113,7 +120,7 @@
 
 	<!-- Form Buttons -->
 	<div class="d-flex justify-content-between mt-4">
-		<a asp-action="Index" asp-controller="Admin" class="btn btn-outline-secondary" onclick="toggleSpinner(true, 'جاري العرض ....')">
+		<a asp-action="Index" asp-controller="Admin" class="btn btn-outline-secondary" @* onclick="toggleSpinner(true, 'جاري العرض ....')" *@>
 			<i class="fas fa-arrow-right me-1"></i> رجوع
 		</a>
 		<button type="submit" class="btn btn-primary">

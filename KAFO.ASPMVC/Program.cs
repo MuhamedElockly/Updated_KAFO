@@ -1,6 +1,7 @@
 using Kafo.DAL.Data;
 using Kafo.DAL.Repository;
 using KAFO.ASPMVC.Hubs;
+using KAFO.ASPMVC.Middleware;
 using KAFO.ASPMVC.Services;
 using KAFO.BLL.Managers;
 using KAFO.Domain.Services;
@@ -96,6 +97,7 @@ namespace KAFO.ASPMVC
             }
 
             app.UseStaticFiles();
+            app.UseMiddleware<DefaultImageMiddleware>();
             app.UseRouting();
 
             app.UseAuthentication();

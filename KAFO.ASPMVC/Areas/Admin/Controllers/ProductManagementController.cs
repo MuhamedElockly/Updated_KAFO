@@ -26,6 +26,7 @@ namespace KAFO.ASPMVC.Areas.Admin.Controllers
 
         public ActionResult Index()
         {
+            ViewBag.Mode = "ER";
             //   var Products = productManager.GetAll(includeProperties: "Category");
             List<Category> categories = _categoryManager.GetAll();
             List<CategoryVM> categoryVMs = new List<CategoryVM>();
@@ -36,7 +37,7 @@ namespace KAFO.ASPMVC.Areas.Admin.Controllers
 
             }
             ViewBag.Categories = categoryVMs;
-
+            ViewBag.Mode = "A";
             return View("Create");
         }
         public ActionResult Details(int? id)
@@ -50,6 +51,7 @@ namespace KAFO.ASPMVC.Areas.Admin.Controllers
 
         public async Task<IActionResult> Upsert(ProductVM productVM, IFormFile? imageFile)
         {
+
             if (ModelState.IsValid)
             {
                 Product product = productVM.ToProduct(await UploadFile(imageFile, productVM.Name));
@@ -92,12 +94,14 @@ namespace KAFO.ASPMVC.Areas.Admin.Controllers
         }
         public ActionResult Edit(int? id)
         {
+            ViewBag.Mode = "ER";
             if (id == null)
                 return BadRequest();
             var product = _productManager.Get(p => p.Id == id, "Category");
             if (product == null)
                 return NotFound();
 
+            ViewBag.Mode = "E";
             var Categories = _categoryManager.GetAll();
             ViewBag.Categories = Categories;
             ProductVM productVM = product.ToProductVM();
