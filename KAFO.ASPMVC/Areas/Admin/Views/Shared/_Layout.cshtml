@@ -12,116 +12,16 @@
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/Kafo.ASPMVC.styles.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/CCDN/font-awesome-5.15.4.min.css" />
+	<link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
 	<link href="~/CCDN/toastr.min.css" rel="stylesheet" />
 	<link href="~/CCDN/Poppins.css" rel="stylesheet">
-	<style>
-		body {
-			display: flex;
-			min-height: 100vh;
-			background-color: #f4f7f6;
-		}
-
-		#sidebar {
-			width: 250px;
-			min-width: 250px;
-			background: #2a2e43; /* Dark blue from the image */
-			color: #fff;
-			transition: all 0.3s;
-			display: flex;
-			flex-direction: column;
-			padding-top: 20px;
-			box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-		}
-
-			#sidebar .sidebar-header {
-				padding: 20px;
-				text-align: center;
-				border-bottom: 1px solid rgba(255,255,255,0.1);
-				margin-bottom: 20px;
-			}
-
-				#sidebar .sidebar-header h3 {
-					color: #fff;
-					margin-bottom: 5px;
-					font-size: 20px;
-				}
-
-				#sidebar .sidebar-header span {
-					font-size: 14px;
-					color: #ccc;
-				}
-
-			#sidebar ul.components {
-				padding: 20px 0;
-				list-style: none;
-				flex-grow: 1;
-			}
-
-				#sidebar ul.components li a {
-					padding: 10px 20px;
-					font-size: 1.1em;
-					display: block;
-					color: #fff;
-					text-decoration: none;
-					transition: all 0.3s;
-					display: flex;
-					align-items: center;
-				}
-
-					#sidebar ul.components li a i {
-						margin-left: 10px; /* For RTL */
-					}
-
-					#sidebar ul.components li a:hover {
-						color: #f8f9fa;
-						background: #4a4f66;
-						border-radius: 5px;
-						margin: 0 10px;
-					}
-
-				#sidebar ul.components li.active > a, a[aria-expanded="true"] {
-					color: #fff;
-					background: #e91e63; /* Pink for active/logout from image */
-					border-radius: 5px;
-					margin: 0 10px;
-				}
-
-		#content {
-			flex-grow: 1;
-			padding: 20px;
-			transition: all 0.3s;
-		}
-
-		.navbar {
-			display: none; /* Hide default navbar */
-		}
-
-		.footer {
-			margin-top: auto; /* Push footer to the bottom */
-			background: #2a2e43;
-			color: #fff;
-			padding: 15px 0;
-			text-align: center;
-			width: 100%;
-		}
-
-			.footer a {
-				color: #fff;
-				text-decoration: none;
-			}
-
-				.footer a:hover {
-					text-decoration: underline;
-				}
-	</style>
 </head>
 <body>
 	<!-- Mobile Sidebar Toggle Button -->
-	<button class="mobile-sidebar-toggle d-md-none" id="mobileSidebarToggle">
+	<button class="mobile-sidebar-toggle" id="mobileSidebarToggle" aria-label="Toggle Sidebar">
 		<i class="fas fa-bars"></i>
 	</button>
-
 	<!-- Mobile Sidebar Overlay -->
 	<div class="sidebar-overlay" id="sidebarOverlay"></div>
 

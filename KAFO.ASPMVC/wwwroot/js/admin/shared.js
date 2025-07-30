@@ -1,6 +1,54 @@
+// Global function to close mobile sidebar
+function closeMobileSidebar() {
+    try {
+        const sidebar = $('#sidebar');
+        const overlay = $('#sidebarOverlay');
+        const toggleBtn = $('#mobileSidebarToggle');
+
+        if (sidebar.length) {
+            // Re-enable body scroll
+            $('body').removeClass('sidebar-open');
+
+            // Hide overlay
+            if (overlay.length) {
+                overlay.removeClass('active');
+            }
+
+            // Close sidebar
+            sidebar.removeClass('sidebar-open');
+
+            // Reset toggle button
+            if (toggleBtn.length) {
+                toggleBtn.removeClass('rotating');
+                toggleBtn.find('i').removeClass('fa-times').addClass('fa-bars');
+            }
+
+            // Reset sidebar items
+            sidebar.find('li').css({
+                'opacity': '1',
+                'transform': 'translateX(0)'
+            });
+
+            // Add haptic feedback
+            if ('vibrate' in navigator) {
+                navigator.vibrate(25);
+            }
+        }
+    } catch (error) {
+        console.warn('Close sidebar error:', error);
+    }
+}
+
 function loadAdminContent(action, pageNumber) {
-    // Show loading indicator
-    $('#mainContent').html('<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i></div>');
+    // Show loading indicator with enhanced styling
+    $('#mainContent').html(`
+        <div class="text-center py-5">
+            <div class="spinner-container">
+                <i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i>
+                <p class="text-muted">جاري التحميل...</p>
+            </div>
+        </div>
+    `);
 
     // Construct URL with optional page number
     let url = `/Admin/Admin/${action}`;
@@ -8,10 +56,11 @@ function loadAdminContent(action, pageNumber) {
         url += `?page=${pageNumber}`;
     }
 
-    // Load the partial view via AJAX
-    $.ajax({
+    // Load the partial view via AJAX with enhanced error handling
+    return $.ajax({
         url: url,
         type: 'GET',
+        timeout: 30000, // 30 second timeout
         success: function (result) {
             $('#mainContent').html(result);
 
@@ -19,12 +68,12 @@ function loadAdminContent(action, pageNumber) {
             if (action === 'Reports' && typeof initializeReportFunctionality === 'function') {
                 initializeReportFunctionality();
             }
-            
+
             // Initialize invoice functionality if we're on the invoices page
             if (action === 'Invoices' && typeof initializeInvoiceFunctionality === 'function') {
                 initializeInvoiceFunctionality();
             }
-            
+
             // Initialize daily inventory functionality if we're on the daily inventory page
             if (action === 'DailyInventory' && typeof initializeDailyInventory === 'function') {
                 // Reset and re-initialize to prevent duplicate pagination
@@ -34,37 +83,80 @@ function loadAdminContent(action, pageNumber) {
                     initializeDailyInventory();
                 }
             }
+
+            // Add smooth scroll to top for mobile
+            if ($(window).width() <= 768) {
+                $('html, body').animate({
+                    scrollTop: 0
+                }, 300);
+            }
         },
-        error: function (error) {
-            $('#mainContent').html('<div class="alert alert-danger">Error loading content</div>');
+        error: function (xhr, status, error) {
+            let errorMessage = 'حدث خطأ أثناء تحميل المحتوى';
+
+            if (status === 'timeout') {
+                errorMessage = 'انتهت مهلة الاتصال، يرجى المحاولة مرة أخرى';
+            } else if (xhr.status === 404) {
+                errorMessage = 'الصفحة المطلوبة غير موجودة';
+            } else if (xhr.status === 500) {
+                errorMessage = 'خطأ في الخادم، يرجى المحاولة لاحقاً';
+            }
+
+            $('#mainContent').html(`
+                <div class="alert alert-danger text-center">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                    <h5>خطأ في التحميل</h5>
+                    <p>${errorMessage}</p>
+                    <button class="btn btn-primary mt-3" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> إعادة المحاولة
+                    </button>
+                </div>
+            `);
         }
     });
 }
 
 // Handle sidebar navigation
 $(document).ready(function () {
-    // Check if we're on a mobile device and if the sidebar exists
+    // Enhanced mobile detection with better breakpoints
     const isMobile = $(window).width() <= 768;
+    const isTablet = $(window).width() > 768 && $(window).width() <= 1024;
     const sidebarExists = $('#sidebar').length > 0;
-    
-    $('.sidebar-link').on('click', function (e) {
-        e.preventDefault();
 
-        // Remove active class from all links
-        $('.sidebar-link').parent().removeClass('active');
-        // Add active class to clicked link
-        $(this).parent().addClass('active');
+    // Initialize sidebar functionality
+    initSidebarNavigation();
 
-        const action = $(this).data('action');
-        loadAdminContent(action, 1);
+    function initSidebarNavigation() {
+        $('.sidebar-link').on('click', function (e) {
+            e.preventDefault();
 
-        // Close mobile sidebar after navigation
-        if (isMobile && sidebarExists) {
-            closeMobileSidebar();
-        }
-    });
+            // Add loading state to clicked link
+            const $this = $(this);
+            $this.addClass('loading');
+            $this.find('i').addClass('fa-spin');
 
-    // Mobile sidebar functionality - only initialize if sidebar exists
+            // Remove active class from all links
+            $('.sidebar-link').parent().removeClass('active');
+            // Add active class to clicked link
+            $this.parent().addClass('active');
+
+            const action = $this.data('action');
+
+            // Load content with enhanced error handling
+            loadAdminContent(action, 1).always(function () {
+                // Remove loading state
+                $this.removeClass('loading');
+                $this.find('i').removeClass('fa-spin');
+            });
+
+            // Close mobile sidebar after navigation
+            if ((isMobile || isTablet) && sidebarExists) {
+                closeMobileSidebar();
+            }
+        });
+    }
+
+    // Enhanced mobile sidebar functionality
     function initMobileSidebar() {
         const sidebar = $('#sidebar');
         const overlay = $('#sidebarOverlay');
@@ -75,66 +167,73 @@ $(document).ready(function () {
             return;
         }
 
-        // Toggle sidebar with enhanced animations
-        toggleBtn.on('click', function() {
+        // Enhanced toggle sidebar with better animations
+        toggleBtn.on('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
             try {
                 const isOpen = sidebar.hasClass('sidebar-open');
-                
+
                 if (!isOpen) {
-                    // Opening animation
-                    sidebar.addClass('sidebar-open');
-                    overlay.addClass('active');
-                    
-                    // Animate toggle button
-                    $(this).addClass('rotating');
-                    
-                    // Change icon with smooth transition
-                    const icon = $(this).find('i');
-                    icon.fadeOut(150, function() {
-                        icon.removeClass('fa-bars').addClass('fa-times').fadeIn(150);
-                    });
-                    
-                    // Add entrance animation to sidebar items
-                    setTimeout(() => {
-                        sidebar.find('li').each(function(index) {
-                            $(this).css({
-                                'opacity': '0',
-                                'transform': 'translateX(20px)'
-                            }).delay(index * 50).animate({
-                                'opacity': '1',
-                                'transform': 'translateX(0)'
-                            }, 300);
-                        });
-                    }, 200);
-                    
+                    // Opening animation with enhanced effects
+                    openMobileSidebar();
                 } else {
                     // Closing animation
-                    sidebar.removeClass('sidebar-open');
-                    overlay.removeClass('active');
-                    
-                    // Animate toggle button
-                    $(this).removeClass('rotating');
-                    
-                    // Change icon with smooth transition
-                    const icon = $(this).find('i');
-                    icon.fadeOut(150, function() {
-                        icon.removeClass('fa-times').addClass('fa-bars').fadeIn(150);
-                    });
+                    closeMobileSidebar();
                 }
             } catch (error) {
                 console.warn('Sidebar toggle error:', error);
             }
         });
 
+        function openMobileSidebar() {
+            // Prevent body scroll when sidebar is open
+            $('body').addClass('sidebar-open');
+
+            // Show overlay first
+            overlay.addClass('active');
+
+            // Open sidebar with smooth animation
+            sidebar.addClass('sidebar-open');
+
+            // Animate toggle button
+            toggleBtn.addClass('rotating');
+
+            // Change icon with smooth transition
+            const icon = toggleBtn.find('i');
+            icon.fadeOut(150, function () {
+                icon.removeClass('fa-bars').addClass('fa-times').fadeIn(150);
+            });
+
+            // Add staggered entrance animation to sidebar items
+            setTimeout(() => {
+                sidebar.find('li').each(function (index) {
+                    $(this).css({
+                        'opacity': '0',
+                        'transform': 'translateX(30px)'
+                    }).delay(index * 80).animate({
+                        'opacity': '1',
+                        'transform': 'translateX(0)'
+                    }, 400, 'swing');
+                });
+            }, 300);
+
+            // Add haptic feedback
+            if ('vibrate' in navigator) {
+                navigator.vibrate([50, 25, 50]);
+            }
+        }
+
         // Close sidebar when clicking overlay with enhanced feedback
-        overlay.on('click', function() {
+        overlay.on('click', function () {
             try {
                 closeMobileSidebar();
-                
+
                 // Add ripple effect to overlay
                 const ripple = $('<div class="ripple-effect"></div>');
                 $(this).append(ripple);
-                
+
                 setTimeout(() => {
                     ripple.remove();
                 }, 600);
@@ -144,7 +243,7 @@ $(document).ready(function () {
         });
 
         // Enhanced keyboard navigation
-        $(document).on('keydown', function(e) {
+        $(document).on('keydown', function (e) {
             try {
                 if (e.key === 'Escape' && sidebar.hasClass('sidebar-open')) {
                     closeMobileSidebar();
@@ -155,12 +254,12 @@ $(document).ready(function () {
         });
 
         // Close sidebar when clicking outside with improved detection
-        $(document).on('click', function(e) {
+        $(document).on('click', function (e) {
             try {
-                if ($(window).width() <= 768 && 
-                    !sidebar.is(e.target) && 
-                    sidebar.has(e.target).length === 0 && 
-                    !toggleBtn.is(e.target) && 
+                if ($(window).width() <= 768 &&
+                    !sidebar.is(e.target) &&
+                    sidebar.has(e.target).length === 0 &&
+                    !toggleBtn.is(e.target) &&
                     toggleBtn.has(e.target).length === 0 &&
                     !overlay.is(e.target)) {
                     closeMobileSidebar();
@@ -170,25 +269,8 @@ $(document).ready(function () {
             }
         });
 
-        function closeMobileSidebar() {
-            try {
-                sidebar.removeClass('sidebar-open');
-                overlay.removeClass('active');
-                toggleBtn.removeClass('rotating');
-                toggleBtn.find('i').removeClass('fa-times').addClass('fa-bars');
-                
-                // Reset sidebar items
-                sidebar.find('li').css({
-                    'opacity': '1',
-                    'transform': 'translateX(0)'
-                });
-            } catch (error) {
-                console.warn('Close sidebar error:', error);
-            }
-        }
-
         // Enhanced window resize handling
-        $(window).on('resize', function() {
+        $(window).on('resize', function () {
             try {
                 if ($(window).width() > 768) {
                     closeMobileSidebar();
@@ -208,14 +290,14 @@ $(document).ready(function () {
     function initSwipeGestures() {
         // Only initialize on mobile devices and if sidebar exists
         if ($(window).width() > 768 || !$('#sidebar').length) return;
-        
+
         let startX = 0;
         let startY = 0;
         let isDragging = false;
         let touchStartTime = 0;
 
         // Touch start with enhanced detection
-        document.addEventListener('touchstart', function(e) {
+        document.addEventListener('touchstart', function (e) {
             try {
                 if (e.touches && e.touches.length > 0) {
                     startX = e.touches[0].clientX;
@@ -229,12 +311,12 @@ $(document).ready(function () {
         }, { passive: true });
 
         // Touch move with improved gesture detection
-        document.addEventListener('touchmove', function(e) {
+        document.addEventListener('touchmove', function (e) {
             try {
                 if (!isDragging && e.touches && e.touches.length > 0) {
                     const deltaX = Math.abs(e.touches[0].clientX - startX);
                     const deltaY = Math.abs(e.touches[0].clientY - startY);
-                    
+
                     if (deltaX > 8 && deltaX > deltaY * 1.5) {
                         isDragging = true;
                     }
@@ -245,19 +327,19 @@ $(document).ready(function () {
         }, { passive: true });
 
         // Touch end with enhanced gesture recognition
-        document.addEventListener('touchend', function(e) {
+        document.addEventListener('touchend', function (e) {
             try {
                 if (isDragging && $(window).width() <= 768 && e.changedTouches && e.changedTouches.length > 0) {
                     const endX = e.changedTouches[0].clientX;
                     const deltaX = endX - startX;
                     const touchDuration = Date.now() - touchStartTime;
-                    
+
                     // Swipe right to open sidebar (more sensitive)
                     if (deltaX > 40 && endX < 120 && touchDuration < 500) {
                         const sidebar = $('#sidebar');
                         const overlay = $('#sidebarOverlay');
                         const toggleBtn = $('#mobileSidebarToggle');
-                        
+
                         if (sidebar.length && !sidebar.hasClass('sidebar-open')) {
                             // Add haptic feedback safely
                             try {
@@ -267,7 +349,7 @@ $(document).ready(function () {
                             } catch (vibrateError) {
                                 console.warn('Vibration not supported:', vibrateError);
                             }
-                            
+
                             sidebar.addClass('sidebar-open');
                             overlay.addClass('active');
                             toggleBtn.find('i').removeClass('fa-bars').addClass('fa-times');
@@ -276,7 +358,7 @@ $(document).ready(function () {
                     // Swipe left to close sidebar (more sensitive)
                     else if (deltaX < -40 && touchDuration < 500) {
                         closeMobileSidebar();
-                        
+
                         // Add haptic feedback safely
                         try {
                             if ('vibrate' in navigator && navigator.vibrate) {
@@ -302,18 +384,18 @@ $(document).ready(function () {
     function addHapticFeedback() {
         // Only add haptic feedback on mobile devices
         if ($(window).width() > 768) return;
-        
+
         try {
             if ('vibrate' in navigator && navigator.vibrate) {
-                $('.sidebar-link').on('click', function() {
+                $('.sidebar-link').on('click', function () {
                     try {
                         navigator.vibrate([30, 20, 30]);
                     } catch (error) {
                         console.warn('Vibration error on sidebar link:', error);
                     }
                 });
-                
-                $('.mobile-sidebar-toggle').on('click', function() {
+
+                $('.mobile-sidebar-toggle').on('click', function () {
                     try {
                         const isOpen = $('#sidebar').hasClass('sidebar-open');
                         navigator.vibrate(isOpen ? [50, 25] : [25, 50]);
@@ -334,9 +416,9 @@ $(document).ready(function () {
 
     // Performance optimization: Debounce resize events with enhanced timing
     let resizeTimeout;
-    $(window).on('resize', function() {
+    $(window).on('resize', function () {
         clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(function() {
+        resizeTimeout = setTimeout(function () {
             if ($(window).width() > 768) {
                 closeMobileSidebar();
             }
@@ -344,13 +426,13 @@ $(document).ready(function () {
     });
 
     // Enhanced keyboard navigation with focus management
-    $(document).on('keydown', function(e) {
+    $(document).on('keydown', function (e) {
         if (e.key === 'Tab' && $('#sidebar').hasClass('sidebar-open')) {
             // Keep focus within sidebar when open
             const sidebarLinks = $('#sidebar .sidebar-link');
             const firstLink = sidebarLinks.first();
             const lastLink = sidebarLinks.last();
-            
+
             if (e.shiftKey && document.activeElement === firstLink[0]) {
                 e.preventDefault();
                 lastLink.focus();
@@ -362,14 +444,14 @@ $(document).ready(function () {
     });
 
     // Add loading states and visual feedback
-    $('.sidebar-link').on('click', function() {
+    $('.sidebar-link').on('click', function () {
         const $this = $(this);
         const originalText = $this.text();
-        
+
         // Add loading state
         $this.addClass('loading');
         $this.find('i').addClass('fa-spin');
-        
+
         // Remove loading state after content loads
         setTimeout(() => {
             $this.removeClass('loading');
