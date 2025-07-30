@@ -1,171 +1,579 @@
+/* Enhanced Modern Statistics Cards */
 .statistics-card {
 	border: none;
-	border-radius: 10px;
-	box-shadow: 0 3px 15px rgba(0, 0, 0, 0.12);
-	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	border-radius: 16px;
+	box-shadow: 
+		0 4px 20px rgba(0, 0, 0, 0.08),
+		0 2px 8px rgba(0, 0, 0, 0.04);
+	transition: all 0.3s ease;
 	overflow: hidden;
 	position: relative;
-	background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
-	backdrop-filter: blur(6px);
+	backdrop-filter: blur(15px);
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	min-height: 140px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.statistics-card::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: linear-gradient(135deg, 
+		rgba(255, 255, 255, 0.08) 0%, 
+		rgba(255, 255, 255, 0.03) 100%);
+	opacity: 0;
+	transition: opacity 0.3s ease;
+	pointer-events: none;
 }
 
 .statistics-card:hover {
-	transform: translateY(-3px) scale(1.01);
-	box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+	transform: translateY(-4px);
+	box-shadow: 
+		0 8px 25px rgba(0, 0, 0, 0.12),
+		0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.statistics-card:hover::before {
+	opacity: 1;
 }
 
 .statistics-card .card-body {
-	padding: 1rem;
+	padding: 1.2rem;
 	position: relative;
-	z-index: 1;
+	z-index: 2;
 	text-align: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+}
+
+/* Enhanced Icon Wrapper */
+.card-icon-wrapper {
+	position: relative;
+	margin-bottom: 0.4rem;
+	display: inline-block;
+}
+
+.icon-glow {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 100%;
+	height: 100%;
+	background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+	transform: translate(-50%, -50%);
+	opacity: 0;
+	transition: opacity 0.3s ease;
+	border-radius: 50%;
+	z-index: -1;
+}
+
+.card-icon-wrapper.updating .icon-glow {
+	opacity: 1;
+	animation: iconGlow 0.8s ease-out;
+}
+
+@keyframes iconGlow {
+	0% {
+		opacity: 0;
+		transform: translate(-50%, -50%) scale(0.8);
+	}
+	50% {
+		opacity: 1;
+		transform: translate(-50%, -50%) scale(1.1);
+	}
+	100% {
+		opacity: 0;
+		transform: translate(-50%, -50%) scale(1.3);
+	}
 }
 
 .statistics-card .card-title {
-	font-size: 0.8rem;
+	font-size: 0.85rem;
 	font-weight: 600;
 	margin-bottom: 0.5rem;
-	opacity: 0.95;
+	opacity: 0.9;
 	letter-spacing: 0.2px;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+	line-height: 1.3;
+	color: rgba(255, 255, 255, 0.95);
+}
+
+/* Card Subtitle */
+.card-subtitle {
+	font-size: 0.7rem;
+	opacity: 0.75;
+	margin-bottom: 0.3rem;
+	font-weight: 400;
+	letter-spacing: 0.1px;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+	color: rgba(255, 255, 255, 0.85);
 }
 
 .statistics-card .card-text {
-	font-size: 1.6rem;
+	font-size: 1.8rem;
 	font-weight: 700;
 	margin: 0 0 0.3rem 0;
 	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 	transition: all 0.3s ease;
-	line-height: 1;
+	line-height: 1.1;
+	color: #ffffff;
+	letter-spacing: -0.5px;
 }
 
 .statistics-card .card-icon {
-	font-size: 2rem;
-	opacity: 0.95;
+	font-size: 2.2rem;
+	opacity: 0.9;
 	transition: all 0.3s ease;
 	position: relative;
 	margin-bottom: 0.3rem;
+	filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
 }
 
 .statistics-card:hover .card-icon {
-	transform: scale(1.08);
+	transform: scale(1.05);
 	opacity: 1;
+	filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.2));
 }
 
-/* Live indicator - single red dot with wave animation */
+/* Card Decorations */
+.card-decoration {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+	z-index: 1;
+}
+
+.decoration-circle {
+	position: absolute;
+	width: 40px;
+	height: 40px;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 50%;
+	top: 12px;
+	right: 12px;
+	animation: decorationFloat 8s ease-in-out infinite;
+}
+
+.decoration-line {
+	position: absolute;
+	width: 25px;
+	height: 1px;
+	background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+	bottom: 15px;
+	left: 12px;
+	animation: decorationFloat 6s ease-in-out infinite reverse;
+}
+
+@keyframes decorationFloat {
+	0%, 100% {
+		transform: translateY(0px) rotate(0deg);
+		opacity: 0.2;
+	}
+	50% {
+		transform: translateY(-6px) rotate(3deg);
+		opacity: 0.4;
+	}
+}
+
+/* Enhanced Live Indicator */
 .live-indicator {
 	position: absolute;
 	top: 8px;
 	right: 8px;
-	width: 10px;
-	height: 10px;
-	background: #ef4444;
+	width: 8px;
+	height: 8px;
+	background: #10b981;
 	border-radius: 50%;
-	animation: liveWave 2s ease-in-out infinite;
+	animation: liveWave 3s ease-in-out infinite;
+	box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+}
+
+.live-indicator::before,
+.live-indicator::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+	background: rgba(16, 185, 129, 0.2);
+	transform: translate(-50%, -50%);
+	animation: liveWave 3s ease-in-out infinite;
+}
+
+.live-indicator::before {
+	animation-delay: 0.5s;
+}
+
+.live-indicator::after {
+	animation-delay: 1s;
 }
 
 @keyframes liveWave {
 	0%, 100% {
-		transform: scale(1);
+		transform: translate(-50%, -50%) scale(1);
 		opacity: 1;
-		box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8);
 	}
 	50% {
-		transform: scale(1.5);
-		opacity: 0.7;
-		box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+		transform: translate(-50%, -50%) scale(1.8);
+		opacity: 0;
 	}
 }
 
-/* More attractive and vibrant colors */
+/* Simplified Modern Color Schemes */
 .statistics-card.profit-card {
-	--card-gradient-start: #6366f1;
-	--card-gradient-end: #4f46e5;
+	background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.statistics-card.profit-card::after {
+	content: '';
+	position: absolute;
+	top: -50%;
+	right: -50%;
+	width: 200%;
+	height: 200%;
+	background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+
+.statistics-card.profit-card:hover::after {
+	opacity: 1;
 }
 
 .statistics-card.sales-card {
-	--card-gradient-start: #10b981;
-	--card-gradient-end: #059669;
+	background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.statistics-card.sales-card::after {
+	content: '';
+	position: absolute;
+	bottom: -50%;
+	left: -50%;
+	width: 200%;
+	height: 200%;
+	background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+
+.statistics-card.sales-card:hover::after {
+	opacity: 1;
 }
 
 .statistics-card.products-card {
-	--card-gradient-start: #06b6d4;
-	--card-gradient-end: #0891b2;
+	background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
 }
 
-/* Text animation for value changes */
+.statistics-card.products-card::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 200%;
+	height: 200%;
+	background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+	opacity: 0;
+	transition: opacity 0.3s ease;
+	transform: translate(-50%, -50%);
+}
+
+.statistics-card.products-card:hover::after {
+	opacity: 1;
+}
+
+/* Enhanced Text Animation for Value Changes */
 .counter-animation {
-	animation: textPulse 0.5s ease-out;
+	animation: textPulse 0.5s ease;
 }
 
 @keyframes textPulse {
 	0% {
 		transform: scale(1);
+		filter: brightness(1);
+	}
+	25% {
+		transform: scale(1.05);
+		filter: brightness(1.1);
 	}
 	50% {
-		transform: scale(1.05);
-		color: #fff;
-		text-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
+		transform: scale(1.03);
+		filter: brightness(1.05);
+		text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+	}
+	75% {
+		transform: scale(1.01);
+		filter: brightness(1.02);
 	}
 	100% {
 		transform: scale(1);
+		filter: brightness(1);
 	}
 }
 
-/* Trend indicator */
+/* Enhanced Trend Indicator */
 .statistics-card .trend-indicator {
 	position: absolute;
 	bottom: 6px;
 	right: 6px;
-	font-size: 0.7rem;
+	font-size: 0.65rem;
 	opacity: 0.9;
 	animation: fadeInUp 0.4s ease;
+	background: rgba(255, 255, 255, 0.15);
+	padding: 2px 5px;
+	border-radius: 8px;
+	backdrop-filter: blur(8px);
+	border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 @keyframes fadeInUp {
 	from {
 		opacity: 0;
-		transform: translateY(6px);
+		transform: translateY(8px) scale(0.9);
 	}
 	to {
 		opacity: 0.9;
-		transform: translateY(0);
+		transform: translateY(0) scale(1);
 	}
 }
 
-/* Icon update animation */
+/* Enhanced Icon Update Animation */
 .card-icon.updating {
-	animation: iconUpdate 0.5s ease-out;
+	animation: iconUpdate 0.6s ease;
 }
 
 @keyframes iconUpdate {
 	0% {
 		transform: scale(1) rotate(0deg);
+		filter: brightness(1);
 	}
 	25% {
-		transform: scale(1.12) rotate(-2deg);
+		transform: scale(1.1) rotate(-2deg);
+		filter: brightness(1.2);
 	}
 	50% {
-		transform: scale(1.08) rotate(2deg);
+		transform: scale(1.05) rotate(2deg);
+		filter: brightness(1.1);
 	}
 	75% {
-		transform: scale(1.1) rotate(-1deg);
+		transform: scale(1.08) rotate(-1deg);
+		filter: brightness(1.15);
 	}
 	100% {
 		transform: scale(1) rotate(0deg);
+		filter: brightness(1);
 	}
 }
 
-/* Data flow animation */
+/* Enhanced Data Flow Animation */
 @keyframes dataFlow {
 	0% {
-		transform: translateX(-12px) scale(0.8);
+		transform: translateX(-15px) scale(0.5);
 		opacity: 0;
 	}
-	50% {
+	30% {
 		opacity: 1;
+		transform: translateX(-8px) scale(0.7);
+	}
+	70% {
+		opacity: 1;
+		transform: translateX(8px) scale(0.9);
 	}
 	100% {
-		transform: translateX(12px) scale(1.1);
+		transform: translateX(15px) scale(1);
 		opacity: 0;
+	}
+}
+
+/* Card Pulse Effect */
+.statistics-card.pulse-effect {
+	animation: cardPulse 0.5s ease;
+}
+
+@keyframes cardPulse {
+	0% {
+		transform: scale(1);
+		box-shadow: 
+			0 4px 20px rgba(0, 0, 0, 0.08),
+			0 2px 8px rgba(0, 0, 0, 0.04);
+	}
+	50% {
+		transform: scale(1.01);
+		box-shadow: 
+			0 6px 25px rgba(0, 0, 0, 0.12),
+			0 3px 12px rgba(0, 0, 0, 0.06);
+	}
+	100% {
+		transform: scale(1);
+		box-shadow: 
+			0 4px 20px rgba(0, 0, 0, 0.08),
+			0 2px 8px rgba(0, 0, 0, 0.04);
+	}
+}
+
+/* Floating Particles Effect */
+.statistics-card::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-image: 
+		radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+		radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 50%);
+	opacity: 0;
+	transition: opacity 0.3s ease;
+	pointer-events: none;
+}
+
+.statistics-card:hover::after {
+	opacity: 1;
+}
+
+/* Responsive Design Enhancements */
+@media (max-width: 768px) {
+	.statistics-card {
+		min-height: 120px;
+		border-radius: 14px;
+		margin-bottom: 0.8rem;
+	}
+	
+	.statistics-card .card-body {
+		padding: 1rem;
+	}
+	
+	.statistics-card .card-title {
+		font-size: 0.8rem;
+		margin-bottom: 0.4rem;
+	}
+	
+	.statistics-card .card-text {
+		font-size: 1.5rem;
+	}
+	
+	.statistics-card .card-icon {
+		font-size: 1.9rem;
+	}
+	
+	.card-subtitle {
+		font-size: 0.65rem;
+	}
+	
+	.live-indicator {
+		top: 6px;
+		right: 6px;
+		width: 6px;
+		height: 6px;
+	}
+	
+	.statistics-card .trend-indicator {
+		bottom: 5px;
+		right: 5px;
+		font-size: 0.6rem;
+		padding: 2px 4px;
+	}
+	
+	.decoration-circle {
+		width: 30px;
+		height: 30px;
+		top: 10px;
+		right: 10px;
+	}
+	
+	.decoration-line {
+		width: 20px;
+		bottom: 12px;
+		left: 10px;
+	}
+}
+
+@media (max-width: 576px) {
+	.statistics-card {
+		min-height: 110px;
+		border-radius: 12px;
+	}
+	
+	.statistics-card .card-body {
+		padding: 0.8rem;
+	}
+	
+	.statistics-card .card-title {
+		font-size: 0.75rem;
+	}
+	
+	.statistics-card .card-text {
+		font-size: 1.3rem;
+	}
+	
+	.statistics-card .card-icon {
+		font-size: 1.7rem;
+	}
+	
+	.card-subtitle {
+		font-size: 0.6rem;
+	}
+	
+	.decoration-circle {
+		width: 25px;
+		height: 25px;
+		top: 8px;
+		right: 8px;
+	}
+	
+	.decoration-line {
+		width: 18px;
+		bottom: 10px;
+		left: 8px;
+	}
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+	.statistics-card {
+		box-shadow: 
+			0 4px 20px rgba(0, 0, 0, 0.2),
+			0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+	
+	.statistics-card:hover {
+		box-shadow: 
+			0 8px 25px rgba(0, 0, 0, 0.25),
+			0 4px 12px rgba(0, 0, 0, 0.15);
+	}
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+	.statistics-card,
+	.statistics-card .card-icon,
+	.statistics-card .trend-indicator,
+	.live-indicator,
+	.live-indicator::before,
+	.live-indicator::after,
+	.decoration-circle,
+	.decoration-line {
+		animation: none;
+		transition: none;
+	}
+	
+	.statistics-card:hover {
+		transform: none;
+	}
+	
+	.statistics-card:hover .card-icon {
+		transform: none;
 	}
 } 

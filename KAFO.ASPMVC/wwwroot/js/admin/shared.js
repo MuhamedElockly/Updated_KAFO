@@ -83,6 +83,13 @@ function loadAdminContent(action, pageNumber) {
                     initializeDailyInventory();
                 }
             }
+            
+            // Add smooth scroll to top for mobile
+            if ($(window).width() <= 768) {
+                $('html, body').animate({
+                    scrollTop: 0
+                }, 300);
+            }
 
             // Add smooth scroll to top for mobile
             if ($(window).width() <= 768) {
