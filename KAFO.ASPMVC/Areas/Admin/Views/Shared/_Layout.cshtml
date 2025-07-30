@@ -11,11 +11,110 @@
 	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/Kafo.ASPMVC.styles.css" asp-append-version="true" />
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+	<link rel="stylesheet" href="~/CCDN/font-awesome-5.15.4.min.css" />
 	<link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
-	<link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet" />
-	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+	<link href="~/CCDN/toastr.min.css" rel="stylesheet" />
+	<link href="~/CCDN/Poppins.css" rel="stylesheet">
+	<style>
+		body {
+			display: flex;
+			min-height: 100vh;
+			background-color: #f4f7f6;
+		}
+
+		#sidebar {
+			width: 250px;
+			min-width: 250px;
+			background: #2a2e43; /* Dark blue from the image */
+			color: #fff;
+			transition: all 0.3s;
+			display: flex;
+			flex-direction: column;
+			padding-top: 20px;
+			box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+		}
+
+			#sidebar .sidebar-header {
+				padding: 20px;
+				text-align: center;
+				border-bottom: 1px solid rgba(255,255,255,0.1);
+				margin-bottom: 20px;
+			}
+
+				#sidebar .sidebar-header h3 {
+					color: #fff;
+					margin-bottom: 5px;
+					font-size: 20px;
+				}
+
+				#sidebar .sidebar-header span {
+					font-size: 14px;
+					color: #ccc;
+				}
+
+			#sidebar ul.components {
+				padding: 20px 0;
+				list-style: none;
+				flex-grow: 1;
+			}
+
+				#sidebar ul.components li a {
+					padding: 10px 20px;
+					font-size: 1.1em;
+					display: block;
+					color: #fff;
+					text-decoration: none;
+					transition: all 0.3s;
+					display: flex;
+					align-items: center;
+				}
+
+					#sidebar ul.components li a i {
+						margin-left: 10px; /* For RTL */
+					}
+
+					#sidebar ul.components li a:hover {
+						color: #f8f9fa;
+						background: #4a4f66;
+						border-radius: 5px;
+						margin: 0 10px;
+					}
+
+				#sidebar ul.components li.active > a, a[aria-expanded="true"] {
+					color: #fff;
+					background: #e91e63; /* Pink for active/logout from image */
+					border-radius: 5px;
+					margin: 0 10px;
+				}
+
+		#content {
+			flex-grow: 1;
+			padding: 20px;
+			transition: all 0.3s;
+		}
+
+		.navbar {
+			display: none; /* Hide default navbar */
+		}
+
+		.footer {
+			margin-top: auto; /* Push footer to the bottom */
+			background: #2a2e43;
+			color: #fff;
+			padding: 15px 0;
+			text-align: center;
+			width: 100%;
+		}
+
+			.footer a {
+				color: #fff;
+				text-decoration: none;
+			}
+
+				.footer a:hover {
+					text-decoration: underline;
+				}
+	</style>
 </head>
 <body>
 	<!-- Mobile Sidebar Toggle Button -->
@@ -82,7 +181,7 @@
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
 	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="~/lib/signalr.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+	<script src="~/CCDN/toastr.min.js"></script>
 	@* <script>
 		window.onload = function() {
 			toastr.options = {
@@ -98,9 +197,9 @@
 	<script src="~/js/admin/shared.js" asp-append-version="true"></script>
 	<script src="~/js/admin/category.js" asp-append-version="true"></script>
 	<script src="~/js/admin/invoices.js" asp-append-version="true"></script>
-	<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+	<link href="~/CCDN/sweetalert2.min.css" rel="stylesheet">
+	<script src="~/CCDN/sweetalert2.all.min.js"></script>
+	<script src="~/CCDN/html2pdf.bundle.min.js"></script>
 	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
