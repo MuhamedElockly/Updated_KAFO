@@ -19,7 +19,7 @@
     <Area_SelectedScaffolderCategoryPath>root/Common</Area_SelectedScaffolderCategoryPath>
     <ActiveDebugProfile>IIS Express</ActiveDebugProfile>
     <WebStackScaffolding_DbContextDialogWidth>650.4</WebStackScaffolding_DbContextDialogWidth>
-    <NameOfLastUsedPublishProfile>site32241-WebDeploy1</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>C:\Users\steve\Desktop\KAFO\Updated_KAFO\KAFO.ASPMVC\Properties\PublishProfiles\site32241-WebDeploy.pubxml</NameOfLastUsedPublishProfile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>

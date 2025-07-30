@@ -30,6 +30,8 @@
 
   <ItemGroup>
     <Folder Include="Areas\Admin\Controllers\" />
+    <Folder Include="wwwroot\images\Upload\invoices\" />
+    <Folder Include="wwwroot\images\Upload\products\" />
   </ItemGroup>
 
   <ItemGroup>
