@@ -151,7 +151,7 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
 
                 // Fetch invoices for this customer
                 var invoices = _invoiceManager.GetInvoicesByCustomer(customer.Id)
-                    .OrderByDescending(i => i.CreatedAt)
+                    .OrderBy(i => i.CreatedAt)
                     .Select(invoice => new InvoiceVM
                     {
                         Id = invoice.Id,
