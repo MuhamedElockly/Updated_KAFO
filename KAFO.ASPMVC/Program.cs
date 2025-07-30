@@ -22,7 +22,7 @@ namespace KAFO.ASPMVC
             builder.Services.AddDbContext<AppDBContext>(options =>
             {
                 options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("RemoteConnection"),
+                    builder.Configuration.GetConnectionString("DefaultConnection"),
                     sqlServerOptionsAction: sqlOptions =>
                     {
                         sqlOptions.EnableRetryOnFailure(
