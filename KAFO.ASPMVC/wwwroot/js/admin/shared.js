@@ -681,41 +681,47 @@ function showDeleteConfirmation(options) {
         confirmButtonText: settings.confirmButtonText,
         cancelButtonText: settings.cancelButtonText,
         background: 'white',
-        backdrop: `
-            rgba(220,53,69,0.1)
-            url("/images/trash-icon.gif")
-            center top
-            no-repeat
-        `,
-        showClass: {
-            popup: 'animate__animated animate__fadeInDown'
-        },
-        hideClass: {
-            popup: 'animate__animated animate__fadeOutUp'
-        },
+        // Removed problematic backdrop with GIF
+        backdrop: true,
+        // Removed problematic animation classes
         customClass: {
-            confirmButton: 'btn btn-danger shadow-sm px-4 py-2 me-2', // Added me-2 for margin
-            cancelButton: 'btn btn-secondary shadow-sm px-4 py-2 ms-2', // Added ms-2 for margin
+            confirmButton: 'btn btn-danger shadow-sm px-4 py-2 me-2',
+            cancelButton: 'btn btn-secondary shadow-sm px-4 py-2 ms-2',
             actions: 'swal2-actions-custom'
         },
-        buttonsStyling: false
+        buttonsStyling: false,
+        allowOutsideClick: true,
+        allowEscapeKey: true,
+        focusConfirm: false,
+        reverseButtons: false
     }).then((result) => {
+        // Check if user confirmed (not dismissed/canceled)
         if (result.isConfirmed) {
-            // Show processing dialog
-            Swal.fire({
+            // Validate required settings before proceeding
+            if (!settings.actionUrl) {
+                Swal.fire({
+                    title: 'خطأ!',
+                    text: 'رابط العملية غير محدد',
+                    icon: 'error',
+                    confirmButtonText: 'موافق'
+                });
+                return;
+            }
+
+            // Show processing dialog with proper timeout handling
+            const processingDialog = Swal.fire({
                 title: settings.processingText,
                 html: settings.waitingText,
                 timerProgressBar: true,
+                timer: 30000, // 30 second timeout
                 didOpen: () => {
-                    Swal.showLoading()
+                    Swal.showLoading();
                 },
                 background: 'white',
-                backdrop: `
-                    rgba(0,0,0,0.5)
-                    center
-                    no-repeat
-                `,
-                allowOutsideClick: false
+                backdrop: true, // Simplified backdrop
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false
             });
 
             // Prepare AJAX data
@@ -725,14 +731,17 @@ function showDeleteConfirmation(options) {
                 ...settings.ajaxData
             };
 
-            // Execute AJAX request
-            $.ajax({
+            // Store the AJAX request so we can abort it if needed
+            const ajaxRequest = $.ajax({
                 url: settings.actionUrl,
                 type: 'POST',
                 data: requestData,
+                timeout: 25000, // 25 second timeout (less than Swal timer)
                 success: function (response) {
+                    // Close processing dialog
                     Swal.close();
-                    if (response.success) {
+
+                    if (response && response.success) {
                         Swal.fire({
                             title: 'تم!',
                             confirmButtonText: "موافق",
@@ -741,14 +750,13 @@ function showDeleteConfirmation(options) {
                             iconColor: '#28a745',
                             confirmButtonColor: '#28a745',
                             background: 'white',
-                            showClass: {
-                                popup: 'animate__animated animate__bounceIn'
-                            },
                             customClass: {
                                 confirmButton: 'btn btn-success shadow-sm px-4 py-2'
-                            }
+                            },
+                            allowOutsideClick: true,
+                            allowEscapeKey: true
                         }).then(() => {
-                            if (settings.callback) {
+                            if (settings.callback && typeof settings.callback === 'function') {
                                 settings.callback(response);
                             }
                         });
@@ -757,16 +765,75 @@ function showDeleteConfirmation(options) {
                             title: 'خطأ!',
                             text: response.message || 'حدث خطأ أثناء المعالجة',
                             icon: 'error',
-                            confirmButtonText: 'موافق'
+                            confirmButtonText: 'موافق',
+                            allowOutsideClick: true,
+                            allowEscapeKey: true
                         });
                     }
                 },
-                error: function (xhr) {
+                error: function (xhr, status, error) {
+                    // Close processing dialog
                     Swal.close();
-                    Swal.fire({ title: 'خطأ!', text: xhr.responseJSON?.message || settings.errorText, confirmButtonText: "موافق" });
+
+                    let errorMessage = settings.errorText;
+
+                    // Handle different error types
+                    if (status === 'timeout') {
+                        errorMessage = 'انتهت مهلة الاتصال. يرجى المحاولة مرة أخرى.';
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    } else if (xhr.responseText) {
+                        try {
+                            const errorObj = JSON.parse(xhr.responseText);
+                            errorMessage = errorObj.message || errorMessage;
+                        } catch (e) {
+                            // Keep default error message
+                        }
+                    }
+
+                    Swal.fire({
+                        title: 'خطأ!',
+                        text: errorMessage,
+                        icon: 'error',
+                        confirmButtonText: 'موافق',
+                        allowOutsideClick: true,
+                        allowEscapeKey: true
+                    });
+                },
+                complete: function () {
+                    // This runs regardless of success or error
+                    console.log('AJAX request completed');
+                }
+            });
+
+            // Handle processing dialog timeout
+            processingDialog.then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                    // Dialog timed out, abort AJAX request
+                    if (ajaxRequest && ajaxRequest.readyState !== 4) {
+                        ajaxRequest.abort();
+                    }
+
+                    Swal.fire({
+                        title: 'انتهت المهلة الزمنية!',
+                        text: 'العملية تستغرق وقتاً أطول من المتوقع',
+                        icon: 'warning',
+                        confirmButtonText: 'موافق'
+                    });
                 }
             });
         }
+        // If result.isDismissed or result.isDenied, do nothing (user canceled)
+        // This prevents any freezing issues
+    }).catch((error) => {
+        // Handle any unexpected errors in the Swal promise chain
+        console.error('Error in delete confirmation:', error);
+        Swal.fire({
+            title: 'خطأ!',
+            text: 'حدث خطأ غير متوقع',
+            icon: 'error',
+            confirmButtonText: 'موافق'
+        });
     });
 }
 
