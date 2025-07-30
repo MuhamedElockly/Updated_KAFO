@@ -166,8 +166,8 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
                         {
                             ProductName = item.Product?.Name ?? "غير محدد",
                             Quantity = item.Quantity,
-                            UnitPrice = item.UnitSellingPrice,
-                            TotalPrice = item.UnitSellingPrice * item.Quantity
+                            UnitPrice = GetUnitPriceForInvoiceType(invoice.Type, item),
+                            TotalPrice = GetUnitPriceForInvoiceType(invoice.Type, item) * item.Quantity
                         }).ToList() ?? new List<InvoiceItemVM>()
                     }).ToList();
 
@@ -328,6 +328,16 @@ namespace Kafo.ASPMVC.Areas.Admin.Controllers
                 InvoiceType.CreditReturn => "مرتجع آجل",
                 InvoiceType.PurchasingReturn => "مرتجع شراء",
                 _ => invoiceType.ToString()
+            };
+        }
+
+        private decimal GetUnitPriceForInvoiceType(InvoiceType invoiceType, InvoiceItem item)
+        {
+            return invoiceType switch
+            {
+                InvoiceType.Purchasing => item.UnitPurchasingPrice,
+                InvoiceType.PurchasingReturn => item.UnitPurchasingPrice,
+                _ => item.UnitSellingPrice
             };
         }
     }

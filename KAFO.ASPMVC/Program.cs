@@ -1,5 +1,6 @@
 using Kafo.DAL.Data;
 using Kafo.DAL.Repository;
+using KAFO.ASPMVC.Filters;
 using KAFO.ASPMVC.Hubs;
 using KAFO.ASPMVC.Middleware;
 using KAFO.ASPMVC.Services;
@@ -16,7 +17,10 @@ namespace KAFO.ASPMVC
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add<CustomExceptionFilter>();
+            });
             builder.Services.AddSignalR();
             // Configure DbContext with production-ready settings
             builder.Services.AddDbContext<AppDBContext>(options =>
@@ -91,10 +95,18 @@ namespace KAFO.ASPMVC
             // Configure the HTTP request pipeline
             if (!app.Environment.IsDevelopment())
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Error");
+                app.UseStatusCodePagesWithReExecute("/Error/{0}");
                 app.UseHsts();
                 app.UseHttpsRedirection();
             }
+            else
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            // Add global exception middleware
+            app.UseMiddleware<GlobalExceptionMiddleware>();
 
             app.UseStaticFiles();
             app.UseMiddleware<DefaultImageMiddleware>();

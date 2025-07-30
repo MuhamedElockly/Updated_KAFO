@@ -106,11 +106,11 @@
 				<!-- Action Buttons -->
 				<!-- Alternative Stacked Version -->
 				<div class="d-flex flex-column flex-sm-row justify-content-between mt-4 pt-3 border-top gap-2">
-					<a asp-controller="Admin" asp-action="Index" class="btn btn-outline-secondary action-btn order-1 order-sm-0" @* onclick="toggleSpinner(true, 'جاري العرض ....')" *@>
+					<a asp-controller="Admin" asp-action="Index" class="btn btn-outline-secondary action-btn order-1 order-sm-0" >
 						<i class="fas fa-arrow-right me-1"></i> رجوع للقائمة
 					</a>
 					<div class="d-flex flex-column flex-sm-row gap-2 order-0 order-sm-1">
-						<a asp-controller="ProductManagement" asp-action="Edit" asp-route-Id="@Model.Id" class="btn btn-warning action-btn" @* onclick="toggleSpinner(true, 'جاري العرض ....')" *@>
+						<a asp-controller="ProductManagement" asp-action="Edit" asp-route-Id="@Model.Id" class="btn btn-warning action-btn" >
 							<i class="fas fa-edit me-1"></i> تعديل
 						</a>
 						<button onclick="showDeleteConfirmation({

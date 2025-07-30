@@ -140,8 +140,8 @@ namespace KAFO.BLL.Managers
                             {
                                 productName = item.Product?.Name ?? "غير محدد",
                                 quantity = item.Quantity,
-                                unitPrice = item.UnitSellingPrice,
-                                totalPrice = item.UnitSellingPrice * item.Quantity
+                                unitPrice = item.UnitPurchasingPrice,
+                                totalPrice = item.UnitPurchasingPrice * item.Quantity
                             }).Cast<object>().ToList() ?? new List<object>()
                         });
                     }
@@ -213,8 +213,8 @@ namespace KAFO.BLL.Managers
                             {
                                 productName = item.Product?.Name ?? "غير محدد",
                                 quantity = item.Quantity,
-                                unitPrice = item.UnitSellingPrice,
-                                totalPrice = item.UnitSellingPrice * item.Quantity
+                                unitPrice = item.UnitPurchasingPrice,
+                                totalPrice = item.UnitPurchasingPrice * item.Quantity
                             }).Cast<object>().ToList() ?? new List<object>()
                         });
                     }
