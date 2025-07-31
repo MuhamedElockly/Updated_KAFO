@@ -475,7 +475,7 @@ function displayInvoiceModal(invoice) {
             <td>${item.name}</td>
             <td>${item.quantity}</td>
             <td>${formatCurrency(item.price)}</td>
-            <td>${formatCurrency(item.total)}</td>
+            <td>${formatCurrency(Math.round(item.total))}</td>
         </tr>
     `).join('');
 
