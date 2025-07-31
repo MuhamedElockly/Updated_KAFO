@@ -26,7 +26,7 @@ namespace KAFO.ASPMVC
             builder.Services.AddDbContext<AppDBContext>(options =>
             {
                 options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("DefaultConnection"),
+                    builder.Configuration.GetConnectionString("RemoteConnection"),
                     sqlServerOptionsAction: sqlOptions =>
                     {
                         sqlOptions.EnableRetryOnFailure(
